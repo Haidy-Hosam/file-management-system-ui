@@ -1,0 +1,22 @@
+.active {
+  color: blue;
+}
+:host {
+  display: block;
+  width: 250px;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  height: 100vh;
+}
+
+.top-menu{
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    padding: 20px;
+}
+/* == 
+app-sidebar{
+    width: 250px;
+} */

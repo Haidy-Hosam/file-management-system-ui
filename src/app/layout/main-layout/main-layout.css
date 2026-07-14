@@ -1,0 +1,8 @@
+.layout{
+    display: flex;
+    background-color: #576eff;
+}
+.page-content{
+    flex: 1;
+    background-color: #9da8f2;
+}
