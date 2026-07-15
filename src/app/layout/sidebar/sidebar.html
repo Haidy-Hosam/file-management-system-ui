@@ -12,12 +12,15 @@
   <nav class="nav nav-pills flex-column px-3 py-4 gap-2 flex-grow-1">
     <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
     <a class="nav-link" routerLink="/files" routerLinkActive="active">Files</a>
-    <a class="nav-link" routerLink="/departments" routerLinkActive="active">Departments</a>
-    <a class="nav-link" routerLink="/users" routerLinkActive="active">Users</a>
-    <a class="nav-link" routerLink="/roles" routerLinkActive="active">Roles</a>
+
+    <ng-container *ngIf="isAdmin">
+      <a class="nav-link" routerLink="/departments" routerLinkActive="active">Departments</a>
+      <a class="nav-link" routerLink="/users" routerLinkActive="active">Users</a>
+      <a class="nav-link" routerLink="/roles" routerLinkActive="active">Roles</a>
+    </ng-container>
   </nav>
 
   <div class="px-3 pb-4 pt-2 border-top border-secondary">
-    <button type="button" class="btn btn-outline-light w-100" routerLink="/login">Logout</button>
+    <button type="button" class="btn btn-outline-light w-100" (click)="logout()">Logout</button>
   </div>
 </aside>
