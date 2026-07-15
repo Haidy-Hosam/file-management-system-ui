@@ -1,0 +1,131 @@
+.login-page{
+
+    min-height:100vh;
+
+    display:flex;
+
+    flex-direction:column;
+
+    justify-content:center;
+
+    align-items:center;
+
+    background:#eef4ff;
+
+    background-image:
+        radial-gradient(circle at top left,#dbe8ff 0%,transparent 40%),
+        radial-gradient(circle at bottom right,#dbe8ff 0%,transparent 40%);
+}
+
+.login-card{
+
+    width:460px;
+
+    background:white;
+
+    border-radius:20px;
+
+    padding:45px;
+
+    border:none;
+}
+
+.logo{
+
+    width:64px;
+
+    height:64px;
+
+    margin:auto;
+
+    border-radius:18px;
+
+    background:linear-gradient(135deg,#2456ff,#5d2eff);
+
+    color:white;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    font-size:30px;
+
+    font-weight:bold;
+}
+
+.form-control{
+
+    height:52px;
+
+    border-radius:12px;
+}
+
+.login-btn{
+
+    height:52px;
+
+    border-radius:12px;
+
+    font-size:18px;
+
+    font-weight:600;
+}
+
+.google-btn{
+
+    height:52px;
+
+    border-radius:12px;
+
+    display:flex;
+
+    justify-content:center;
+
+    align-items:center;
+
+    gap:12px;
+}
+
+.divider{
+
+    display:flex;
+
+    align-items:center;
+
+    text-align:center;
+}
+
+.divider::before,
+.divider::after{
+
+    content:"";
+
+    flex:1;
+
+    height:1px;
+
+    background:#ddd;
+}
+
+.divider span{
+
+    padding:0 16px;
+
+    color:#777;
+}
+
+a{
+
+    text-decoration:none;
+}
+
+.copyright{
+
+    margin-top:30px;
+
+    color:#777;
+
+    font-size:14px;
+}

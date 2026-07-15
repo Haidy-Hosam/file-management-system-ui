@@ -1,18 +1,23 @@
-<div class="top-menu">
-<h2>ADIB</h2>
+<aside class="sidebar bg-dark text-white d-flex flex-column">
+  <div class="sidebar-header border-bottom border-secondary px-4 py-4">
+    <div class="d-flex align-items-center gap-3">
+      <div class="sidebar-brand-mark">A</div>
+      <div>
+        <div class="text-uppercase text-secondary small">ADIB</div>
+        <div class="fw-semibold">File Management</div>
+      </div>
+    </div>
+  </div>
 
-<a routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+  <nav class="nav nav-pills flex-column px-3 py-4 gap-2 flex-grow-1">
+    <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
+    <a class="nav-link" routerLink="/files" routerLinkActive="active">Files</a>
+    <a class="nav-link" routerLink="/departments" routerLinkActive="active">Departments</a>
+    <a class="nav-link" routerLink="/users" routerLinkActive="active">Users</a>
+    <a class="nav-link" routerLink="/roles" routerLinkActive="active">Roles</a>
+  </nav>
 
-<a routerLink="/files" routerLinkActive="active"> Files </a>
-
-<a routerLink="/departments" routerLinkActive="active"> Departments </a>
-
-<a routerLink="/users" routerLinkActive="active"> Users </a>
-
-<a routerLink="/roles" routerLinkActive="active"> Roles </a>
-</div>
-<div class="bottom-menu">
-
-    Logout
-
-</div>
+  <div class="px-3 pb-4 pt-2 border-top border-secondary">
+    <button type="button" class="btn btn-outline-light w-100" routerLink="/login">Logout</button>
+  </div>
+</aside>
