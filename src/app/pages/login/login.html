@@ -1,45 +1,35 @@
-<div class="login-page">
-  <div class="login-card shadow-lg">
-    <div class="text-center mb-4">
-      <div class="logo">A</div>
+<div class="login-container">
+  <form class="login-form" (ngSubmit)="onSubmit()">
+    <h2>Sign In</h2>
 
-      <h2 class="mt-4 fw-bold">Welcome back</h2>
-
-      <p class="text-muted">Sign in to continue to ADIB File Management</p>
+    <div class="form-group">
+      <label for="email">Email</label>
+      <input
+        id="email"
+        type="email"
+        name="email"
+        [(ngModel)]="email"
+        required
+        autocomplete="email"
+      />
     </div>
 
-    <form>
-      <div class="mb-3">
-        <label class="form-label fw-semibold"> Email or Username </label>
+    <div class="form-group">
+      <label for="password">Password</label>
+      <input
+        id="password"
+        type="password"
+        name="password"
+        [(ngModel)]="password"
+        required
+        autocomplete="current-password"
+      />
+    </div>
 
-        <input type="text" class="form-control" placeholder="Enter your email or username" />
-      </div>
+    <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
 
-      <div class="mb-3">
-        <label class="form-label fw-semibold"> Password </label>
-
-        <input type="password" class="form-control" placeholder="Enter your password" />
-      </div>
-
-      <div class="d-flex justify-content-between align-items-center mb-4">
-        <div class="form-check">
-          <input class="form-check-input" type="checkbox" />
-
-          <label class="form-check-label"> Remember me </label>
-        </div>
-
-        <a href="#"> Forgot password? </a>
-      </div>
-
-      <button type="button" class="btn btn-primary w-100 login-btn" routerLink="/dashboard">Login</button>
-    </form>
-
-    <p class="text-center mt-4 mb-0">
-      Don't have an account?
-
-      <a href="#"> Contact your administrator. </a>
-    </p>
-  </div>
-
-  <div class="copyright">© 2025 ADIB File Management. All rights reserved.</div>
+    <button type="submit" [disabled]="isLoading">
+      {{ isLoading ? 'Signing in...' : 'Sign In' }}
+    </button>
+  </form>
 </div>

@@ -7,7 +7,7 @@ import { Departments } from './pages/departments/departments';
 import { Users } from './pages/users/users';
 import { Roles } from './pages/roles/roles';
 import { MainLayout } from './layout/main-layout/main-layout';
-
+import { authGuard, roleGuard } from './core/auth/auth.guard';
 export const routes: Routes = [
   {
     path: 'login',
@@ -16,6 +16,7 @@ export const routes: Routes = [
   {
     path: '',
     component: MainLayout,
+    canActivate: [authGuard],
     children: [
       {
         path: 'dashboard',
@@ -32,15 +33,19 @@ export const routes: Routes = [
       {
         path: 'departments',
         component: Departments,
+        canActivate: [roleGuard(['ADMIN'])],
       },
       {
         path: 'users',
         component: Users,
+        canActivate: [roleGuard(['ADMIN'])],
       },
       {
         path: 'roles',
         component: Roles,
+        canActivate: [roleGuard(['ADMIN'])],
       },
+      
     ],
   },
 ];

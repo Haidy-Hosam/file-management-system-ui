@@ -37,7 +37,7 @@
 				<li class="nav-item">
 					<a class="nav-link px-3" routerLink="/files" routerLinkActive="active">Files</a>
 				</li>
-				<li class="nav-item dropdown">
+				<li class="nav-item dropdown" *ngIf="isAdmin">
 					<button
 						class="btn btn-outline-primary btn-sm dropdown-toggle"
 						type="button"
