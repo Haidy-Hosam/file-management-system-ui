@@ -1,8 +1,8 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { PageService } from '../../core/Services/page.service';
-import { AuthService } from '../../core/Services/auth.service';
+import { AuthService } from '../../core/services/auth.service';
+import { PageService } from '../../core/services/page.service';
 import {Page} from '../../core/models/page.model'
 
 @Component({

@@ -71,3 +71,31 @@ button:disabled {
   background-color: #a0c4e8;
   cursor: not-allowed;
 }
+
+.login-container {
+  position: relative;
+}
+
+.language-switcher {
+  position: absolute;
+  top: 20px;
+  right: 20px;
+
+  display: flex;
+  gap: 8px;
+}
+
+.language-switcher button {
+  padding: 6px 14px;
+  border: 1px solid #4f8fe8;
+  border-radius: 20px;
+  background: white;
+  color: #4f8fe8;
+  cursor: pointer;
+  transition: .2s;
+}
+
+.language-switcher button:hover {
+  background: #4f8fe8;
+  color: white;
+}
