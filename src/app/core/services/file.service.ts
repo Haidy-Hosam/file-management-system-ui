@@ -5,15 +5,20 @@ import { Observable } from 'rxjs';
 export interface FileResponse {
   id: number;
   name: string;
-  ownerName: string;
+  extension: string;
   departmentName: string;
   departmentId: number;
-  sizeLabel: string;
+  size: string;
   modifiedDate: string;
-  status: string; // e.g. 'ACTIVE' | 'ARCHIVED' | 'PENDING' | 'APPROVED' | 'REJECTED'
-  tags: string[];
-  fileType: string; // e.g. 'pdf', 'docx', 'xlsx', 'zip', 'png'
+  status: string; 
+  fileType: string; 
 }
+export interface FileRequest {
+  file:File;
+  department_id:number;
+  fileType_id:number;
+}
+
 
 export interface FileForwardRequest {
   fileId: number;
@@ -28,7 +33,12 @@ export class FileService {
   constructor(private http: HttpClient) {}
 
   uploadFile(formData: FormData): Observable<FileResponse> {
+    const formData = new FormData();
+    formData.append('file', request.file);
+    formData.append('department_id', request.department_id.toString());
+    formData.append('fileType_id', request.fileType_id.toString());
     return this.http.post<FileResponse>(this.baseUrl, formData);
+
   }
 
   deleteFile(fileId: number): Observable<void> {

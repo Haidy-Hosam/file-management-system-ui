@@ -3,8 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
-import { FileService, FileResponse } from '../../core/services/file.service';
+import { FileService, FileResponse, FileRequest } from '../../core/services/file.service';
 import { AuthService } from '../../core/services/auth.service';
+import { DepartmentService, Department } from '../../core/services/department.service';
+import { FileTypeService, FileType } from '../../core/services/file-type.service';
 
 @Component({
   selector: 'app-files',
@@ -32,24 +34,51 @@ export class Files implements OnInit {
   constructor(
     private fileService: FileService,
     private authService: AuthService,
+    private departmentService: DepartmentService,
+    private fileTypeService: FileTypeService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
     this.loadFiles();
+    this.loadDepartments();
+    this.loadFileTypes();
+  }
+
+  departments: Department[] = [];
+  fileTypes: FileType[] = [];
+
+  loadDepartments(): void {
+    this.departmentService.getAllDepartments().subscribe({
+      next: (depts) => this.departments = depts,
+      error: () => this.errorMessage = 'Failed to load departments.'
+    });
+  }
+
+  loadFileTypes(): void {
+    this.fileTypeService.getAllFileTypes().subscribe({
+      next: (types) => this.fileTypes = types,
+      error: () => this.errorMessage = 'Failed to load file types.'
+    });
   }
 
   loadFiles(): void {
     this.isLoading = true;
     const role = this.authService.getRole();
 
+    // ADMIN sees everything; MANAGER/EMPLOYEE are restricted to their own
+    // department, per the controller's @PreAuthorize check on /dept/{deptId}.
     let request$;
     if (role === 'ADMIN') {
       request$ = this.fileService.getAllFiles();
-    } else if (role === 'MANAGER') {
-      request$ = this.fileService.getMyDepartmentFiles();
     } else {
-      request$ = this.fileService.getMyFiles();
+      const deptId = this.authService.getDeptId();
+      if (deptId == null) {
+        this.errorMessage = 'No department found for current user.';
+        this.isLoading = false;
+        return;
+      }
+      request$ = this.fileService.getAllFilesByDepartment(deptId);
     }
 
     request$.subscribe({
@@ -76,7 +105,6 @@ export class Files implements OnInit {
       const term = this.searchTerm.toLowerCase();
       result = result.filter(f =>
         f.name.toLowerCase().includes(term) ||
-        f.ownerName.toLowerCase().includes(term) ||
         f.departmentName.toLowerCase().includes(term)
       );
     }
@@ -137,33 +165,94 @@ export class Files implements OnInit {
     this.openMenuFileId = null;
   }
 
-  // ---- File upload ----
+  // ---- File upload dialog ----
+  showUploadModal = false;
+  isDragging = false;
   selectedUploadFile: File | null = null;
+  selectedDepartmentId: number | null = null;
+  selectedFileTypeId: number | null = null;
+  isUploading = false;
+
+  get canSubmitUpload(): boolean {
+    return !!this.selectedUploadFile &&
+      this.selectedDepartmentId != null &&
+      this.selectedFileTypeId != null &&
+      !this.isUploading;
+  }
+
+  openUploadModal(): void {
+    this.showUploadModal = true;
+    this.selectedUploadFile = null;
+    this.selectedDepartmentId = null;
+    this.selectedFileTypeId = null;
+    this.isDragging = false;
+  }
+
+  closeUploadModal(): void {
+    if (this.isUploading) return;
+    this.showUploadModal = false;
+    this.selectedUploadFile = null;
+    this.selectedDepartmentId = null;
+    this.selectedFileTypeId = null;
+    this.isDragging = false;
+  }
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       this.selectedUploadFile = input.files[0];
-      this.uploadFile();
     }
   }
 
-  triggerUpload(fileInput: HTMLInputElement): void {
+  triggerBrowse(fileInput: HTMLInputElement): void {
     fileInput.click();
   }
 
-  uploadFile(): void {
-    if (!this.selectedUploadFile) return;
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = true;
+  }
 
-    const formData = new FormData();
-    formData.append('file', this.selectedUploadFile);
+  onDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = false;
+  }
 
-    this.fileService.uploadFile(formData).subscribe({
+  onDrop(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = false;
+
+    const files = event.dataTransfer?.files;
+    if (files && files.length > 0) {
+      this.selectedUploadFile = files[0];
+    }
+  }
+
+  clearSelectedFile(): void {
+    this.selectedUploadFile = null;
+  }
+
+  submitUpload(): void {
+    if (!this.canSubmitUpload) return;
+
+    const request: FileRequest = {
+      file: this.selectedUploadFile!,
+      department_id: this.selectedDepartmentId!,
+      fileType_id: this.selectedFileTypeId!
+    };
+
+    this.isUploading = true;
+    this.fileService.uploadFile(request).subscribe({
       next: (response: FileResponse) => {
-        this.selectedUploadFile = null;
+        this.isUploading = false;
+        this.closeUploadModal();
         this.loadFiles();
       },
       error: (err: HttpErrorResponse) => {
+        this.isUploading = false;
         this.errorMessage = 'Upload failed. Please try again.';
       }
     });
@@ -244,43 +333,6 @@ export class Files implements OnInit {
       }
     });
     this.closeMenu();
-  }
-
-  // ---- Forward modal ----
-  showForwardModal = false;
-  forwardFileTarget: FileResponse | null = null;
-  forwardDeptId: number | null = null;
-  forwardNote = '';
-
-  openForwardModal(file: FileResponse): void {
-    this.forwardFileTarget = file;
-    this.showForwardModal = true;
-    this.closeMenu();
-  }
-
-  closeForwardModal(): void {
-    this.showForwardModal = false;
-    this.forwardFileTarget = null;
-    this.forwardDeptId = null;
-    this.forwardNote = '';
-  }
-
-  submitForward(): void {
-    if (!this.forwardFileTarget || !this.forwardDeptId) return;
-
-    this.fileService.forwardFile({
-      fileId: this.forwardFileTarget.id,
-      toDepartmentId: this.forwardDeptId,
-      note: this.forwardNote
-    }).subscribe({
-      next: () => {
-        this.closeForwardModal();
-        this.loadFiles();
-      },
-      error: (err: HttpErrorResponse) => {
-        this.errorMessage = 'Forward failed.';
-      }
-    });
   }
 
   get role(): string | null {
