@@ -3,13 +3,15 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/auth/auth.service';
+import { UserService } from '../../core/Services/user.service';
+import { PermissionService } from '../../core/Services/permission.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [CommonModule, FormsModule],
   templateUrl: './login.html',
-  styleUrl: './login.css'
+  styleUrl: './login.css',
 })
 export class Login {
   email = '';
@@ -19,7 +21,9 @@ export class Login {
 
   constructor(
     private authService: AuthService,
-    private router: Router
+    private userService: UserService,
+    private permissionService: PermissionService,
+    private router: Router,
   ) {}
 
   onSubmit(): void {
@@ -33,17 +37,18 @@ export class Login {
 
     this.authService.login(this.email, this.password).subscribe({
       next: () => {
-        this.isLoading = false;
-        this.router.navigate(['/dashboard']);
+        this.userService.getpages().subscribe({
+          next: (pages) => {
+            this.permissionService.setpages(pages);
+            this.isLoading = false;
+            this.router.navigate(['/dashboard']);
+          },
+        });
       },
       error: (err) => {
         this.isLoading = false;
-        if (err.status === 401 || err.status === 400) {
-          this.errorMessage = 'Invalid email or password.';
-        } else {
-          this.errorMessage = 'Something went wrong. Please try again.';
-        }
-      }
+        this.errorMessage = "Couldn't load user permissions .";
+      },
     });
   }
 }
