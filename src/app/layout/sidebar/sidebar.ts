@@ -1,8 +1,9 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../../core/auth/auth.service';
-import { PageService, PageResponse } from '../../core/pages/page.service';
+import { AuthService } from '../../core/services/auth.service';
+import { PageService } from '../../core/services/page.service';
+import {Page} from '../../core/models/page.model'
 
 @Component({
   selector: 'app-sidebar',
@@ -11,8 +12,8 @@ import { PageService, PageResponse } from '../../core/pages/page.service';
   styleUrl: './sidebar.css',
 })
 export class Sidebar implements OnInit {
-  pages: PageResponse[] = [];
-  isLoading = true;
+  pages= signal<Page[]>([]);
+  isLoading = signal(true);
 
   constructor(
     private authService: AuthService,
@@ -23,12 +24,12 @@ export class Sidebar implements OnInit {
   ngOnInit(): void {
     this.pageService.getMyPages().subscribe({
       next: (pages) => {
-        this.pages = pages;
-        this.isLoading = false;
+        this.pages.set(pages);
+        this.isLoading.set(false);
       },
       error: (err) => {
         console.error('Failed to load pages', err);
-        this.isLoading = false;
+        this.isLoading.set(false);
       }
     });
   }

@@ -1,11 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import {Page} from '../models/page.model'
 
-export interface PageResponse {
-  name: string;
-  route: string;
-}
 
 @Injectable({ providedIn: 'root' })
 export class PageService {
@@ -13,7 +10,7 @@ export class PageService {
 
   constructor(private http: HttpClient) {}
 
-  getMyPages(): Observable<PageResponse[]> {
-    return this.http.get<PageResponse[]>(this.baseUrl);
+  getMyPages(): Observable<Page[]> {
+    return this.http.get<Page[]>(this.baseUrl);
   }
 }
