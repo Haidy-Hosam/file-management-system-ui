@@ -10,14 +10,20 @@
   </div>
 
   <nav class="nav nav-pills flex-column px-3 py-4 gap-2 flex-grow-1">
-    <a class="nav-link" routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
-    <a class="nav-link" routerLink="/files" routerLinkActive="active">Files</a>
-
-    <ng-container *ngIf="isAdmin">
-      <a class="nav-link" routerLink="/departments" routerLinkActive="active">Departments</a>
-      <a class="nav-link" routerLink="/users" routerLinkActive="active">Users</a>
-      <a class="nav-link" routerLink="/roles" routerLinkActive="active">Roles</a>
+    <ng-container *ngIf="!isLoading; else loadingLinks">
+      
+        *ngFor="let page of pages"
+        class="nav-link"
+        [routerLink]="page.route"
+        routerLinkActive="active"
+      >
+        {{ page.name }}
+      </a>
     </ng-container>
+
+    <ng-template #loadingLinks>
+      <span class="text-secondary small px-2">Loading menu...</span>
+    </ng-template>
   </nav>
 
   <div class="px-3 pb-4 pt-2 border-top border-secondary">

@@ -7,7 +7,7 @@ import { Departments } from './pages/departments/departments';
 import { Users } from './pages/users/users';
 import { Roles } from './pages/roles/roles';
 import { MainLayout } from './layout/main-layout/main-layout';
-import { authGuard, roleGuard } from './core/auth/auth.guard';
+import { authGuard, roleGuard } from './core/guards/auth.guard';
 export const routes: Routes = [
   {
     path: 'login',
