@@ -2,24 +2,9 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
+import { authResponse, LoginRequest ,DecodedToken} from '../models/auth.model';
 
-interface LoginRequest {
-  email: string;
-  password: string;
-}
 
-interface LoginResponse {
-  accessToken: string;
-  refreshToken: string;
-}
-
-interface DecodedToken {
-  sub: string;      // email
-  userId: number;
-  role: string;
-  deptId: number;
-  exp: number;
-}
 
 @Injectable({ providedIn: 'root' })
 export class AuthService {
@@ -27,9 +12,9 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  login(email: string, password: string): Observable<LoginResponse> {
+  login(email: string, password: string): Observable<authResponse> {
     const body: LoginRequest = { email, password };
-    return this.http.post<LoginResponse>(`${this.baseUrl}/login`, body).pipe(
+    return this.http.post<authResponse>(`${this.baseUrl}/login`, body).pipe(
       tap(res => {
         localStorage.setItem('accessToken', res.accessToken);
         localStorage.setItem('refreshToken', res.refreshToken);

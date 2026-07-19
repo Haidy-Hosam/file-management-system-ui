@@ -2,9 +2,9 @@ import { Component } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
-import { AuthService } from '../../core/auth/auth.service';
 import { UserService } from '../../core/Services/user.service';
 import { PermissionService } from '../../core/Services/permission.service';
+import { AuthService } from '../../core/Services/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -39,7 +39,7 @@ export class Login {
       next: () => {
         this.userService.getpages().subscribe({
           next: (pages) => {
-            this.permissionService.setpages(pages);
+            this.permissionService.setPages(pages);
             this.isLoading = false;
             this.router.navigate(['/dashboard']);
           },
