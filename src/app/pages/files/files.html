@@ -38,7 +38,6 @@
             <input type="checkbox" (change)="toggleSelectAll($event)" />
           </th>
           <th>NAME</th>
-          <th>OWNER</th>
           <th>DEPARTMENT</th>
           <th>SIZE</th>
           <th>MODIFIED</th>
@@ -60,13 +59,11 @@
             <div>
               <div class="file-name">{{ file.name }}</div>
               <div class="tags">
-                <span class="tag" *ngFor="let tag of file.tags">{{ tag }}</span>
               </div>
             </div>
           </td>
-          <td>{{ file.ownerName }}</td>
           <td>{{ file.departmentName }}</td>
-          <td>{{ file.sizeLabel }}</td>
+          <td>{{ file.size }}</td>
           <td>{{ file.modifiedDate }}</td>
           <td>
             <span class="status-badge" [ngClass]="file.status.toLowerCase()">
@@ -82,7 +79,6 @@
               <button (click)="downloadFile(file)">Download</button>
 
               <ng-container *ngIf="role === 'ADMIN' || role === 'MANAGER'">
-                <button (click)="openForwardModal(file)">Forward</button>
                 <button (click)="approveFile(file)">Approve</button>
                 <button (click)="rejectFile(file)">Reject</button>
                 <button (click)="archiveFile(file)">Archive</button>
@@ -94,7 +90,7 @@
         </tr>
 
         <tr *ngIf="paginatedFiles.length === 0">
-          <td colspan="8" class="empty-state">No files found.</td>
+          <td colspan="7" class="empty-state">No files found.</td>
         </tr>
       </tbody>
     </table>
@@ -114,24 +110,6 @@
       >
         {{ i + 1 }}
       </button>
-    </div>
-  </div>
-</div>
-
-<!-- Forward Modal -->
-<div class="modal-overlay" *ngIf="showForwardModal" (click)="closeForwardModal()">
-  <div class="modal" (click)="$event.stopPropagation()">
-    <h3>Forward "{{ forwardFileTarget?.name }}"</h3>
-
-    <label>Target Department ID</label>
-    <input type="number" [(ngModel)]="forwardDeptId" placeholder="e.g. 3" />
-
-    <label>Note (optional)</label>
-    <textarea [(ngModel)]="forwardNote" rows="3" placeholder="Add a note..."></textarea>
-
-    <div class="modal-actions">
-      <button class="cancel-btn" (click)="closeForwardModal()">Cancel</button>
-      <button class="confirm-btn" (click)="submitForward()">Forward</button>
     </div>
   </div>
 </div>

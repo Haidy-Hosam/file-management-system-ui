@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
-import { FileService, FileResponse } from '../../core/services/file.service';
+import { FileService, FileResponse, FileRequest } from '../../core/services/file.service';
 import { AuthService } from '../../core/services/auth.service';
 
 @Component({
@@ -43,13 +43,19 @@ export class Files implements OnInit {
     this.isLoading = true;
     const role = this.authService.getRole();
 
+    // ADMIN sees everything; MANAGER/EMPLOYEE are restricted to their own
+    // department, per the controller's @PreAuthorize check on /dept/{deptId}.
     let request$;
     if (role === 'ADMIN') {
       request$ = this.fileService.getAllFiles();
-    } else if (role === 'MANAGER') {
-      request$ = this.fileService.getMyDepartmentFiles();
     } else {
-      request$ = this.fileService.getMyFiles();
+      const deptId = this.authService.getDeptId();
+      if (deptId == null) {
+        this.errorMessage = 'No department found for current user.';
+        this.isLoading = false;
+        return;
+      }
+      request$ = this.fileService.getAllFilesByDepartment(deptId);
     }
 
     request$.subscribe({
@@ -76,7 +82,6 @@ export class Files implements OnInit {
       const term = this.searchTerm.toLowerCase();
       result = result.filter(f =>
         f.name.toLowerCase().includes(term) ||
-        f.ownerName.toLowerCase().includes(term) ||
         f.departmentName.toLowerCase().includes(term)
       );
     }
@@ -138,7 +143,14 @@ export class Files implements OnInit {
   }
 
   // ---- File upload ----
+  // The backend requires department_id and fileType_id on every upload
+  // (FileRequest). There's currently no dropdown data source wired into
+  // this component for departments/file types, so these are left as
+  // placeholders you'll need to populate (e.g. from a DepartmentService /
+  // FileTypeService) before this will work end-to-end.
   selectedUploadFile: File | null = null;
+  selectedDepartmentId: number | null = null;
+  selectedFileTypeId: number | null = null;
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -155,10 +167,18 @@ export class Files implements OnInit {
   uploadFile(): void {
     if (!this.selectedUploadFile) return;
 
-    const formData = new FormData();
-    formData.append('file', this.selectedUploadFile);
+    if (this.selectedDepartmentId == null || this.selectedFileTypeId == null) {
+      this.errorMessage = 'Please select a department and file type before uploading.';
+      return;
+    }
 
-    this.fileService.uploadFile(formData).subscribe({
+    const request: FileRequest = {
+      file: this.selectedUploadFile,
+      department_id: this.selectedDepartmentId,
+      fileType_id: this.selectedFileTypeId
+    };
+
+    this.fileService.uploadFile(request).subscribe({
       next: (response: FileResponse) => {
         this.selectedUploadFile = null;
         this.loadFiles();
@@ -244,43 +264,6 @@ export class Files implements OnInit {
       }
     });
     this.closeMenu();
-  }
-
-  // ---- Forward modal ----
-  showForwardModal = false;
-  forwardFileTarget: FileResponse | null = null;
-  forwardDeptId: number | null = null;
-  forwardNote = '';
-
-  openForwardModal(file: FileResponse): void {
-    this.forwardFileTarget = file;
-    this.showForwardModal = true;
-    this.closeMenu();
-  }
-
-  closeForwardModal(): void {
-    this.showForwardModal = false;
-    this.forwardFileTarget = null;
-    this.forwardDeptId = null;
-    this.forwardNote = '';
-  }
-
-  submitForward(): void {
-    if (!this.forwardFileTarget || !this.forwardDeptId) return;
-
-    this.fileService.forwardFile({
-      fileId: this.forwardFileTarget.id,
-      toDepartmentId: this.forwardDeptId,
-      note: this.forwardNote
-    }).subscribe({
-      next: () => {
-        this.closeForwardModal();
-        this.loadFiles();
-      },
-      error: (err: HttpErrorResponse) => {
-        this.errorMessage = 'Forward failed.';
-      }
-    });
   }
 
   get role(): string | null {
