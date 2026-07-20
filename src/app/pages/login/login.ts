@@ -4,8 +4,8 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { TranslatePipe } from '@ngx-translate/core';
-import { LanguageService } from '../../core/services/language.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { LanguageService } from '../../core/services/language.service';
 @Component({
   selector: 'app-login',
   standalone: true,
