@@ -10,11 +10,17 @@ export interface Department {
 @Injectable({ providedIn: 'root' })
 export class DepartmentService {
   // ASSUMPTION: adjust to match your actual controller if different.
-  private baseUrl = 'http://localhost:8080/api/departments';
+  private baseUrl = 'http://localhost:8080/api/department';
+  private lookupBaseUrl = 'http://localhost:8080/api/lookup/departments';
 
   constructor(private http: HttpClient) {}
 
   getAllDepartments(): Observable<Department[]> {
     return this.http.get<Department[]>(this.baseUrl);
   }
+
+  getLookupDepartments():Observable<Department[]> {
+    return this.http.get<Department[]>(this.lookupBaseUrl);
+  }
+
 }

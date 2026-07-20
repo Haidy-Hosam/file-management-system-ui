@@ -10,20 +10,14 @@ export interface FileResponse {
   departmentId: number;
   size: string;
   modifiedDate: string;
-  status: string; 
-  fileType: string; 
+  status: string;
+  fileType: string;
 }
+
 export interface FileRequest {
-  file:File;
-  department_id:number;
-  fileType_id:number;
-}
-
-
-export interface FileForwardRequest {
-  fileId: number;
-  toDepartmentId: number;
-  note?: string;
+  file: File;
+  department_id: number;
+  fileType_id: number;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -32,44 +26,42 @@ export class FileService {
 
   constructor(private http: HttpClient) {}
 
-  uploadFile(formData: FormData): Observable<FileResponse> {
+  // POST /api/files (multipart/form-data) -> createFile
+  uploadFile(request: FileRequest): Observable<FileResponse> {
     const formData = new FormData();
     formData.append('file', request.file);
     formData.append('department_id', request.department_id.toString());
     formData.append('fileType_id', request.fileType_id.toString());
     return this.http.post<FileResponse>(this.baseUrl, formData);
-
   }
 
+  // DELETE /api/files/{fileId} -> deleteFile
   deleteFile(fileId: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${fileId}`);
   }
 
+  // GET /api/files/all -> getAllFiles
   getAllFiles(): Observable<FileResponse[]> {
     return this.http.get<FileResponse[]>(`${this.baseUrl}/all`);
   }
 
-  getMyFiles(): Observable<FileResponse[]> {
-    return this.http.get<FileResponse[]>(`${this.baseUrl}/my-files`);
+  // GET /api/files/dept/{deptId} -> getAllFilesByDepartment
+  getAllFilesByDepartment(deptId: number): Observable<FileResponse[]> {
+    return this.http.get<FileResponse[]>(`${this.baseUrl}/dept/${deptId}`);
   }
 
-  getMyDepartmentFiles(): Observable<FileResponse[]> {
-    return this.http.get<FileResponse[]>(`${this.baseUrl}/my-department`);
-  }
-
+  // GET /api/files/{fileId} -> getFileData
   getFileData(fileId: number): Observable<FileResponse> {
     return this.http.get<FileResponse>(`${this.baseUrl}/${fileId}`);
   }
 
+  // GET /api/files/{fileId}/download -> downloadFile
   downloadFile(fileId: number): Observable<Blob> {
     return this.http.get(`${this.baseUrl}/${fileId}/download`, { responseType: 'blob' });
   }
 
+  // PUT /api/files/{fileId}/status -> updateFileStatus
   updateFileStatus(fileId: number, status: string): Observable<FileResponse> {
     return this.http.put<FileResponse>(`${this.baseUrl}/${fileId}/status`, { status });
-  }
-
-  forwardFile(request: FileForwardRequest): Observable<any> {
-    return this.http.post(`${this.baseUrl}/forward`, request);
   }
 }

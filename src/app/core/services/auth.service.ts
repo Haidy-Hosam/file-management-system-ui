@@ -12,12 +12,17 @@ export class AuthService {
 
   constructor(private http: HttpClient) {}
 
-  login(email: string, password: string): Observable<authResponse> {
-    const body: LoginRequest = { email, password };
+  login(email: string, password: string,  rememberMe: boolean): Observable<authResponse> {
+    const body: LoginRequest = { email, password, rememberMe };
     return this.http.post<authResponse>(`${this.baseUrl}/login`, body).pipe(
       tap(res => {
-        localStorage.setItem('accessToken', res.accessToken);
-        localStorage.setItem('refreshToken', res.refreshToken);
+        if (rememberMe) {
+          localStorage.setItem('accessToken', res.accessToken);
+          localStorage.setItem('refreshToken', res.refreshToken);
+        } else {
+          sessionStorage.setItem('accessToken', res.accessToken);
+          sessionStorage.setItem('refreshToken', res.refreshToken);
+}
       })
     );
   }

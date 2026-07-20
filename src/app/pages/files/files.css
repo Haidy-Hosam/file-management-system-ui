@@ -255,8 +255,7 @@
   color: white;
   border-color: #2563eb;
 }
-
-.modal-overlay {
+.upload-overlay {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.4);
@@ -266,7 +265,8 @@
   z-index: 100;
 }
 
-.modal {
+.upload-modal {
+  display: block; /* explicit, defensive */
   background: white;
   border-radius: 10px;
   padding: 1.5rem;
@@ -274,19 +274,19 @@
   max-width: 400px;
 }
 
-.modal h3 {
+.upload-modal h3 {
   margin-top: 0;
   font-size: 1.1rem;
 }
 
-.modal label {
+.upload-modal label {
   display: block;
   font-size: 0.8rem;
   font-weight: 600;
   margin: 0.8rem 0 0.3rem;
 }
 
-.modal input, .modal textarea {
+.upload-modal select {
   width: 100%;
   padding: 0.6rem;
   border: 1px solid #e5e7eb;
@@ -295,6 +295,58 @@
   box-sizing: border-box;
 }
 
+.dropzone {
+  border: 2px dashed #d1d5db;
+  border-radius: 8px;
+  padding: 2rem 1rem;
+  text-align: center;
+  cursor: pointer;
+  color: #6b7280;
+  font-size: 0.85rem;
+  min-height: 100px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dropzone.dragging {
+  border-color: #2563eb;
+  background: #eff6ff;
+}
+
+.selected-file {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  width: 100%;
+}
+
+.selected-file button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #dc2626;
+  font-size: 1rem;
+}
+
+.back-btn {
+  padding: 0.5rem 1rem;
+  border: 1px solid #e5e7eb;
+  background: white;
+  border-radius: 6px;
+  cursor: pointer;
+  margin-right: auto;
+}
+
+.upload-modal input, .upload-modal textarea {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  box-sizing: border-box;
+}
 .modal-actions {
   display: flex;
   justify-content: flex-end;
@@ -317,4 +369,54 @@
   color: white;
   border-radius: 6px;
   cursor: pointer;
+}
+.stepper {
+  display: flex;
+  align-items: center;
+  margin: 16px 0 24px;
+}
+.step {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  cursor: pointer;
+  opacity: 0.5;
+}
+.step.active,
+.step.done {
+  opacity: 1;
+}
+.step-num {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #e5e7eb;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  font-size: 13px;
+}
+.step.active .step-num {
+  background: #2563eb;
+  color: white;
+}
+.step.done .step-num {
+  background: #16a34a;
+  color: white;
+}
+.step-label {
+  font-size: 11px;
+  margin-top: 4px;
+  color: #6b7280;
+}
+.step-line {
+  flex: 1;
+  height: 2px;
+  background: #e5e7eb;
+  margin: 0 8px;
+  margin-bottom: 18px;
+}
+.step-line.done {
+  background: #16a34a;
 }

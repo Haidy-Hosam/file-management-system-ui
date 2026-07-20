@@ -14,7 +14,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 export class Login {
   email = '';
   password = '';
-  keepSignedIn = true;
+  rememberMe = false;
   errorMessage = '';
   isLoading = false;
 
@@ -32,7 +32,7 @@ export class Login {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.authService.login(this.email, this.password).subscribe({
+    this.authService.login(this.email, this.password, this.rememberMe).subscribe({
   next: () => {
     this.isLoading = false;
     this.router.navigate(['/dashboard']);

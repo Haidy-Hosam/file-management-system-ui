@@ -6,7 +6,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { FileService, FileResponse, FileRequest } from '../../core/services/file.service';
 import { AuthService } from '../../core/services/auth.service';
 import { DepartmentService, Department } from '../../core/services/department.service';
-import { FileTypeService, FileType } from '../../core/services/file-type.service';
+import { FileTypeService, FileType } from '../../core/services/filetype.service';
 
 @Component({
   selector: 'app-files',
@@ -49,14 +49,14 @@ export class Files implements OnInit {
   fileTypes: FileType[] = [];
 
   loadDepartments(): void {
-    this.departmentService.getAllDepartments().subscribe({
+    this.departmentService.getLookupDepartments().subscribe({
       next: (depts) => this.departments = depts,
       error: () => this.errorMessage = 'Failed to load departments.'
     });
   }
 
   loadFileTypes(): void {
-    this.fileTypeService.getAllFileTypes().subscribe({
+    this.fileTypeService.lookupAllFileTypes().subscribe({
       next: (types) => this.fileTypes = types,
       error: () => this.errorMessage = 'Failed to load file types.'
     });
@@ -165,7 +165,7 @@ export class Files implements OnInit {
     this.openMenuFileId = null;
   }
 
-  // ---- File upload dialog ----
+
   showUploadModal = false;
   isDragging = false;
   selectedUploadFile: File | null = null;
@@ -173,19 +173,22 @@ export class Files implements OnInit {
   selectedFileTypeId: number | null = null;
   isUploading = false;
 
+  currentStep = 1;
+  readonly totalSteps = 3;
+
   get canSubmitUpload(): boolean {
     return !!this.selectedUploadFile &&
       this.selectedDepartmentId != null &&
       this.selectedFileTypeId != null &&
       !this.isUploading;
   }
-
-  openUploadModal(): void {
+openUploadModal(): void {
     this.showUploadModal = true;
     this.selectedUploadFile = null;
     this.selectedDepartmentId = null;
     this.selectedFileTypeId = null;
     this.isDragging = false;
+    this.currentStep = 1;
   }
 
   closeUploadModal(): void {
@@ -195,8 +198,35 @@ export class Files implements OnInit {
     this.selectedDepartmentId = null;
     this.selectedFileTypeId = null;
     this.isDragging = false;
+    this.currentStep = 1;
+  }
+  nextStep(): void {
+    if (this.canGoNext()) {
+      this.currentStep++;
+    }
   }
 
+  prevStep(): void {
+    if (this.currentStep > 1) {
+      this.currentStep--;
+    }
+  }
+
+  goToStep(step: number): void {
+    // only allow jumping to a step already reached
+    if (step <= this.currentStep) {
+      this.currentStep = step;
+    }
+  }
+
+  canGoNext(): boolean {
+    switch (this.currentStep) {
+      case 1: return !!this.selectedUploadFile;
+      case 2: return this.selectedDepartmentId != null;
+      case 3: return this.selectedFileTypeId != null;
+      default: return false;
+    }
+  }
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {

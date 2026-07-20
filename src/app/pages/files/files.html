@@ -112,48 +112,93 @@
     </div>
   </div>
 </div>
-
 <!-- Upload Modal -->
-<div class="modal-overlay" *ngIf="showUploadModal" (click)="closeUploadModal()">
-  <div class="modal" (click)="$event.stopPropagation()">
+<div class="upload-overlay" *ngIf="showUploadModal" (click)="closeUploadModal()">
+  <div class="upload-modal" (click)="$event.stopPropagation()">
     <h3>Upload File</h3>
+
+    <!-- Step indicator -->
+    <div class="stepper">
+      <div class="step" [class.active]="currentStep === 1" [class.done]="currentStep > 1" (click)="goToStep(1)">
+        <span class="step-num">1</span>
+        <span class="step-label">File</span>
+      </div>
+      <div class="step-line" [class.done]="currentStep > 1"></div>
+      <div class="step" [class.active]="currentStep === 2" [class.done]="currentStep > 2" (click)="goToStep(2)">
+        <span class="step-num">2</span>
+        <span class="step-label">Department</span>
+      </div>
+      <div class="step-line" [class.done]="currentStep > 2"></div>
+      <div class="step" [class.active]="currentStep === 3" (click)="goToStep(3)">
+        <span class="step-num">3</span>
+        <span class="step-label">File Type</span>
+      </div>
+    </div>
 
     <input #fileInput type="file" hidden (change)="onFileSelected($event)" />
 
-    <div
-      class="dropzone"
-      [class.dragging]="isDragging"
-      (dragover)="onDragOver($event)"
-      (dragleave)="onDragLeave($event)"
-      (drop)="onDrop($event)"
-      (click)="triggerBrowse(fileInput)"
-    >
-      <ng-container *ngIf="!selectedUploadFile; else fileSelected">
-        <p>Drag &amp; drop a file here, or click to browse</p>
-      </ng-container>
-      <ng-template #fileSelected>
-        <div class="selected-file">
-          <span>{{ selectedUploadFile?.name }}</span>
-          <button type="button" (click)="clearSelectedFile(); $event.stopPropagation()">✕</button>
-        </div>
-      </ng-template>
+    <!-- Step 1: Drag & drop -->
+    <div class="step-content" *ngIf="currentStep === 1">
+      <div
+        class="dropzone"
+        [class.dragging]="isDragging"
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)"
+        (click)="triggerBrowse(fileInput)"
+      >
+        <ng-container *ngIf="!selectedUploadFile; else fileSelected">
+          <p>Drag &amp; drop a file here, or click to browse</p>
+        </ng-container>
+        <ng-template #fileSelected>
+          <div class="selected-file">
+            <span>{{ selectedUploadFile?.name }}</span>
+            <button type="button" (click)="clearSelectedFile(); $event.stopPropagation()">✕</button>
+          </div>
+        </ng-template>
+      </div>
     </div>
 
-    <label>Department</label>
-    <select [(ngModel)]="selectedDepartmentId">
-      <option [ngValue]="null" disabled>Select department</option>
-      <option *ngFor="let dept of departments" [ngValue]="dept.id">{{ dept.name }}</option>
-    </select>
+    <!-- Step 2: Department -->
+    <div class="step-content" *ngIf="currentStep === 2">
+      <label>Department</label>
+      <select [(ngModel)]="selectedDepartmentId">
+        <option [ngValue]="null" disabled>Select department</option>
+        <option *ngFor="let dept of departments" [ngValue]="dept.id">{{ dept.name }}</option>
+      </select>
+    </div>
 
-    <label>File Type</label>
-    <select [(ngModel)]="selectedFileTypeId">
-      <option [ngValue]="null" disabled>Select file type</option>
-      <option *ngFor="let type of fileTypes" [ngValue]="type.id">{{ type.name }}</option>
-    </select>
+    <!-- Step 3: File Type -->
+    <div class="step-content" *ngIf="currentStep === 3">
+      <label>File Type</label>
+      <select [(ngModel)]="selectedFileTypeId">
+        <option [ngValue]="null" disabled>Select file type</option>
+        <option *ngFor="let type of fileTypes" [ngValue]="type.id">{{ type.name }}</option>
+      </select>
+    </div>
 
     <div class="modal-actions">
       <button class="cancel-btn" (click)="closeUploadModal()" [disabled]="isUploading">Cancel</button>
-      <button class="confirm-btn" (click)="submitUpload()" [disabled]="!canSubmitUpload">
+
+      <button *ngIf="currentStep > 1" class="back-btn" (click)="prevStep()" [disabled]="isUploading">
+        Back
+      </button>
+
+      <button
+        *ngIf="currentStep < totalSteps"
+        class="confirm-btn"
+        (click)="nextStep()"
+        [disabled]="!canGoNext()"
+      >
+        Next
+      </button>
+
+      <button
+        *ngIf="currentStep === totalSteps"
+        class="confirm-btn"
+        (click)="submitUpload()"
+        [disabled]="!canSubmitUpload"
+      >
         {{ isUploading ? 'Uploading...' : 'Upload' }}
       </button>
     </div>
