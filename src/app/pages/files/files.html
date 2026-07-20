@@ -1,1 +1,115 @@
-<p>files works!</p>
+<div class="files-page" (click)="closeMenu()">
+  <div class="page-header">
+    <div>
+      <h1>Files</h1>
+      <p class="subtitle">Manage and archive documents</p>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-box">
+      <input
+        type="text"
+        placeholder="Search files..."
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearchChange()"
+      />
+    </div>
+
+    <div class="tabs">
+      <button [class.active]="activeTab === 'ALL'" (click)="setTab('ALL')">All</button>
+      <button [class.active]="activeTab === 'ACTIVE'" (click)="setTab('ACTIVE')">Active</button>
+      <button [class.active]="activeTab === 'ARCHIVED'" (click)="setTab('ARCHIVED')">Archived</button>
+    </div>
+
+    <button class="filter-btn">Filter</button>
+
+    <input #fileInput type="file" hidden (change)="onFileSelected($event)" />
+    <button class="upload-btn" (click)="triggerUpload(fileInput)">Upload File</button>
+  </div>
+
+  <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+  <div class="table-wrapper" *ngIf="!isLoading; else loadingState">
+    <table class="files-table">
+      <thead>
+        <tr>
+          <th class="col-checkbox">
+            <input type="checkbox" (change)="toggleSelectAll($event)" />
+          </th>
+          <th>NAME</th>
+          <th>DEPARTMENT</th>
+          <th>SIZE</th>
+          <th>MODIFIED</th>
+          <th>STATUS</th>
+          <th class="col-actions"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let file of paginatedFiles">
+          <td class="col-checkbox">
+            <input
+              type="checkbox"
+              [checked]="isSelected(file.id)"
+              (change)="toggleSelectFile(file.id)"
+            />
+          </td>
+          <td class="name-cell" (click)="viewDetails(file.id)">
+            <span class="file-icon">{{ getFileIcon(file.fileType) }}</span>
+            <div>
+              <div class="file-name">{{ file.name }}</div>
+              <div class="tags">
+              </div>
+            </div>
+          </td>
+          <td>{{ file.departmentName }}</td>
+          <td>{{ file.size }}</td>
+          <td>{{ file.modifiedDate }}</td>
+          <td>
+            <span class="status-badge" [ngClass]="file.status.toLowerCase()">
+              {{ file.status }}
+            </span>
+          </td>
+          <td class="col-actions">
+            <button class="menu-btn" (click)="toggleMenu(file.id, $event)">⋮</button>
+
+            <div class="action-menu" *ngIf="openMenuFileId === file.id" (click)="$event.stopPropagation()">
+              <button (click)="viewDetails(file.id)">View Details</button>
+              <button (click)="previewFile(file)">Preview</button>
+              <button (click)="downloadFile(file)">Download</button>
+
+              <ng-container *ngIf="role === 'ADMIN' || role === 'MANAGER'">
+                <button (click)="approveFile(file)">Approve</button>
+                <button (click)="rejectFile(file)">Reject</button>
+                <button (click)="archiveFile(file)">Archive</button>
+              </ng-container>
+
+              <button class="danger" *ngIf="role === 'ADMIN'" (click)="deleteFile(file)">Delete</button>
+            </div>
+          </td>
+        </tr>
+
+        <tr *ngIf="paginatedFiles.length === 0">
+          <td colspan="7" class="empty-state">No files found.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <ng-template #loadingState>
+    <div class="loading-state">Loading files...</div>
+  </ng-template>
+
+  <div class="table-footer" *ngIf="!isLoading">
+    <span>Showing {{ paginatedFiles.length }} of {{ filteredFiles.length }} files</span>
+    <div class="pagination">
+      <button
+        *ngFor="let page of [].constructor(totalPages); let i = index"
+        [class.active]="currentPage === i + 1"
+        (click)="goToPage(i + 1)"
+      >
+        {{ i + 1 }}
+      </button>
+    </div>
+  </div>
+</div>

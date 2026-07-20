@@ -5,6 +5,7 @@ import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { TranslatePipe } from '@ngx-translate/core';
 import { LanguageService } from '../../core/services/language.service';
+import { HttpErrorResponse } from '@angular/common/http';
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -15,6 +16,7 @@ import { LanguageService } from '../../core/services/language.service';
 export class Login {
   email = '';
   password = '';
+  keepSignedIn = true;
   errorMessage = '';
   isLoading = false;
 
@@ -37,18 +39,18 @@ export class Login {
     this.errorMessage = '';
 
     this.authService.login(this.email, this.password).subscribe({
-      next: () => {
-        this.isLoading = false;
-        this.router.navigate(['/dashboard']);
-      },
-      error: (err) => {
-        this.isLoading = false;
-        if (err.status === 401 || err.status === 400) {
-          this.errorMessage = 'Invalid email or password.';
-        } else {
-          this.errorMessage = 'Something went wrong. Please try again.';
-        }
-      }
-    });
+  next: () => {
+    this.isLoading = false;
+    this.router.navigate(['/dashboard']);
+  },
+  error: (err: HttpErrorResponse) => {
+    this.isLoading = false;
+    if (err.status === 401 || err.status === 400) {
+      this.errorMessage = 'Invalid email or password.';
+    } else {
+      this.errorMessage = 'Something went wrong. Please try again.';
+    }
+  }
+});
   }
 }

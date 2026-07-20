@@ -14,10 +14,15 @@ export class LanguageService {
     const language = localStorage.getItem('language') || 'en';
     //  console.log('Language:', language);
     this.translate.use(language);
+    document.documentElement.lang = language;
+    document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
   }
 
   ChangeLanguage(language: string): void {
     this.translate.use(language);
     localStorage.setItem('language', language);
+
+    document.documentElement.lang = language;
+    document.documentElement.dir = language === 'ar' ? 'rtl' : 'ltr';
   }
 }
