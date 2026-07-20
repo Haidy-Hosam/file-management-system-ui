@@ -1,4 +1,3 @@
-import { Routes } from '@angular/router';
 import { Login } from './pages/login/login';
 import { Dashboard } from './pages/dashboard/dashboard';
 import { Files } from './pages/files/files';
@@ -8,6 +7,7 @@ import { Users } from './pages/users/users';
 import { Roles } from './pages/roles/roles';
 import { MainLayout } from './layout/main-layout/main-layout';
 import { authGuard, roleGuard } from './core/guards/auth.guard';
+import { Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: 'login',
