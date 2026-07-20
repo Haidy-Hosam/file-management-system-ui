@@ -1,0 +1,55 @@
+.department-card {
+  border-radius: 12px;
+  transition: transform 0.2s ease, box-shadow 0.2s ease;
+  height: 100%;
+}
+
+.department-card:hover {
+  transform: translateY(-4px);
+  box-shadow: 0 10px 25px rgba(0,0,0,0.05) !important;
+}
+
+.dept-icon-wrapper {
+  width: 48px;
+  height: 48px;
+  background-color: #f0f4ff !important;
+}
+
+.stats-container {
+  background-color: #f8f9fa;
+}
+
+.stat-divider {
+  width: 1px;
+}
+
+.status-badge {
+  background-color: #f1f3f5;
+  color: #495057;
+}
+
+.status-badge.status-active {
+  background-color: #e6fcf5;
+  color: #0ca678;
+  border: 1px solid #b2f2bb;
+}
+
+.status-active .status-dot {
+  background-color: #0ca678;
+}
+
+.status-badge.status-inactive {
+  background-color: #f8f9fa;
+  color: #868e96;
+  border: 1px solid #dee2e6;
+}
+
+.status-inactive .status-dot {
+  background-color: #868e96;
+}
+
+.status-dot {
+  width: 6px;
+  height: 6px;
+  display: inline-block;
+}

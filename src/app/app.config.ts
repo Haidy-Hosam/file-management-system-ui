@@ -13,7 +13,7 @@ import {
   provideZoneChangeDetection,
 
 } from '@angular/core';
-import { LanguageService } from './core/services/language.service';
+import { LanguageService } from './core/Services/language.service';
 
 export const appConfig: ApplicationConfig = {
   providers: [
