@@ -11,21 +11,21 @@ import {
   provideAppInitializer,
   provideBrowserGlobalErrorListeners,
   provideZoneChangeDetection,
+
 } from '@angular/core';
 import { LanguageService } from './core/services/language.service';
 
 export const appConfig: ApplicationConfig = {
-  providers: [
-    provideBrowserGlobalErrorListeners(),
-    provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes),
-    provideHttpClient(withInterceptors([authInterceptor, errorInterceptor])),
-    provideAppTranslate(),
+  providers: [
+    provideBrowserGlobalErrorListeners(),
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideRouter(routes),
+    provideHttpClient(withInterceptors([authInterceptor, errorInterceptor])),
+    provideAppTranslate(),
 
-    provideAppInitializer(() => {
-      const languageService = inject(LanguageService);
-      return languageService.initialLanguage();
-    }),
-  ],
+    provideAppInitializer(() => {
+      const languageService = inject(LanguageService);
+      return languageService.initialLanguage();
+    }),
+  ],
 };
-

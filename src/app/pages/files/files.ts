@@ -5,6 +5,8 @@ import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FileService, FileResponse, FileRequest } from '../../core/services/file.service';
 import { AuthService } from '../../core/services/auth.service';
+import { DepartmentService, Department } from '../../core/services/department.service';
+import { FileTypeService, FileType } from '../../core/services/filetype.service';
 
 @Component({
   selector: 'app-files',
@@ -32,11 +34,32 @@ export class Files implements OnInit {
   constructor(
     private fileService: FileService,
     private authService: AuthService,
+    private departmentService: DepartmentService,
+    private fileTypeService: FileTypeService,
     private router: Router
   ) {}
 
   ngOnInit(): void {
     this.loadFiles();
+    this.loadDepartments();
+    this.loadFileTypes();
+  }
+
+  departments: Department[] = [];
+  fileTypes: FileType[] = [];
+
+  loadDepartments(): void {
+    this.departmentService.getLookupDepartments().subscribe({
+      next: (depts) => this.departments = depts,
+      error: () => this.errorMessage = 'Failed to load departments.'
+    });
+  }
+
+  loadFileTypes(): void {
+    this.fileTypeService.lookupAllFileTypes().subscribe({
+      next: (types) => this.fileTypes = types,
+      error: () => this.errorMessage = 'Failed to load file types.'
+    });
   }
 
   loadFiles(): void {
@@ -142,48 +165,124 @@ export class Files implements OnInit {
     this.openMenuFileId = null;
   }
 
-  // ---- File upload ----
-  // The backend requires department_id and fileType_id on every upload
-  // (FileRequest). There's currently no dropdown data source wired into
-  // this component for departments/file types, so these are left as
-  // placeholders you'll need to populate (e.g. from a DepartmentService /
-  // FileTypeService) before this will work end-to-end.
+
+  showUploadModal = false;
+  isDragging = false;
   selectedUploadFile: File | null = null;
   selectedDepartmentId: number | null = null;
   selectedFileTypeId: number | null = null;
+  isUploading = false;
 
+  currentStep = 1;
+  readonly totalSteps = 3;
+
+  get canSubmitUpload(): boolean {
+    return !!this.selectedUploadFile &&
+      this.selectedDepartmentId != null &&
+      this.selectedFileTypeId != null &&
+      !this.isUploading;
+  }
+openUploadModal(): void {
+    this.showUploadModal = true;
+    this.selectedUploadFile = null;
+    this.selectedDepartmentId = null;
+    this.selectedFileTypeId = null;
+    this.isDragging = false;
+    this.currentStep = 1;
+  }
+
+  closeUploadModal(): void {
+    if (this.isUploading) return;
+    this.showUploadModal = false;
+    this.selectedUploadFile = null;
+    this.selectedDepartmentId = null;
+    this.selectedFileTypeId = null;
+    this.isDragging = false;
+    this.currentStep = 1;
+  }
+  nextStep(): void {
+    if (this.canGoNext()) {
+      this.currentStep++;
+    }
+  }
+
+  prevStep(): void {
+    if (this.currentStep > 1) {
+      this.currentStep--;
+    }
+  }
+
+  goToStep(step: number): void {
+    // only allow jumping to a step already reached
+    if (step <= this.currentStep) {
+      this.currentStep = step;
+    }
+  }
+
+  canGoNext(): boolean {
+    switch (this.currentStep) {
+      case 1: return !!this.selectedUploadFile;
+      case 2: return this.selectedDepartmentId != null;
+      case 3: return this.selectedFileTypeId != null;
+      default: return false;
+    }
+  }
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
       this.selectedUploadFile = input.files[0];
-      this.uploadFile();
     }
   }
 
-  triggerUpload(fileInput: HTMLInputElement): void {
+  triggerBrowse(fileInput: HTMLInputElement): void {
     fileInput.click();
   }
 
-  uploadFile(): void {
-    if (!this.selectedUploadFile) return;
+  onDragOver(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = true;
+  }
 
-    if (this.selectedDepartmentId == null || this.selectedFileTypeId == null) {
-      this.errorMessage = 'Please select a department and file type before uploading.';
-      return;
+  onDragLeave(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = false;
+  }
+
+  onDrop(event: DragEvent): void {
+    event.preventDefault();
+    event.stopPropagation();
+    this.isDragging = false;
+
+    const files = event.dataTransfer?.files;
+    if (files && files.length > 0) {
+      this.selectedUploadFile = files[0];
     }
+  }
+
+  clearSelectedFile(): void {
+    this.selectedUploadFile = null;
+  }
+
+  submitUpload(): void {
+    if (!this.canSubmitUpload) return;
 
     const request: FileRequest = {
-      file: this.selectedUploadFile,
-      department_id: this.selectedDepartmentId,
-      fileType_id: this.selectedFileTypeId
+      file: this.selectedUploadFile!,
+      department_id: this.selectedDepartmentId!,
+      fileType_id: this.selectedFileTypeId!
     };
 
+    this.isUploading = true;
     this.fileService.uploadFile(request).subscribe({
       next: (response: FileResponse) => {
-        this.selectedUploadFile = null;
+        this.isUploading = false;
+        this.closeUploadModal();
         this.loadFiles();
       },
       error: (err: HttpErrorResponse) => {
+        this.isUploading = false;
         this.errorMessage = 'Upload failed. Please try again.';
       }
     });

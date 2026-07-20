@@ -9,26 +9,26 @@ import { LanguageService } from '../../core/services/language.service';
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule , TranslatePipe],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './login.html',
-  styleUrl: './login.css'
+  styleUrl: './login.css',
 })
 export class Login {
   email = '';
   password = '';
-  keepSignedIn = true;
+  rememberMe = false;
   errorMessage = '';
   isLoading = false;
 
   constructor(
-    private languageService: LanguageService,
     private authService: AuthService,
-    private router: Router
+    private languageService: LanguageService,
+    private router: Router,
   ) {}
-
   changeLanguage(language: string): void {
-  this.languageService.ChangeLanguage(language);
-}
+    this.languageService.ChangeLanguage(language);
+  }
+
   onSubmit(): void {
     if (!this.email || !this.password) {
       this.errorMessage = 'Please enter both email and password.';
@@ -38,19 +38,19 @@ export class Login {
     this.isLoading = true;
     this.errorMessage = '';
 
-    this.authService.login(this.email, this.password).subscribe({
-  next: () => {
-    this.isLoading = false;
-    this.router.navigate(['/dashboard']);
-  },
-  error: (err: HttpErrorResponse) => {
-    this.isLoading = false;
-    if (err.status === 401 || err.status === 400) {
-      this.errorMessage = 'Invalid email or password.';
-    } else {
-      this.errorMessage = 'Something went wrong. Please try again.';
-    }
-  }
-});
+    this.authService.login(this.email, this.password, this.rememberMe).subscribe({
+      next: () => {
+        this.isLoading = false;
+        this.router.navigate(['/dashboard']);
+      },
+      error: (err: HttpErrorResponse) => {
+        this.isLoading = false;
+        if (err.status === 401 || err.status === 400) {
+          this.errorMessage = 'Invalid email or password.';
+        } else {
+          this.errorMessage = 'Something went wrong. Please try again.';
+        }
+      },
+    });
   }
 }
