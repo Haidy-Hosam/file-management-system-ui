@@ -1,3 +1,34 @@
+.language-switcher {
+  position: absolute;
+  top: -30px;
+  right: 0;
+
+  display: flex;
+  gap: 8px;
+    direction: ltr;
+
+}
+
+.language-switcher button {
+  padding: 6px 14px;
+  border: 1px solid #d1d5db;
+  border-radius: 8px;
+  background: white;
+  cursor: pointer;
+
+  font-size: 13px;
+  font-weight: 600;
+
+  transition: all 0.2s;
+}
+
+.language-switcher button:hover {
+  background: #2563eb;
+  color: white;
+  border-color: #2563eb;
+}
+
+
 .login-page {
   display: flex;
   justify-content: center;
@@ -8,6 +39,8 @@
 }
 
 .login-card {
+  position: relative;
+
   width: 100%;
   max-width: 380px;
   padding: 1.5rem 0;

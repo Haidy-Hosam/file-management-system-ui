@@ -4,10 +4,14 @@ import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { HttpErrorResponse } from '@angular/common/http';
+import { TranslatePipe } from '@ngx-translate/core';
+import { LanguageService } from '../../core/services/language.service';
+
+
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule,TranslatePipe],
   templateUrl: './login.html',
   styleUrl: './login.css'
 })
@@ -19,9 +23,13 @@ export class Login {
   isLoading = false;
 
   constructor(
+     private languageService: LanguageService,
     private authService: AuthService,
     private router: Router
   ) {}
+   changeLanguage(language: string): void {
+  this.languageService.ChangeLanguage(language);
+}
 
   onSubmit(): void {
     if (!this.email || !this.password) {

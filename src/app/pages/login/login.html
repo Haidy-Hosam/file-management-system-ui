@@ -1,11 +1,15 @@
 <div class="login-page">
   <div class="login-card">
-    <h1 class="login-title">Welcome back</h1>
-    <p class="login-subtitle">Sign in to your Arkive account</p>
+    <div class="language-switcher">
+      <button type="button" (click)="changeLanguage('en')">EN</button>
+      <button type="button" (click)="changeLanguage('ar')">AR</button>
+    </div>
+    <h1 class="login-title">{{ 'AUTH.WELCOME_BACK' | translate }}</h1>
+    <p class="login-subtitle">{{ 'AUTH.SIGN_IN_TO_YOUR_ARCHIVE_ACCOUNT' | translate }}</p>
 
     <form (ngSubmit)="onSubmit()">
       <div class="form-group">
-        <label for="email">Email address</label>
+        <label for="email">{{ 'AUTH.EMAIL' | translate }}</label>
         <div class="input-wrapper">
           <svg class="input-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
             <path d="M3 6.5L12 13L21 6.5M4 5H20C20.5523 5 21 5.44772 21 6V18C21 18.5523 20.5523 19 20 19H4C3.44772 19 3 18.5523 3 18V6C3 5.44772 3.44772 5 4 5Z"
@@ -25,7 +29,7 @@
 
       <div class="form-group">
         <div class="password-row">
-          <label for="password">Password</label>
+          <label for="password">{{ 'AUTH.PASSWORD' | translate }}</label>
         </div>
         <div class="input-wrapper">
           <svg class="input-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -48,14 +52,14 @@
       <div class="checkbox-row"> 
         <label class="checkbox-label">
           <input type="checkbox" name="Remember me" [(ngModel)]="rememberMe" />
-          <span>Remember me</span>
+          <span>{{ 'AUTH.KEEP_SIGNED_IN' | translate }}</span>
         </label>
       </div>
 
       <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
 
       <button type="submit" class="sign-in-btn" [disabled]="isLoading">
-        {{ isLoading ? 'Signing in...' : 'Sign In' }}
+        {{ (isLoading ? 'AUTH.SIGNING_IN' : 'AUTH.LOGIN') | translate }}
       </button>
 
       <!-- <p class="contact-admin"> to be completed

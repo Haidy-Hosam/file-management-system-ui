@@ -28,6 +28,8 @@
     "@angular/forms": "^20.2.0",
     "@angular/platform-browser": "^20.2.0",
     "@angular/router": "^20.2.0",
+    "@ngx-translate/core": "^18.0.0",
+    "@ngx-translate/http-loader": "^18.0.0",
     "bootstrap": "^5.3.8",
     "jwt-decode": "^4.0.0",
     "rxjs": "~7.8.0",
@@ -46,5 +48,9 @@
     "karma-jasmine": "~5.1.0",
     "karma-jasmine-html-reporter": "~2.1.0",
     "typescript": "~5.9.2"
+  },
+  "allowScripts": {
+    "@ngx-translate/core@18.0.0": true,
+    "@ngx-translate/http-loader@18.0.0": true
   }
 }

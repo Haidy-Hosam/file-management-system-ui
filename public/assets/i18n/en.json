@@ -1,0 +1,13 @@
+{
+  "AUTH": {
+    "WELCOME_BACK": "Welcome back",
+    "LOGIN": "Sign In",
+    "SIGNING_IN": "Signing in...",
+    "EMAIL": "Email",
+    "PASSWORD": "Password",
+    "SIGN_IN_TO_YOUR_ARCHIVE_ACCOUNT": "Sign in to your ARCHIVE account",
+    "SIGNING_IN...": "Signing in...",
+    "KEEP_SIGNED_IN": "Remember me"
+  },
+  "LOGOUT": "Logout"
+}
