@@ -7,6 +7,7 @@ import { FileService, FileResponse, FileRequest } from '../../core/services/file
 import { AuthService } from '../../core/services/auth.service';
 import { DepartmentService, Department } from '../../core/services/department.service';
 import { FileTypeService, FileType } from '../../core/services/filetype.service';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
 interface FileGroup {
   groupId: string;
@@ -31,7 +32,7 @@ export class Files implements OnInit {
   errorMessage = '';
 
   searchTerm = '';
-  activeTab: 'ALL' | 'ACTIVE' | 'ARCHIVED' = 'ALL';
+  activeTab: 'ALL' | 'PENDING' | 'APPROVED' | 'REJECTED' = 'ALL';
 
   selectedFileIds = new Set<number>();
   openMenuFileId: number | null = null;
@@ -47,7 +48,9 @@ export class Files implements OnInit {
     private authService: AuthService,
     private departmentService: DepartmentService,
     private fileTypeService: FileTypeService,
-    private router: Router
+    private router: Router,
+    private sanitizer: DomSanitizer
+
   ) {}
 
   ngOnInit(): void {
@@ -106,26 +109,26 @@ export class Files implements OnInit {
   }
 
   applyFilters(): void {
-    let result = [...this.allFiles];
+  let result = [...this.allFiles];
 
-    if (this.activeTab !== 'ALL') {
-      result = result.filter(f => f.status.toUpperCase() === this.activeTab);
-    }
-
-    if (this.searchTerm.trim()) {
-      const term = this.searchTerm.toLowerCase();
-      result = result.filter(f =>
-        f.name.toLowerCase().includes(term) ||
-        f.departmentName.toLowerCase().includes(term)
-      );
-    }
-
-    this.filteredFiles = result;
-    this.currentPage = 1;
+  if (this.activeTab !== 'ALL') {
+    result = result.filter(f => f.status.toUpperCase() === this.activeTab);
   }
+
+  if (this.searchTerm.trim()) {
+    const term = this.searchTerm.toLowerCase();
+    result = result.filter(f =>
+      f.name.toLowerCase().includes(term) ||
+      f.departmentNames.some(dept => dept.toLowerCase().includes(term))
+    );
+  }
+
+  this.filteredFiles = result;
+  this.currentPage = 1;
+}
   
 
-  setTab(tab: 'ALL' | 'ACTIVE' | 'ARCHIVED'): void {
+  setTab(tab: 'ALL' | 'PENDING' | 'APPROVED' | 'REJECTED'): void {
     this.activeTab = tab;
     this.applyFilters();
   }
@@ -180,9 +183,6 @@ export class Files implements OnInit {
 
   showUploadModal = false;
   isDragging = false;
-  // selectedUploadFile: File | null = null;
-  // selectedDepartmentId: number | null = null;
-  // selectedFileTypeId: number | null = null;
   isUploading = false;
    uploadItems: { file: File; fileTypeId: number | null }[] = [];
   selectedDepartmentIds: number[] = [];
@@ -190,117 +190,6 @@ export class Files implements OnInit {
   currentStep = 1;
   readonly totalSteps = 4;
 
-//   get canSubmitUpload(): boolean {
-//     return !!this.selectedUploadFile &&
-//       this.selectedDepartmentId != null &&
-//       this.selectedFileTypeId != null &&
-//       !this.isUploading;
-//   }
-// openUploadModal(): void {
-//     this.showUploadModal = true;
-//     this.selectedUploadFile = null;
-//     this.selectedDepartmentId = null;
-//     this.selectedFileTypeId = null;
-//     this.isDragging = false;
-//     this.currentStep = 1;
-//   }
-
-//   closeUploadModal(): void {
-//     if (this.isUploading) return;
-//     this.showUploadModal = false;
-//     this.selectedUploadFile = null;
-//     this.selectedDepartmentId = null;
-//     this.selectedFileTypeId = null;
-//     this.isDragging = false;
-//     this.currentStep = 1;
-//   }
-//   nextStep(): void {
-//     if (this.canGoNext()) {
-//       this.currentStep++;
-//     }
-//   }
-
-//   prevStep(): void {
-//     if (this.currentStep > 1) {
-//       this.currentStep--;
-//     }
-//   }
-
-//   goToStep(step: number): void {
-//     // only allow jumping to a step already reached
-//     if (step <= this.currentStep) {
-//       this.currentStep = step;
-//     }
-//   }
-
-//   canGoNext(): boolean {
-//     switch (this.currentStep) {
-//       case 1: return !!this.selectedUploadFile;
-//       case 2: return this.selectedDepartmentId != null;
-//       case 3: return this.selectedFileTypeId != null;
-//       default: return false;
-//     }
-//   }
-//   onFileSelected(event: Event): void {
-//     const input = event.target as HTMLInputElement;
-//     if (input.files && input.files.length > 0) {
-//       this.selectedUploadFile = input.files[0];
-//     }
-//   }
-
-//   triggerBrowse(fileInput: HTMLInputElement): void {
-//     fileInput.click();
-//   }
-
-//   onDragOver(event: DragEvent): void {
-//     event.preventDefault();
-//     event.stopPropagation();
-//     this.isDragging = true;
-//   }
-
-//   onDragLeave(event: DragEvent): void {
-//     event.preventDefault();
-//     event.stopPropagation();
-//     this.isDragging = false;
-//   }
-
-//   onDrop(event: DragEvent): void {
-//     event.preventDefault();
-//     event.stopPropagation();
-//     this.isDragging = false;
-
-//     const files = event.dataTransfer?.files;
-//     if (files && files.length > 0) {
-//       this.selectedUploadFile = files[0];
-//     }
-//   }
-
-//   clearSelectedFile(): void {
-//     this.selectedUploadFile = null;
-//   }
-
-//   submitUpload(): void {
-//     if (!this.canSubmitUpload) return;
-
-//     const request: FileRequest = {
-//       file: this.selectedUploadFile!,
-//       department_id: this.selectedDepartmentId!,
-//       fileType_id: this.selectedFileTypeId!
-//     };
-
-//     this.isUploading = true;
-//     this.fileService.uploadFile(request).subscribe({
-//       next: (response: FileResponse) => {
-//         this.isUploading = false;
-//         this.closeUploadModal();
-//         this.loadFiles();
-//       },
-//       error: (err: HttpErrorResponse) => {
-//         this.isUploading = false;
-//         this.errorMessage = 'Upload failed. Please try again.';
-//       }
-//     });
-//   }
  get canSubmitUpload(): boolean {
     return this.uploadItems.length > 0 &&
       this.selectedDepartmentIds.length > 0 &&
@@ -470,16 +359,61 @@ openUploadModal(): void {
   }
 
   previewFile(file: FileResponse): void {
-    this.fileService.downloadFile(file.id).subscribe({
-      next: (blob: Blob) => {
-        const url = window.URL.createObjectURL(blob);
-        window.open(url, '_blank');
-      },
-      error: (err: HttpErrorResponse) => {
-        this.errorMessage = 'Preview failed.';
+     this.closeMenu();
+  this.previewModalFile = file;
+  this.previewKind = this.getPreviewKind(file.extension);
+  this.previewText = '';
+  this.previewUrl = null;
+  this.showPreviewModal = true;
+
+  if (this.previewKind === 'unsupported') {
+    return; // nothing to fetch — modal just shows a "can't preview" message + download button
+  }
+
+  this.isLoadingPreview = true;
+  this.fileService.downloadFile(file.id).subscribe({
+    next: (blob: Blob) => {
+      this.isLoadingPreview = false;
+
+      if (this.previewKind === 'text') {
+        const reader = new FileReader();
+        reader.onload = () => {
+          this.previewText = reader.result as string;
+        };
+        reader.readAsText(blob);
+        return;
       }
-    });
-    this.closeMenu();
+
+      // image or pdf — render via object URL
+      const objectUrl = window.URL.createObjectURL(blob);
+      this.previewObjectUrl = objectUrl;
+      this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
+    },
+    error: (err: HttpErrorResponse) => {
+      this.isLoadingPreview = false;
+      this.errorMessage = 'Preview failed.';
+      this.showPreviewModal = false;
+    }
+  });
+}
+
+closePreviewModal(): void {
+  this.showPreviewModal = false;
+  this.previewModalFile = null;
+  this.previewKind = null;
+  this.previewText = '';
+  this.previewUrl = null;
+
+  if (this.previewObjectUrl) {
+    window.URL.revokeObjectURL(this.previewObjectUrl);
+    this.previewObjectUrl = null;
+  }
+}
+
+downloadPreviewedFile(): void {
+  if (this.previewModalFile) {
+    this.downloadFile(this.previewModalFile);
+  }
   }
 
   deleteFile(file: FileResponse): void {
@@ -556,4 +490,79 @@ openUploadModal(): void {
     };
     return map[fileType.toLowerCase()] ?? '📄';
   }
+
+  get selectedCount(): number {
+  return this.selectedFileIds.size;
+}
+
+get hasSelection(): boolean {
+  return this.selectedCount > 0;
+}
+
+deleteSelectedFiles(): void {
+
+  if (this.selectedFileIds.size === 0) {
+    return;
+  }
+
+  if (!confirm(`Delete ${this.selectedCount} selected file(s)?`)) {
+    return;
+  }
+
+  const ids = [...this.selectedFileIds];
+
+  ids.forEach(id => {
+    this.fileService.deleteFile(id).subscribe({
+      next: () => {
+        this.selectedFileIds.delete(id);
+
+        if (this.selectedFileIds.size === 0) {
+          this.loadFiles();
+        }
+      }
+    });
+  });
+}
+
+downloadSelectedFiles(): void {
+  if (this.selectedFileIds.size === 0) return;
+
+  const ids = [...this.selectedFileIds];
+
+  this.fileService.downloadFilesBulk(ids).subscribe({
+    next: (blob: Blob) => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'files.zip';
+      a.click();
+      window.URL.revokeObjectURL(url);
+    },
+    error: (err: HttpErrorResponse) => {
+      console.error('Bulk download failed:', err.status, err.error);
+      this.errorMessage = 'Download failed. Please try again.';
+    }
+  });
+}
+
+// ---- Preview modal ----
+showPreviewModal = false;
+previewModalFile: FileResponse | null = null;
+previewKind: 'image' | 'pdf' | 'text' | 'unsupported' | null = null;
+previewUrl: SafeResourceUrl | null = null;
+previewText = '';
+isLoadingPreview = false;
+private previewObjectUrl: string | null = null; // raw URL, kept to revoke later
+
+readonly imageExtensions = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'bmp'];
+readonly textExtensions = ['txt', 'csv', 'json', 'md', 'log', 'xml', 'yml', 'yaml'];
+
+private getPreviewKind(extension: string): 'image' | 'pdf' | 'text' | 'unsupported' {
+  const ext = extension.toLowerCase();
+  if (this.imageExtensions.includes(ext)) return 'image';
+  if (ext === 'pdf') return 'pdf';
+  if (this.textExtensions.includes(ext)) return 'text';
+  return 'unsupported';
+}
+
 }

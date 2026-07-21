@@ -6,8 +6,7 @@ export interface FileResponse {
   id: number;
   name: string;
   extension: string;
-  departmentName: string;
-  departmentId: number;
+  departmentNames: string[]; // CHANGED
   size: string;
   modifiedDate: string;
   status: string;
@@ -88,4 +87,8 @@ export class FileService {
   updateFileStatus(fileId: number, status: string): Observable<FileResponse> {
     return this.http.put<FileResponse>(`${this.baseUrl}/${fileId}/status`, { status });
   }
+
+  downloadFilesBulk(fileIds: number[]): Observable<Blob> {
+  return this.http.post(`${this.baseUrl}/download-bulk`, fileIds, { responseType: 'blob' });
+}
 }

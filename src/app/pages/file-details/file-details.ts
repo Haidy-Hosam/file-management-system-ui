@@ -9,8 +9,9 @@ import {
   FileActivity,
   FilePermission,
 } from '../../core/services/file-details.service';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
-type TabId = 'overview' | 'versions' | 'activity' | 'permissions';
+type TabId = 'overview' | 'activity' | 'permissions';
 
 @Component({
   selector: 'app-file-details',
@@ -33,7 +34,6 @@ export class FileDetails implements OnInit {
   activeTab: TabId = 'overview';
   tabs: { id: TabId; label: string }[] = [
     { id: 'overview', label: 'Overview' },
-    { id: 'versions', label: 'Versions' },
     { id: 'activity', label: 'Activity' },
     { id: 'permissions', label: 'Permissions' },
   ];
@@ -42,7 +42,9 @@ export class FileDetails implements OnInit {
     private route: ActivatedRoute,
     private router: Router,
     private fileService: FileService,
-    private fileDetailsService: FileDetailsService
+    private fileDetailsService: FileDetailsService,
+      private sanitizer: DomSanitizer
+
   ) {}
 
   ngOnInit(): void {
@@ -75,9 +77,6 @@ export class FileDetails implements OnInit {
 
   private loadTabData(tab: TabId): void {
     switch (tab) {
-      case 'versions':
-        if (this.versions.length === 0) this.loadVersions();
-        break;
       case 'activity':
         if (this.activity.length === 0) this.loadActivity();
         break;
@@ -171,4 +170,74 @@ export class FileDetails implements OnInit {
   goBack(): void {
     this.router.navigate(['/files']);
   }
+
+  // ---- Preview modal ----
+showPreviewModal = false;
+previewKind: 'image' | 'pdf' | 'text' | 'unsupported' | null = null;
+previewUrl: SafeResourceUrl | null = null;
+previewText = '';
+isLoadingPreview = false;
+private previewObjectUrl: string | null = null; // raw URL, kept to revoke later
+
+readonly imageExtensions = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'bmp'];
+readonly textExtensions = ['txt', 'csv', 'json', 'md', 'log', 'xml', 'yml', 'yaml'];
+
+private getPreviewKind(extension: string): 'image' | 'pdf' | 'text' | 'unsupported' {
+  const ext = extension.toLowerCase();
+  if (this.imageExtensions.includes(ext)) return 'image';
+  if (ext === 'pdf') return 'pdf';
+  if (this.textExtensions.includes(ext)) return 'text';
+  return 'unsupported';
+}
+
+previewFile(): void {
+  if (!this.file) return;
+
+  this.previewKind = this.getPreviewKind(this.file.extension);
+  this.previewText = '';
+  this.previewUrl = null;
+  this.showPreviewModal = true;
+
+  if (this.previewKind === 'unsupported') {
+    return; // modal shows a "can't preview" message + download button
+  }
+
+  this.isLoadingPreview = true;
+  this.fileService.downloadFile(this.fileId).subscribe({
+    next: (blob: Blob) => {
+      this.isLoadingPreview = false;
+
+      if (this.previewKind === 'text') {
+        const reader = new FileReader();
+        reader.onload = () => {
+          this.previewText = reader.result as string;
+        };
+        reader.readAsText(blob);
+        return;
+      }
+
+      // image or pdf — render via object URL
+      const objectUrl = window.URL.createObjectURL(blob);
+      this.previewObjectUrl = objectUrl;
+      this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
+    },
+    error: (err: HttpErrorResponse) => {
+      this.isLoadingPreview = false;
+      this.errorMessage = 'Preview failed.';
+      this.showPreviewModal = false;
+    }
+  });
+}
+
+closePreviewModal(): void {
+  this.showPreviewModal = false;
+  this.previewKind = null;
+  this.previewText = '';
+  this.previewUrl = null;
+
+  if (this.previewObjectUrl) {
+    window.URL.revokeObjectURL(this.previewObjectUrl);
+    this.previewObjectUrl = null;
+  }
+}
 }

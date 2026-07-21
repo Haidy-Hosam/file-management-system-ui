@@ -4,6 +4,9 @@
       <span class="icon">←</span> Back to Files
     </button>
     <div class="actions">
+        <button class="btn btn-outline" (click)="previewFile()">
+    <span class="icon">👁</span> Preview
+  </button>
       <button class="btn btn-outline" (click)="downloadFile()">
         <span class="icon">⬇</span> Download
       </button>
@@ -21,7 +24,7 @@
         <div>
           <h2>{{ file.name }}</h2>
           <div class="meta-line">
-            <span>🏢 {{ file.departmentName }}</span>
+            <span>🏢 {{ file.departmentNames }}</span>
             <span class="mono">.{{ file.extension }}</span>
             <span class="mono">{{ file.size }}</span>
             <span>🕒 {{ file.modifiedDate }}</span>
@@ -75,7 +78,7 @@
         </div>
         <div>
           <div class="label">DEPARTMENT</div>
-          <div class="value">{{ file.departmentName }}</div>
+          <div class="value">{{ file.departmentNames }}</div>
         </div>
         <div>
           <div class="label">LAST MODIFIED</div>
@@ -93,9 +96,6 @@
         <button class="btn btn-outline full">
           <span class="icon">✎</span> Edit Metadata
         </button>
-        <button class="btn btn-outline full" (click)="archiveFile()">
-          <span class="icon">📦</span> Archive File
-        </button>
         <button class="btn btn-outline full danger" (click)="deleteFile()">
           <span class="icon">🗑</span> Delete File
         </button>
@@ -104,7 +104,7 @@
   </div>
 
   <!-- Versions -->
-  <div class="card" *ngIf="activeTab === 'versions'">
+  <!-- <div class="card" *ngIf="activeTab === 'versions'">
     <h3>Version History</h3>
     <div class="version-list">
       <div class="version-row" *ngFor="let v of versions" [class.current]="v.isCurrent">
@@ -118,7 +118,7 @@
       </div>
       <div class="state-msg" *ngIf="versions.length === 0">No versions found.</div>
     </div>
-  </div>
+  </div> -->
 
   <!-- Activity -->
   <div class="card" *ngIf="activeTab === 'activity'">
@@ -164,3 +164,39 @@
   <div *ngIf="isLoading" class="state-msg">Loading file details...</div>
   <div *ngIf="errorMessage" class="state-msg error">{{ errorMessage }}</div>
 </ng-template>
+
+<!-- Preview Modal -->
+<div class="preview-overlay" *ngIf="showPreviewModal" (click)="closePreviewModal()">
+  <div class="preview-modal" (click)="$event.stopPropagation()">
+    <div class="preview-header">
+      <span class="preview-title">{{ file?.name }}</span>
+      <button class="preview-close-btn" (click)="closePreviewModal()">✕</button>
+    </div>
+
+    <div class="preview-body">
+      <div class="preview-loading" *ngIf="isLoadingPreview">Loading preview...</div>
+
+      <ng-container *ngIf="!isLoadingPreview">
+        <img
+          *ngIf="previewKind === 'image' && previewUrl"
+          [src]="previewUrl"
+          class="preview-image"
+          alt="File preview"
+        />
+
+        <iframe
+          *ngIf="previewKind === 'pdf' && previewUrl"
+          [src]="previewUrl"
+          class="preview-pdf"
+        ></iframe>
+
+        <pre *ngIf="previewKind === 'text'" class="preview-text">{{ previewText }}</pre>
+
+        <div class="preview-unsupported" *ngIf="previewKind === 'unsupported'">
+          <p>Preview isn't available for this file type.</p>
+          <button class="btn btn-outline" (click)="downloadFile()">Download instead</button>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>
