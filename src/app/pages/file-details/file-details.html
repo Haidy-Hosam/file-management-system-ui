@@ -1,1 +1,167 @@
-<p>file-details works!</p>
+<div class="fd-content" *ngIf="!isLoading && file; else loadingOrError">
+  <div class="top-row">
+    <button class="link-btn" (click)="goBack()">
+      <span class="icon">←</span> Back to Files
+    </button>
+    <div class="actions">
+      <button class="btn btn-outline" (click)="downloadFile()">
+        <span class="icon">⬇</span> Download
+      </button>
+      <button class="btn btn-primary">
+        <span class="icon">✎</span> Edit
+      </button>
+    </div>
+  </div>
+
+  <!-- File header card -->
+  <div class="card header-card">
+    <div class="header-row">
+      <div class="file-meta">
+        <div class="file-icon">📄</div>
+        <div>
+          <h2>{{ file.name }}</h2>
+          <div class="meta-line">
+            <span>🏢 {{ file.departmentName }}</span>
+            <span class="mono">.{{ file.extension }}</span>
+            <span class="mono">{{ file.size }}</span>
+            <span>🕒 {{ file.modifiedDate }}</span>
+          </div>
+        </div>
+      </div>
+      <div class="header-right">
+        <span class="status">
+          <span class="dot" [class.dot-active]="file.status === 'Active'"></span>
+          {{ file.status }}
+        </span>
+      </div>
+    </div>
+
+    <div class="tabs">
+      <button
+        *ngFor="let tab of tabs"
+        class="tab"
+        [class.tab-active]="activeTab === tab.id"
+        (click)="setTab(tab.id)"
+      >
+        {{ tab.label }}
+      </button>
+    </div>
+  </div>
+
+  <!-- Overview -->
+  <div class="grid-2" *ngIf="activeTab === 'overview'">
+    <div class="card">
+      <h3>File Information</h3>
+      <div class="info-grid">
+        <div>
+          <div class="label">FILE ID</div>
+          <div class="value">{{ file.id }}</div>
+        </div>
+        <div>
+          <div class="label">FILE TYPE</div>
+          <div class="value">{{ file.fileType }}</div>
+        </div>
+        <div>
+          <div class="label">EXTENSION</div>
+          <div class="value">.{{ file.extension }}</div>
+        </div>
+        <div>
+          <div class="label">FILE SIZE</div>
+          <div class="value">{{ file.size }}</div>
+        </div>
+        <div>
+          <div class="label">STATUS</div>
+          <div class="value">{{ file.status }}</div>
+        </div>
+        <div>
+          <div class="label">DEPARTMENT</div>
+          <div class="value">{{ file.departmentName }}</div>
+        </div>
+        <div>
+          <div class="label">LAST MODIFIED</div>
+          <div class="value">{{ file.modifiedDate }}</div>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Quick Actions</h3>
+      <div class="quick-actions">
+        <button class="btn btn-outline full" (click)="downloadFile()">
+          <span class="icon">⬇</span> Download File
+        </button>
+        <button class="btn btn-outline full">
+          <span class="icon">✎</span> Edit Metadata
+        </button>
+        <button class="btn btn-outline full" (click)="archiveFile()">
+          <span class="icon">📦</span> Archive File
+        </button>
+        <button class="btn btn-outline full danger" (click)="deleteFile()">
+          <span class="icon">🗑</span> Delete File
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Versions -->
+  <div class="card" *ngIf="activeTab === 'versions'">
+    <h3>Version History</h3>
+    <div class="version-list">
+      <div class="version-row" *ngFor="let v of versions" [class.current]="v.isCurrent">
+        <div class="version-badge" [class.badge-current]="v.isCurrent">{{ v.version }}</div>
+        <div class="version-info">
+          <div class="version-title">{{ v.title }}</div>
+          <div class="version-sub">{{ v.author }} · {{ v.date }}</div>
+        </div>
+        <span class="pill" *ngIf="v.isCurrent">Current</span>
+        <button class="icon-btn" (click)="downloadVersion(v)">⬇</button>
+      </div>
+      <div class="state-msg" *ngIf="versions.length === 0">No versions found.</div>
+    </div>
+  </div>
+
+  <!-- Activity -->
+  <div class="card" *ngIf="activeTab === 'activity'">
+    <h3>Activity Log</h3>
+    <div class="activity-list">
+      <div class="activity-row" *ngFor="let a of activity; let last = last">
+        <div class="timeline">
+          <span class="timeline-dot"></span>
+          <span class="timeline-line" *ngIf="!last"></span>
+        </div>
+        <div class="activity-content">
+          <div class="activity-text">
+            <strong>{{ a.action }}</strong> by {{ a.by }}
+          </div>
+          <div class="activity-date">{{ a.date }}</div>
+        </div>
+      </div>
+      <div class="state-msg" *ngIf="activity.length === 0">No activity yet.</div>
+    </div>
+  </div>
+
+  <!-- Permissions -->
+  <div class="card" *ngIf="activeTab === 'permissions'">
+    <h3>Access &amp; Permissions</h3>
+    <div class="permission-list">
+      <div class="permission-row" *ngFor="let p of permissions">
+        <div class="avatar" [style.background]="getAvatarColor(p.name)">
+          {{ getInitials(p.name) }}
+        </div>
+        <div class="permission-info">
+          <div class="permission-name">{{ p.name }}</div>
+          <div class="permission-sub">{{ p.subtitle }}</div>
+        </div>
+        <span class="access-pill">{{ p.access }}</span>
+        <button class="icon-btn">⋮</button>
+      </div>
+      <div class="state-msg" *ngIf="permissions.length === 0">No permissions set.</div>
+    </div>
+    <button class="add-permission">+ Add Permission</button>
+  </div>
+</div>
+
+<ng-template #loadingOrError>
+  <div *ngIf="isLoading" class="state-msg">Loading file details...</div>
+  <div *ngIf="errorMessage" class="state-msg error">{{ errorMessage }}</div>
+</ng-template>

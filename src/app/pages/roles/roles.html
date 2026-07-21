@@ -1,1 +1,58 @@
-<p>roles works!</p>
+<div class="roles-content">
+  <div class="page-header">
+    <h1>Roles</h1>
+    <p>Manage roles and permissions</p>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-box">
+      <span class="icon">🔍</span>
+      <input placeholder="Search roles..." [(ngModel)]="searchTerm" />
+    </div>
+    <button class="btn btn-outline">
+      <span class="icon">⚙</span> Filter
+    </button>
+    <button class="btn btn-primary">
+      <span class="icon">+</span> New Role
+    </button>
+  </div>
+
+  <div *ngIf="isLoading" class="state-msg">Loading roles...</div>
+  <div *ngIf="errorMessage" class="state-msg error">{{ errorMessage }}</div>
+
+  <div class="table-card" *ngIf="!isLoading && !errorMessage">
+    <table class="roles-table">
+      <thead>
+        <tr>
+          <th class="col-check">
+            <input type="checkbox" [checked]="allSelected" (change)="toggleSelectAll()" />
+          </th>
+          <th>NAME</th>
+          <th>MEMBERS</th>
+          <th>PERMISSIONS</th>
+          <th class="col-actions"></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let role of filteredRoles">
+          <td class="col-check">
+            <input
+              type="checkbox"
+              [checked]="isSelected(role)"
+              (change)="toggleSelect(role)"
+            />
+          </td>
+          <td class="col-name">{{ role.name }}</td>
+          <td>{{ role.users.length }}</td>
+          <td>{{ role.permissions.length }}</td>
+          <td class="col-actions">
+            <a class="view-link" [routerLink]="['/roles', role.id]">View ›</a>
+            <button class="icon-btn danger" (click)="deleteRole(role)">🗑</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="state-msg" *ngIf="filteredRoles.length === 0">No roles found.</div>
+  </div>
+</div>

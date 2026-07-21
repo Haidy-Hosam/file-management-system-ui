@@ -1,1 +1,114 @@
-<p>users works!</p>
+<div class="users-page" (click)="closeMenu()">
+  <div class="page-header">
+    <div>
+      <h1>Users</h1>
+      <p class="subtitle">Manage team members and access</p>
+    </div>
+  </div>
+
+  <div class="toolbar">
+    <div class="search-box">
+      <input
+        type="text"
+        placeholder="Search users..."
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearchChange()"
+      />
+    </div>
+
+    <select class="filter-select" (change)="onRoleFilterChange($any($event.target).value)">
+      <option value="">Filter by Role</option>
+      <option *ngFor="let role of uniqueRoles" [value]="role">{{ role }}</option>
+    </select>
+
+    <button class="add-btn" (click)="openAddModal()">+ Add User</button>
+  </div>
+
+  <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+
+  <div *ngIf="isLoading" class="loading-state">Loading users...</div>
+
+  <div class="users-grid" *ngIf="!isLoading">
+    <div class="user-card" *ngFor="let user of filteredUsers">
+      <div class="card-top">
+        <div class="user-identity">
+          <div class="avatar" [style.background]="getAvatarColor(user.name)">
+            {{ getInitials(user.name) }}
+          </div>
+          <div>
+            <div class="user-name">{{ user.name }}</div>
+            <div class="user-email">{{ user.email }}</div>
+          </div>
+        </div>
+
+        <button class="menu-btn" (click)="toggleMenu(user.id, $event)">⋮</button>
+
+        <div class="action-menu" *ngIf="openMenuUserId === user.id" (click)="$event.stopPropagation()">
+          <button (click)="openEditModal(user)">Edit</button>
+          <button class="danger" (click)="deleteUser(user)">Delete</button>
+        </div>
+      </div>
+
+      <div class="card-info-row">
+        <div class="info-block">
+          <span class="info-label">Role</span>
+          <span class="info-value">{{ user.role }}</span>
+        </div>
+        <div class="info-block">
+          <span class="info-label">Department</span>
+          <span class="info-value">{{ user.departmentName }}</span>
+        </div>
+      </div>
+
+      <div class="card-info-row">
+        <div class="info-block">
+          <span class="info-label">Files</span>
+          <span class="info-value">{{ user.filesCount ?? '—' }}</span>
+        </div>
+        <div class="info-block">
+          <span class="info-label">Last Login</span>
+          <span class="info-value">{{ user.lastLogin ?? '—' }}</span>
+        </div>
+      </div>
+
+      <div class="card-footer">
+        <span class="status-badge" [ngClass]="user.isDeleted ? 'inactive' : 'active'">
+          {{ user.isDeleted ? 'Inactive' : 'Active' }}
+        </span>
+        <div class="footer-icons">
+          <button class="icon-btn" title="View">👁️</button>
+          <button class="icon-btn" title="Edit" (click)="openEditModal(user)">✏️</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="empty-state" *ngIf="filteredUsers.length === 0">No users found.</div>
+  </div>
+</div>
+
+<!-- Add/Edit User Modal -->
+<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="modal" (click)="$event.stopPropagation()">
+    <h3>{{ isEditMode ? 'Edit User' : 'Add User' }}</h3>
+
+    <label>Name</label>
+    <input type="text" [(ngModel)]="formName" placeholder="Full name" />
+
+    <label>Email</label>
+    <input type="email" [(ngModel)]="formEmail" placeholder="email@arkive.co" />
+
+    <label>Password {{ isEditMode ? '(leave blank to keep unchanged)' : '' }}</label>
+    <input type="password" [(ngModel)]="formPassword" placeholder="••••••••" />
+
+    <label>Role ID</label>
+    <input type="number" [(ngModel)]="formRoleId" placeholder="e.g. 1" />
+
+    <label>Department ID</label>
+    <input type="number" [(ngModel)]="formDepartmentId" placeholder="e.g. 2" />
+
+    <div class="modal-actions">
+      <button class="cancel-btn" (click)="closeModal()">Cancel</button>
+      <button class="confirm-btn" (click)="submitForm()">{{ isEditMode ? 'Save' : 'Add' }}</button>
+    </div>
+  </div>
+</div>
