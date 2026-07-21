@@ -31,7 +31,7 @@ export class Files implements OnInit {
   errorMessage = '';
 
   searchTerm = '';
-  activeTab: 'ALL' | 'ACTIVE' | 'ARCHIVED' = 'ALL';
+  activeTab: 'ALL' | 'PENDING' | 'APPROVED' | 'REJECTED' = 'ALL';
 
   selectedFileIds = new Set<number>();
   openMenuFileId: number | null = null;
@@ -106,26 +106,26 @@ export class Files implements OnInit {
   }
 
   applyFilters(): void {
-    let result = [...this.allFiles];
+  let result = [...this.allFiles];
 
-    if (this.activeTab !== 'ALL') {
-      result = result.filter(f => f.status.toUpperCase() === this.activeTab);
-    }
-
-    if (this.searchTerm.trim()) {
-      const term = this.searchTerm.toLowerCase();
-      result = result.filter(f =>
-        f.name.toLowerCase().includes(term) ||
-        f.departmentName.toLowerCase().includes(term)
-      );
-    }
-
-    this.filteredFiles = result;
-    this.currentPage = 1;
+  if (this.activeTab !== 'ALL') {
+    result = result.filter(f => f.status.toUpperCase() === this.activeTab);
   }
+
+  if (this.searchTerm.trim()) {
+    const term = this.searchTerm.toLowerCase();
+    result = result.filter(f =>
+      f.name.toLowerCase().includes(term) ||
+      f.departmentNames.some(dept => dept.toLowerCase().includes(term))
+    );
+  }
+
+  this.filteredFiles = result;
+  this.currentPage = 1;
+}
   
 
-  setTab(tab: 'ALL' | 'ACTIVE' | 'ARCHIVED'): void {
+  setTab(tab: 'ALL' | 'PENDING' | 'APPROVED' | 'REJECTED'): void {
     this.activeTab = tab;
     this.applyFilters();
   }
@@ -556,4 +556,59 @@ openUploadModal(): void {
     };
     return map[fileType.toLowerCase()] ?? '📄';
   }
+
+  get selectedCount(): number {
+  return this.selectedFileIds.size;
+}
+
+get hasSelection(): boolean {
+  return this.selectedCount > 0;
+}
+
+deleteSelectedFiles(): void {
+
+  if (this.selectedFileIds.size === 0) {
+    return;
+  }
+
+  if (!confirm(`Delete ${this.selectedCount} selected file(s)?`)) {
+    return;
+  }
+
+  const ids = [...this.selectedFileIds];
+
+  ids.forEach(id => {
+    this.fileService.deleteFile(id).subscribe({
+      next: () => {
+        this.selectedFileIds.delete(id);
+
+        if (this.selectedFileIds.size === 0) {
+          this.loadFiles();
+        }
+      }
+    });
+  });
+}
+
+downloadSelectedFiles(): void {
+  if (this.selectedFileIds.size === 0) return;
+
+  const ids = [...this.selectedFileIds];
+
+  this.fileService.downloadFilesBulk(ids).subscribe({
+    next: (blob: Blob) => {
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'files.zip';
+      a.click();
+      window.URL.revokeObjectURL(url);
+    },
+    error: (err: HttpErrorResponse) => {
+      console.error('Bulk download failed:', err.status, err.error);
+      this.errorMessage = 'Download failed. Please try again.';
+    }
+  });
+}
+
 }
