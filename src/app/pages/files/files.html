@@ -313,3 +313,39 @@
     </div>
   </div>
 </div>
+
+<!-- Preview Modal -->
+<div class="preview-overlay" *ngIf="showPreviewModal" (click)="closePreviewModal()">
+  <div class="preview-modal" (click)="$event.stopPropagation()">
+    <div class="preview-header">
+      <span class="preview-title">{{ previewModalFile?.name }}</span>
+      <button class="preview-close-btn" (click)="closePreviewModal()">✕</button>
+    </div>
+
+    <div class="preview-body">
+      <div class="preview-loading" *ngIf="isLoadingPreview">Loading preview...</div>
+
+      <ng-container *ngIf="!isLoadingPreview">
+        <img
+          *ngIf="previewKind === 'image' && previewUrl"
+          [src]="previewUrl"
+          class="preview-image"
+          alt="File preview"
+        />
+
+        <iframe
+          *ngIf="previewKind === 'pdf' && previewUrl"
+          [src]="previewUrl"
+          class="preview-pdf"
+        ></iframe>
+
+        <pre *ngIf="previewKind === 'text'" class="preview-text">{{ previewText }}</pre>
+
+        <div class="preview-unsupported" *ngIf="previewKind === 'unsupported'">
+          <p>Preview isn't available for this file type.</p>
+          <button class="confirm-btn" (click)="downloadPreviewedFile()">Download instead</button>
+        </div>
+      </ng-container>
+    </div>
+  </div>
+</div>
