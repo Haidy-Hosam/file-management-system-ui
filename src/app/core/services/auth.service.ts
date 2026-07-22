@@ -75,4 +75,35 @@ export class AuthService {
   getDeptId(): number | null {
     return this.getDecodedToken()?.deptId ?? null;
   }
+
+  refreshToken(): Observable<authResponse> {
+
+  return this.http.post<authResponse>(
+      'http://localhost:8080/api/auth/refresh',
+      {
+          refreshToken: this.getRefreshToken()
+      }
+  );
+
+}
+
+saveAccessToken(token: string): void {
+
+  if (localStorage.getItem('accessToken')) {
+    localStorage.setItem('accessToken', token);
+  } else {
+    sessionStorage.setItem('accessToken', token);
+  }
+
+}
+
+saveRefreshToken(token: string): void {
+
+  if (localStorage.getItem('refreshToken')) {
+    localStorage.setItem('refreshToken', token);
+  } else {
+    sessionStorage.setItem('refreshToken', token);
+  }
+
+}
 }
