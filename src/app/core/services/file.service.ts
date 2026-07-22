@@ -34,6 +34,30 @@ export class FileService {
     formData.append('fileType_id', request.fileType_id.toString());
     return this.http.post<FileResponse>(this.baseUrl, formData);
   }
+  // POST /api/files/bulk (multipart/form-data) -> createFilesBulk
+  // Sends N files (each with its own file type) fanned out across M departments.
+  // The backend creates one File record per (file, department) pair.
+  uploadFilesBulk(
+    items: { file: File; fileTypeId: number }[],
+    departmentIds: number[]
+  ): Observable<FileResponse[]> {
+    const formData = new FormData();
+ 
+    // 'files' and 'fileTypeIds' are parallel arrays — index i of one
+    // corresponds to index i of the other. We control the append order
+    // here in a single loop, so it's safe to rely on it.
+    items.forEach(item => {
+      formData.append('files', item.file);
+      formData.append('fileTypeIds', item.fileTypeId.toString());
+    });
+ 
+    departmentIds.forEach(id => {
+      formData.append('departmentIds', id.toString());
+    });
+ 
+    return this.http.post<FileResponse[]>(`${this.baseUrl}/bulk`, formData);
+  }
+ 
 
   // DELETE /api/files/{fileId} -> deleteFile
   deleteFile(fileId: number): Observable<void> {

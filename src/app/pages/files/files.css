@@ -420,3 +420,185 @@
 .step-line.done {
   background: #16a34a;
 }
+
+.status-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0,0,0,0.4);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 100;
+}
+
+.status-modal {
+  background: white;
+  border-radius: 10px;
+  padding: 1.5rem;
+  width: 100%;
+  max-width: 380px;
+}
+
+.status-modal h3 {
+  margin-top: 0;
+  font-size: 1.1rem;
+}
+
+.status-modal-file {
+  font-size: 0.85rem;
+  color: #6b7280;
+  margin-top: -0.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.status-modal label {
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 600;
+  margin: 0.9rem 0 0.4rem;
+}
+
+.status-modal select {
+  width: 100%;
+  padding: 0.6rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  box-sizing: border-box;
+}
+
+.upload-modal-wide {
+  max-width: 480px;
+}
+
+.selected-files-list {
+  list-style: none;
+  margin: 0.75rem 0 0;
+  padding: 0;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.selected-files-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 0.7rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  margin-bottom: 0.4rem;
+  font-size: 0.82rem;
+}
+
+.selected-files-list li button {
+  border: none;
+  background: none;
+  cursor: pointer;
+  color: #dc2626;
+  font-size: 0.9rem;
+}
+
+.checkbox-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 220px;
+  overflow-y: auto;
+}
+
+.checkbox-list li {
+  padding: 0.4rem 0;
+}
+
+.checkbox-list label {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  font-size: 0.85rem;
+  font-weight: 400;
+  margin: 0;
+  cursor: pointer;
+}
+
+.filetype-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 240px;
+  overflow-y: auto;
+}
+
+.filetype-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.6rem;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #f3f4f6;
+}
+
+.filetype-list-name {
+  font-size: 0.82rem;
+  color: #374151;
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.filetype-list select {
+  width: auto;
+  min-width: 140px;
+  padding: 0.4rem 0.5rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 0.8rem;
+}
+
+.preview-tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.4rem;
+  margin-bottom: 0.5rem;
+}
+
+.preview-list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  max-height: 200px;
+  overflow-y: auto;
+}
+
+.preview-list li {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.45rem 0;
+  border-bottom: 1px solid #f3f4f6;
+  font-size: 0.82rem;
+}
+
+.preview-file-name {
+  color: #1a1a2e;
+  font-weight: 600;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.preview-file-type {
+  color: #6b7280;
+  font-size: 0.78rem;
+  white-space: nowrap;
+  margin-left: 0.75rem;
+}
+
+.preview-summary {
+  margin-top: 0.9rem;
+  font-size: 0.8rem;
+  color: #4b5563;
+  background: #f9fafb;
+  border-radius: 6px;
+  padding: 0.6rem 0.8rem;
+}

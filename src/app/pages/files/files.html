@@ -78,9 +78,7 @@
               <button (click)="downloadFile(file)">Download</button>
 
               <ng-container *ngIf="role === 'ADMIN' || role === 'MANAGER'">
-                <button (click)="approveFile(file)">Approve</button>
-                <button (click)="rejectFile(file)">Reject</button>
-                <button (click)="archiveFile(file)">Archive</button>
+                <button (click)="openStatusModal(file)">Edit Status</button>
               </ng-container>
 
               <button class="danger" *ngIf="role === 'ADMIN'" (click)="deleteFile(file)">Delete</button>
@@ -114,30 +112,35 @@
 </div>
 <!-- Upload Modal -->
 <div class="upload-overlay" *ngIf="showUploadModal" (click)="closeUploadModal()">
-  <div class="upload-modal" (click)="$event.stopPropagation()">
-    <h3>Upload File</h3>
+  <div class="upload-modal upload-modal-wide" (click)="$event.stopPropagation()">
+    <h3>Upload Files</h3>
 
     <!-- Step indicator -->
     <div class="stepper">
       <div class="step" [class.active]="currentStep === 1" [class.done]="currentStep > 1" (click)="goToStep(1)">
         <span class="step-num">1</span>
-        <span class="step-label">File</span>
+        <span class="step-label">Files</span>
       </div>
       <div class="step-line" [class.done]="currentStep > 1"></div>
       <div class="step" [class.active]="currentStep === 2" [class.done]="currentStep > 2" (click)="goToStep(2)">
         <span class="step-num">2</span>
-        <span class="step-label">Department</span>
+        <span class="step-label">Departments</span>
       </div>
       <div class="step-line" [class.done]="currentStep > 2"></div>
-      <div class="step" [class.active]="currentStep === 3" (click)="goToStep(3)">
+      <div class="step" [class.active]="currentStep === 3" [class.done]="currentStep > 3" (click)="goToStep(3)">
         <span class="step-num">3</span>
-        <span class="step-label">File Type</span>
+        <span class="step-label">File Types</span>
+      </div>
+      <div class="step-line" [class.done]="currentStep > 3"></div>
+      <div class="step" [class.active]="currentStep === 4" (click)="goToStep(4)">
+        <span class="step-num">4</span>
+        <span class="step-label">Preview</span>
       </div>
     </div>
 
-    <input #fileInput type="file" hidden (change)="onFileSelected($event)" />
+    <input #fileInput type="file" hidden multiple (change)="onFileSelected($event)" />
 
-    <!-- Step 1: Drag & drop -->
+    <!-- Step 1: Drag & drop, multiple files -->
     <div class="step-content" *ngIf="currentStep === 1">
       <div
         class="dropzone"
@@ -147,34 +150,67 @@
         (drop)="onDrop($event)"
         (click)="triggerBrowse(fileInput)"
       >
-        <ng-container *ngIf="!selectedUploadFile; else fileSelected">
-          <p>Drag &amp; drop a file here, or click to browse</p>
-        </ng-container>
-        <ng-template #fileSelected>
-          <div class="selected-file">
-            <span>{{ selectedUploadFile?.name }}</span>
-            <button type="button" (click)="clearSelectedFile(); $event.stopPropagation()">✕</button>
-          </div>
-        </ng-template>
+        <p>Drag &amp; drop files here, or click to browse</p>
       </div>
+
+      <ul class="selected-files-list" *ngIf="uploadItems.length > 0">
+        <li *ngFor="let item of uploadItems; let i = index">
+          <span>{{ item.file.name }}</span>
+          <button type="button" (click)="removeUploadItem(i); $event.stopPropagation()">✕</button>
+        </li>
+      </ul>
     </div>
 
-    <!-- Step 2: Department -->
+    <!-- Step 2: Departments (multi-select) -->
     <div class="step-content" *ngIf="currentStep === 2">
-      <label>Department</label>
-      <select [(ngModel)]="selectedDepartmentId">
-        <option [ngValue]="null" disabled>Select department</option>
-        <option *ngFor="let dept of departments" [ngValue]="dept.id">{{ dept.name }}</option>
-      </select>
+      <label>Send to Departments</label>
+      <ul class="checkbox-list">
+        <li *ngFor="let dept of departments">
+          <label>
+            <input
+              type="checkbox"
+              [checked]="isDepartmentSelected(dept.id)"
+              (change)="toggleDepartmentSelection(dept.id)"
+            />
+            {{ dept.name }}
+          </label>
+        </li>
+      </ul>
     </div>
 
-    <!-- Step 3: File Type -->
+    <!-- Step 3: File Type per file -->
     <div class="step-content" *ngIf="currentStep === 3">
-      <label>File Type</label>
-      <select [(ngModel)]="selectedFileTypeId">
-        <option [ngValue]="null" disabled>Select file type</option>
-        <option *ngFor="let type of fileTypes" [ngValue]="type.id">{{ type.name }}</option>
-      </select>
+      <label>File Type for Each File</label>
+      <ul class="filetype-list">
+        <li *ngFor="let item of uploadItems">
+          <span class="filetype-list-name">{{ item.file.name }}</span>
+          <select [(ngModel)]="item.fileTypeId">
+            <option [ngValue]="null" disabled>Select file type</option>
+            <option *ngFor="let type of fileTypes" [ngValue]="type.id">{{ type.name }}</option>
+          </select>
+        </li>
+      </ul>
+    </div>
+
+    <!-- Step 4: Preview -->
+    <div class="step-content" *ngIf="currentStep === 4">
+      <label>Departments</label>
+      <div class="preview-tags">
+        <span class="tag" *ngFor="let deptId of selectedDepartmentIds">{{ getDepartmentName(deptId) }}</span>
+      </div>
+
+      <label>Files</label>
+      <ul class="preview-list">
+        <li *ngFor="let item of uploadItems">
+          <span class="preview-file-name">{{ item.file.name }}</span>
+          <span class="preview-file-type">{{ getFileTypeName(item.fileTypeId) }}</span>
+        </li>
+      </ul>
+
+      <p class="preview-summary">
+        {{ uploadItems.length }} file(s) × {{ selectedDepartmentIds.length }} department(s)
+        = {{ totalRecordsToCreate }} record(s) will be created.
+      </p>
     </div>
 
     <div class="modal-actions">
@@ -200,6 +236,35 @@
         [disabled]="!canSubmitUpload"
       >
         {{ isUploading ? 'Uploading...' : 'Upload' }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- Edit Status Modal -->
+<div class="status-overlay" *ngIf="showStatusModal" (click)="closeStatusModal()">
+  <div class="status-modal" (click)="$event.stopPropagation()">
+    <h3>Edit Status</h3>
+    <p class="status-modal-file" *ngIf="statusModalFile">{{ statusModalFile.name }}</p>
+
+    <label>Current Status</label>
+    <span class="status-badge" [ngClass]="statusModalFile?.status?.toLowerCase()" *ngIf="statusModalFile">
+      {{ statusModalFile.status }}
+    </span>
+
+    <label>New Status</label>
+    <select [(ngModel)]="selectedStatus">
+      <option *ngFor="let option of statusOptions" [ngValue]="option">{{ option }}</option>
+    </select>
+
+    <div class="modal-actions">
+      <button class="cancel-btn" (click)="closeStatusModal()" [disabled]="isUpdatingStatus">Cancel</button>
+      <button
+        class="confirm-btn"
+        (click)="confirmStatusUpdate()"
+        [disabled]="!canConfirmStatus"
+      >
+        {{ isUpdatingStatus ? 'Saving...' : 'Save Status' }}
       </button>
     </div>
   </div>

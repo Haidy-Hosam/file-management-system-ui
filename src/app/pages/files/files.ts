@@ -8,6 +8,15 @@ import { AuthService } from '../../core/Services/auth.service';
 import { DepartmentService, Department } from '../../core/Services/department.service';
 import { FileTypeService, FileType } from '../../core/Services/filetype.service';
 
+interface FileGroup {
+  groupId: string;
+  name: string;
+  fileType: string;
+  size: string;
+  modifiedDate: string;
+  entries: FileResponse[]; // one per department this file was sent to
+}
+
 @Component({
   selector: 'app-files',
   standalone: true,
@@ -26,10 +35,12 @@ export class Files implements OnInit {
 
   selectedFileIds = new Set<number>();
   openMenuFileId: number | null = null;
+  openGroupMenuId: string | null = null;
+
 
   // pagination
   currentPage = 1;
-  pageSize = 8;
+  pageSize = 10;
 
   constructor(
     private fileService: FileService,
@@ -112,6 +123,7 @@ export class Files implements OnInit {
     this.filteredFiles = result;
     this.currentPage = 1;
   }
+  
 
   setTab(tab: 'ALL' | 'ACTIVE' | 'ARCHIVED'): void {
     this.activeTab = tab;
@@ -168,25 +180,141 @@ export class Files implements OnInit {
 
   showUploadModal = false;
   isDragging = false;
-  selectedUploadFile: File | null = null;
-  selectedDepartmentId: number | null = null;
-  selectedFileTypeId: number | null = null;
+  // selectedUploadFile: File | null = null;
+  // selectedDepartmentId: number | null = null;
+  // selectedFileTypeId: number | null = null;
   isUploading = false;
+   uploadItems: { file: File; fileTypeId: number | null }[] = [];
+  selectedDepartmentIds: number[] = [];
 
   currentStep = 1;
-  readonly totalSteps = 3;
+  readonly totalSteps = 4;
 
-  get canSubmitUpload(): boolean {
-    return !!this.selectedUploadFile &&
-      this.selectedDepartmentId != null &&
-      this.selectedFileTypeId != null &&
+//   get canSubmitUpload(): boolean {
+//     return !!this.selectedUploadFile &&
+//       this.selectedDepartmentId != null &&
+//       this.selectedFileTypeId != null &&
+//       !this.isUploading;
+//   }
+// openUploadModal(): void {
+//     this.showUploadModal = true;
+//     this.selectedUploadFile = null;
+//     this.selectedDepartmentId = null;
+//     this.selectedFileTypeId = null;
+//     this.isDragging = false;
+//     this.currentStep = 1;
+//   }
+
+//   closeUploadModal(): void {
+//     if (this.isUploading) return;
+//     this.showUploadModal = false;
+//     this.selectedUploadFile = null;
+//     this.selectedDepartmentId = null;
+//     this.selectedFileTypeId = null;
+//     this.isDragging = false;
+//     this.currentStep = 1;
+//   }
+//   nextStep(): void {
+//     if (this.canGoNext()) {
+//       this.currentStep++;
+//     }
+//   }
+
+//   prevStep(): void {
+//     if (this.currentStep > 1) {
+//       this.currentStep--;
+//     }
+//   }
+
+//   goToStep(step: number): void {
+//     // only allow jumping to a step already reached
+//     if (step <= this.currentStep) {
+//       this.currentStep = step;
+//     }
+//   }
+
+//   canGoNext(): boolean {
+//     switch (this.currentStep) {
+//       case 1: return !!this.selectedUploadFile;
+//       case 2: return this.selectedDepartmentId != null;
+//       case 3: return this.selectedFileTypeId != null;
+//       default: return false;
+//     }
+//   }
+//   onFileSelected(event: Event): void {
+//     const input = event.target as HTMLInputElement;
+//     if (input.files && input.files.length > 0) {
+//       this.selectedUploadFile = input.files[0];
+//     }
+//   }
+
+//   triggerBrowse(fileInput: HTMLInputElement): void {
+//     fileInput.click();
+//   }
+
+//   onDragOver(event: DragEvent): void {
+//     event.preventDefault();
+//     event.stopPropagation();
+//     this.isDragging = true;
+//   }
+
+//   onDragLeave(event: DragEvent): void {
+//     event.preventDefault();
+//     event.stopPropagation();
+//     this.isDragging = false;
+//   }
+
+//   onDrop(event: DragEvent): void {
+//     event.preventDefault();
+//     event.stopPropagation();
+//     this.isDragging = false;
+
+//     const files = event.dataTransfer?.files;
+//     if (files && files.length > 0) {
+//       this.selectedUploadFile = files[0];
+//     }
+//   }
+
+//   clearSelectedFile(): void {
+//     this.selectedUploadFile = null;
+//   }
+
+//   submitUpload(): void {
+//     if (!this.canSubmitUpload) return;
+
+//     const request: FileRequest = {
+//       file: this.selectedUploadFile!,
+//       department_id: this.selectedDepartmentId!,
+//       fileType_id: this.selectedFileTypeId!
+//     };
+
+//     this.isUploading = true;
+//     this.fileService.uploadFile(request).subscribe({
+//       next: (response: FileResponse) => {
+//         this.isUploading = false;
+//         this.closeUploadModal();
+//         this.loadFiles();
+//       },
+//       error: (err: HttpErrorResponse) => {
+//         this.isUploading = false;
+//         this.errorMessage = 'Upload failed. Please try again.';
+//       }
+//     });
+//   }
+ get canSubmitUpload(): boolean {
+    return this.uploadItems.length > 0 &&
+      this.selectedDepartmentIds.length > 0 &&
+      this.uploadItems.every(item => item.fileTypeId != null) &&
       !this.isUploading;
+  }
+
+  get totalRecordsToCreate(): number {
+    return this.uploadItems.length * this.selectedDepartmentIds.length;
   }
 openUploadModal(): void {
     this.showUploadModal = true;
-    this.selectedUploadFile = null;
-    this.selectedDepartmentId = null;
-    this.selectedFileTypeId = null;
+    this.uploadItems = [];
+    this.selectedDepartmentIds = [];
     this.isDragging = false;
     this.currentStep = 1;
   }
@@ -194,9 +322,8 @@ openUploadModal(): void {
   closeUploadModal(): void {
     if (this.isUploading) return;
     this.showUploadModal = false;
-    this.selectedUploadFile = null;
-    this.selectedDepartmentId = null;
-    this.selectedFileTypeId = null;
+    this.uploadItems = [];
+    this.selectedDepartmentIds = [];
     this.isDragging = false;
     this.currentStep = 1;
   }
@@ -221,16 +348,30 @@ openUploadModal(): void {
 
   canGoNext(): boolean {
     switch (this.currentStep) {
-      case 1: return !!this.selectedUploadFile;
-      case 2: return this.selectedDepartmentId != null;
-      case 3: return this.selectedFileTypeId != null;
+      case 1: return this.uploadItems.length > 0;
+      case 2: return this.selectedDepartmentIds.length > 0;
+      case 3: return this.uploadItems.every(item => item.fileTypeId != null);
       default: return false;
     }
   }
+
+  private addFiles(files: FileList): void {
+    Array.from(files).forEach(file => {
+      // skip exact duplicates (same name + size) already in the batch
+      const alreadyAdded = this.uploadItems.some(
+        item => item.file.name === file.name && item.file.size === file.size
+      );
+      if (!alreadyAdded) {
+        this.uploadItems.push({ file, fileTypeId: null });
+      }
+    });
+  }
+
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
     if (input.files && input.files.length > 0) {
-      this.selectedUploadFile = input.files[0];
+      this.addFiles(input.files);
+      input.value = ''; // allow re-selecting the same file later if removed
     }
   }
 
@@ -257,36 +398,54 @@ openUploadModal(): void {
 
     const files = event.dataTransfer?.files;
     if (files && files.length > 0) {
-      this.selectedUploadFile = files[0];
+      this.addFiles(files);
     }
   }
 
-  clearSelectedFile(): void {
-    this.selectedUploadFile = null;
+  removeUploadItem(index: number): void {
+    this.uploadItems.splice(index, 1);
+  }
+
+  toggleDepartmentSelection(deptId: number): void {
+    const idx = this.selectedDepartmentIds.indexOf(deptId);
+    if (idx > -1) {
+      this.selectedDepartmentIds.splice(idx, 1);
+    } else {
+      this.selectedDepartmentIds.push(deptId);
+    }
+  }
+
+  isDepartmentSelected(deptId: number): boolean {
+    return this.selectedDepartmentIds.includes(deptId);
+  }
+
+  getDepartmentName(deptId: number): string {
+    return this.departments.find(d => d.id === deptId)?.name ?? 'Unknown';
+  }
+
+  getFileTypeName(fileTypeId: number | null): string {
+    if (fileTypeId == null) return '—';
+    return this.fileTypes.find(t => t.id === fileTypeId)?.name ?? 'Unknown';
   }
 
   submitUpload(): void {
     if (!this.canSubmitUpload) return;
 
-    const request: FileRequest = {
-      file: this.selectedUploadFile!,
-      department_id: this.selectedDepartmentId!,
-      fileType_id: this.selectedFileTypeId!
-    };
-
     this.isUploading = true;
-    this.fileService.uploadFile(request).subscribe({
-      next: (response: FileResponse) => {
-        this.isUploading = false;
-        this.closeUploadModal();
-        this.loadFiles();
-      },
-      error: (err: HttpErrorResponse) => {
-        this.isUploading = false;
-        this.errorMessage = 'Upload failed. Please try again.';
-      }
-    });
+    this.fileService.uploadFilesBulk(this.uploadItems as { file: File; fileTypeId: number }[], this.selectedDepartmentIds)
+      .subscribe({
+        next: (response: FileResponse[]) => {
+          this.isUploading = false;
+          this.closeUploadModal();
+          this.loadFiles();
+        },
+        error: (err: HttpErrorResponse) => {
+          this.isUploading = false;
+          this.errorMessage = 'Upload failed. Please try again.';
+        }
+      });
   }
+
 
   // ---- Row actions ----
   viewDetails(fileId: number): void {
@@ -335,34 +494,53 @@ openUploadModal(): void {
     this.closeMenu();
   }
 
-  approveFile(file: FileResponse): void {
-    this.fileService.updateFileStatus(file.id, 'APPROVED').subscribe({
-      next: () => this.loadFiles(),
-      error: (err: HttpErrorResponse) => {
-        this.errorMessage = 'Status update failed.';
-      }
-    });
+ 
+  // ---- Edit Status modal ----
+  showStatusModal = false;
+  statusModalFile: FileResponse | null = null;
+  selectedStatus: string | null = null;
+  isUpdatingStatus = false;
+
+  readonly statusOptions: string[] = ['PENDING', 'APPROVED', 'REJECTED'];
+
+  openStatusModal(file: FileResponse): void {
+    this.statusModalFile = file;
+    this.selectedStatus = file.status;
+    this.showStatusModal = true;
     this.closeMenu();
   }
 
-  rejectFile(file: FileResponse): void {
-    this.fileService.updateFileStatus(file.id, 'REJECTED').subscribe({
-      next: () => this.loadFiles(),
-      error: (err: HttpErrorResponse) => {
-        this.errorMessage = 'Status update failed.';
-      }
-    });
-    this.closeMenu();
+  closeStatusModal(): void {
+    if (this.isUpdatingStatus) return;
+    this.showStatusModal = false;
+    this.statusModalFile = null;
+    this.selectedStatus = null;
   }
 
-  archiveFile(file: FileResponse): void {
-    this.fileService.updateFileStatus(file.id, 'ARCHIVED').subscribe({
-      next: () => this.loadFiles(),
+  get canConfirmStatus(): boolean {
+    return !!this.statusModalFile &&
+      !!this.selectedStatus &&
+      this.selectedStatus !== this.statusModalFile.status &&
+      !this.isUpdatingStatus;
+  }
+
+  confirmStatusUpdate(): void {
+    if (!this.canConfirmStatus) return;
+
+    this.isUpdatingStatus = true;
+    this.fileService.updateFileStatus(this.statusModalFile!.id, this.selectedStatus!).subscribe({
+      next: () => {
+        this.isUpdatingStatus = false;
+        this.showStatusModal = false;
+        this.statusModalFile = null;
+        this.selectedStatus = null;
+        this.loadFiles();
+      },
       error: (err: HttpErrorResponse) => {
+        this.isUpdatingStatus = false;
         this.errorMessage = 'Status update failed.';
       }
     });
-    this.closeMenu();
   }
 
   get role(): string | null {

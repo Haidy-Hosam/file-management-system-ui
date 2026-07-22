@@ -28,16 +28,18 @@ export class AuthService {
   }
 
   logout(): void {
-    localStorage.removeItem('accessToken');
-    localStorage.removeItem('refreshToken');
+     localStorage.removeItem('accessToken');
+  localStorage.removeItem('refreshToken');
+  sessionStorage.removeItem('accessToken');
+  sessionStorage.removeItem('refreshToken');
   }
 
   getToken(): string | null {
-    return localStorage.getItem('accessToken');
+  return localStorage.getItem('accessToken') ?? sessionStorage.getItem('accessToken');
   }
 
   getRefreshToken(): string | null {
-    return localStorage.getItem('refreshToken');
+  return localStorage.getItem('refreshToken') ?? sessionStorage.getItem('refreshToken');
   }
 
   isLoggedIn(): boolean {
