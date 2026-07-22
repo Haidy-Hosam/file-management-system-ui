@@ -89,7 +89,7 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let file of paginatedFiles">
+       <tr *ngFor="let file of filteredFiles">
           <td class="col-checkbox">
             <input
               type="checkbox"
@@ -130,7 +130,7 @@
           </td>
         </tr>
 
-        <tr *ngIf="paginatedFiles.length === 0">
+        <tr *ngIf="filteredFiles.length === 0">
           <td colspan="7" class="empty-state">No files found.</td>
         </tr>
       </tbody>
@@ -142,16 +142,33 @@
   </ng-template>
 
   <div class="table-footer" *ngIf="!isLoading">
-    <span>Showing {{ paginatedFiles.length }} of {{ filteredFiles.length }} files</span>
+    <span>Showing {{ filteredFiles.length }} of {{ totalElements }} files</span>
     <div class="pagination">
-      <button
-        *ngFor="let page of [].constructor(totalPages); let i = index"
-        [class.active]="currentPage === i + 1"
-        (click)="goToPage(i + 1)"
-      >
-        {{ i + 1 }}
-      </button>
-    </div>
+    <div class="pagination">
+
+  <button
+      (click)="previousPage()"
+      [disabled]="page === 0">
+
+      Previous
+
+  </button>
+
+  <span>
+
+      {{ page + 1 }} / {{ totalDisplayedPages }}
+
+  </span>
+
+  <button
+      (click)="nextPage()"
+      [disabled]="page === totalDisplayedPages - 1">
+
+      Next
+
+  </button>
+
+</div>
   </div>
 </div>
 <!-- Upload Modal -->
