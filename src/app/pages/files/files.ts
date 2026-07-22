@@ -3,10 +3,10 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
-import { FileService, FileResponse, FileRequest } from '../../core/Services/file.service';
-import { AuthService } from '../../core/Services/auth.service';
-import { DepartmentService, Department } from '../../core/Services/department.service';
-import { FileTypeService, FileType } from '../../core/Services/filetype.service';
+import { FileService, FileResponse, FileRequest } from '../../core/services/file.service';
+import { AuthService } from '../../core/services/auth.service';
+import { DepartmentService, Department } from '../../core/services/department.service';
+import { FileTypeService, FileType } from '../../core/services/filetype.service';
 
 interface FileGroup {
   groupId: string;

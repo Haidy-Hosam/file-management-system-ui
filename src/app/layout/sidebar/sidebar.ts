@@ -1,10 +1,10 @@
 import { Component, OnInit, signal } from '@angular/core';
 import { RouterLink, RouterLinkActive, Router } from '@angular/router';
 import { CommonModule } from '@angular/common';
-import { AuthService } from '../../core/Services/auth.service';
-import { PageService } from '../../core/Services/page.service';
+import { AuthService } from '../../core/services/auth.service';
+import { PageService } from '../../core/services/page.service';
 import { Page } from '../../core/models/page.model';
-import { UserService } from '../../core/Services/user.service';
+import { UserService } from '../../core/services/user.service';
 import { User } from '../../core/models/user.model';
 
 @Component({
