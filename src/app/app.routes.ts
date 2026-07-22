@@ -1,7 +1,8 @@
-import { Routes } from '@angular/router';
+﻿import { Routes } from '@angular/router';
 import { Login } from './pages/login/login';
 import { Dashboard } from './pages/dashboard/dashboard';
 import { Files } from './pages/files/files';
+import { Profile } from './pages/profile/profile';
 import { FileDetails } from './pages/file-details/file-details';
 import { Departments } from './pages/departments/departments';
 import { Users } from './pages/users/users';
@@ -45,7 +46,10 @@ export const routes: Routes = [
         component: Roles,
         canActivate: [roleGuard(['ADMIN'])],
       },
-      
+      {
+         path: 'profile', 
+         component: Profile
+       }
     ],
   },
 ];

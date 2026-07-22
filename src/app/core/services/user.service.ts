@@ -9,8 +9,8 @@ export interface UserResponse {
   role: string;
   departmentName: string;
   isDeleted: boolean;
-  filesCount?: number;      // not yet in backend DTO
-  lastLogin?: string;       // not yet in backend DTO
+  filesCount?: number;
+  lastLogin?: string;
 }
 
 export interface RegisterRequest {
@@ -29,6 +29,10 @@ export class UserService {
 
   getAllUsers(): Observable<UserResponse[]> {
     return this.http.get<UserResponse[]>(this.baseUrl);
+  }
+
+  getCurrentUser(): Observable<UserResponse> {
+    return this.http.get<UserResponse>(`${this.baseUrl}/me`);
   }
 
   createUser(request: RegisterRequest): Observable<UserResponse> {

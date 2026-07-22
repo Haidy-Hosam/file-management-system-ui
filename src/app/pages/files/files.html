@@ -108,11 +108,14 @@
           <td>{{ file.departmentNames.join(', ') }}</td>
           <td>{{ file.size }}</td>
           <td>{{ file.modifiedDate }}</td>
-          <td>
-            <span class="status-badge" [ngClass]="file.status.toLowerCase()">
-              {{ file.status }}
-            </span>
-          </td>
+         <td>
+  <div class="status-progress" [ngClass]="file.status.toLowerCase()">
+    <div class="status-progress-track">
+      <div class="status-progress-fill"></div>
+    </div>
+    <span class="status-progress-label">{{ file.status }}</span>
+  </div>
+</td>
           <td class="col-actions">
             <button class="menu-btn" (click)="toggleMenu(file.id, $event)">⋮</button>
 
@@ -142,33 +145,17 @@
   </ng-template>
 
   <div class="table-footer" *ngIf="!isLoading">
-    <span>Showing {{ filteredFiles.length }} of {{ totalElements }} files</span>
-    <div class="pagination">
-    <div class="pagination">
-
-  <button
-      (click)="previousPage()"
-      [disabled]="page === 0">
-
+  <span>Showing {{ filteredFiles.length }} of {{ totalElements }} files</span>
+  <div class="pagination">
+    <button (click)="previousPage()" [disabled]="page === 0">
       Previous
+    </button>
 
-  </button>
+    <span>{{ page + 1 }} / {{ totalDisplayedPages }}</span>
 
-  <span>
-
-      {{ page + 1 }} / {{ totalDisplayedPages }}
-
-  </span>
-
-  <button
-      (click)="nextPage()"
-      [disabled]="page === totalDisplayedPages - 1">
-
+    <button (click)="nextPage()" [disabled]="page === totalDisplayedPages - 1">
       Next
-
-  </button>
-
-</div>
+    </button>
   </div>
 </div>
 <!-- Upload Modal -->
