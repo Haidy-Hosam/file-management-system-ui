@@ -9,14 +9,14 @@ import { DepartmentService, Department } from '../../core/services/department.se
 import { FileTypeService, FileType } from '../../core/services/filetype.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
-interface FileGroup {
-  groupId: string;
-  name: string;
-  fileType: string;
-  size: string;
-  modifiedDate: string;
-  entries: FileResponse[]; // one per department this file was sent to
-}
+// interface FileGroup {
+//   groupId: string;
+//   name: string;
+//   fileType: string;
+//   size: string;
+//   modifiedDate: string;
+//   entries: FileResponse[]; // one per department this file was sent to
+// }
 
 @Component({
   selector: 'app-files',
@@ -30,6 +30,12 @@ export class Files implements OnInit {
   filteredFiles: FileResponse[] = [];
   isLoading = true;
   errorMessage = '';
+//Backend pagination parameters
+  page = 0;
+  size = 10;
+
+  totalDisplayedPages = 0;
+  totalElements = 0;
 
   searchTerm = '';
   activeTab: 'ALL' | 'PENDING' | 'APPROVED' | 'REJECTED' = 'ALL';
@@ -40,8 +46,8 @@ export class Files implements OnInit {
 
 
   // pagination
-  currentPage = 1;
-  pageSize = 10;
+  // currentPage = 1;
+  // pageSize = 10;
 
   constructor(
     private fileService: FileService,
@@ -76,7 +82,7 @@ export class Files implements OnInit {
     });
   }
 
-  loadFiles(): void {
+  loadFiles() {
     this.isLoading = true;
     const role = this.authService.getRole();
 
@@ -84,7 +90,7 @@ export class Files implements OnInit {
     // department, per the controller's @PreAuthorize check on /dept/{deptId}.
     let request$;
     if (role === 'ADMIN') {
-      request$ = this.fileService.getAllFiles();
+      request$ = this.fileService.getAllFiles(this.page,this.size);
     } else {
       const deptId = this.authService.getDeptId();
       if (deptId == null) {
@@ -92,20 +98,36 @@ export class Files implements OnInit {
         this.isLoading = false;
         return;
       }
-      request$ = this.fileService.getAllFilesByDepartment(deptId);
+      request$ = this.fileService.getAllFilesByDepartment(deptId, this.page, this.size);
     }
 
+    // request$.subscribe({
+    //   next: (files: FileResponse[]) => {
+    //     this.allFiles = files;
+    //     this.applyFilters();
+    //     this.isLoading = false;
+    //   },
+    //   error: (err: HttpErrorResponse) => {
+    //     this.errorMessage = 'Failed to load files.';
+    //     this.isLoading = false;
+    //   }
+    // });
+
     request$.subscribe({
-      next: (files: FileResponse[]) => {
-        this.allFiles = files;
+      next: (response) => {
+        this.allFiles = response.content;
+
+        this.totalElements =response.totalElements;
+        this.totalDisplayedPages = response.totalPages;
         this.applyFilters();
+
         this.isLoading = false;
       },
-      error: (err: HttpErrorResponse) => {
+      error: (err: HttpErrorResponse) =>{
         this.errorMessage = 'Failed to load files.';
         this.isLoading = false;
       }
-    });
+    })
   }
 
   applyFilters(): void {
@@ -124,7 +146,7 @@ export class Files implements OnInit {
   }
 
   this.filteredFiles = result;
-  this.currentPage = 1;
+  // this.currentPage = 1;
 }
   
 
@@ -137,25 +159,38 @@ export class Files implements OnInit {
     this.applyFilters();
   }
 
-  get paginatedFiles(): FileResponse[] {
-    const start = (this.currentPage - 1) * this.pageSize;
-    return this.filteredFiles.slice(start, start + this.pageSize);
-  }
+  // get paginatedFiles(): FileResponse[] {
+  //   const start = (this.currentPage - 1) * this.pageSize;
+  //   return this.filteredFiles.slice(start, start + this.pageSize);
+  // }
 
-  get totalPages(): number {
-    return Math.max(1, Math.ceil(this.filteredFiles.length / this.pageSize));
-  }
+  // get totalPages(): number {
+  //   return Math.max(1, Math.ceil(this.filteredFiles.length / this.pageSize));
+  // }
 
+  nextPage(): void{
+    if(this.page < this.totalDisplayedPages -1){
+      this.page++;
+      this.loadFiles();
+    }
+  }
+  previousPage(): void{
+    if(this.page > 0){
+      this.page--;
+      this.loadFiles();
+    }
+  }
   goToPage(page: number): void {
-    this.currentPage = page;
+    this.page = page;
+    this.loadFiles();
   }
 
   toggleSelectAll(event: Event): void {
     const checked = (event.target as HTMLInputElement).checked;
     if (checked) {
-      this.paginatedFiles.forEach(f => this.selectedFileIds.add(f.id));
+      this.filteredFiles.forEach(f => this.selectedFileIds.add(f.id)); 
     } else {
-      this.paginatedFiles.forEach(f => this.selectedFileIds.delete(f.id));
+      this.filteredFiles.forEach(f => this.selectedFileIds.delete(f.id));
     }
   }
 
