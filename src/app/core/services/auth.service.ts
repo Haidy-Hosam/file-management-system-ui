@@ -17,25 +17,31 @@ export class AuthService {
     return this.http.post<authResponse>(`${this.baseUrl}/login`, body).pipe(
       tap(res => {
         if (rememberMe) {
+          sessionStorage.removeItem('accessToken');
+          sessionStorage.removeItem('refreshToken');
+
           localStorage.setItem('accessToken', res.accessToken);
           localStorage.setItem('refreshToken', res.refreshToken);
         } else {
+          localStorage.removeItem('accessToken');
+          localStorage.removeItem('refreshToken');
+
           sessionStorage.setItem('accessToken', res.accessToken);
           sessionStorage.setItem('refreshToken', res.refreshToken);
-}
+        }
       })
     );
   }
 
   logout(): void {
-     localStorage.removeItem('accessToken');
+  localStorage.removeItem('accessToken');
   localStorage.removeItem('refreshToken');
   sessionStorage.removeItem('accessToken');
   sessionStorage.removeItem('refreshToken');
   }
 
   getToken(): string | null {
-  return localStorage.getItem('accessToken') ?? sessionStorage.getItem('accessToken');
+  return localStorage.getItem('accessToken') || sessionStorage.getItem('accessToken');
   }
 
   getRefreshToken(): string | null {
@@ -44,10 +50,14 @@ export class AuthService {
 
   isLoggedIn(): boolean {
     const token = this.getToken();
-    if (!token) return false;
+
+    if (!token){
+       return false;
+    } 
 
     const decoded = this.getDecodedToken();
-    if (!decoded) return false;
+    if (!decoded) {
+      return false;}
 
     // exp is in seconds, Date.now() is in ms
     const isExpired = decoded.exp * 1000 < Date.now();
