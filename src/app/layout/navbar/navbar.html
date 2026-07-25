@@ -1,59 +1,62 @@
-<nav class="navbar navbar-expand-lg navbar-light bg-white border-bottom shadow-sm px-3 py-2">
-	<div class="container-fluid px-0">
-		<a class="navbar-brand fw-bold text-primary d-flex align-items-center gap-2" routerLink="/dashboard">
-			<span class="navbar-brand-mark">A</span>
-			<span>ADIB Files</span>
-		</a>
+<header class="topbar">
+  <div class="topbar-inner">
+    <div class="search-wrap">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.6"/>
+        <path d="M21 21l-4.3-4.3" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+      </svg>
+      <input
+       type="search"
+       placeholder="Search files, users, departments..."
+       [(ngModel)]="searchTerm"
+       (keyup.enter)="onSearchSubmit()"
+        name="search"
+      />
+      <kbd class="search-kbd">⌘K</kbd>
+    </div>
 
-		<button
-			class="navbar-toggler"
-			type="button"
-			data-bs-toggle="collapse"
-			data-bs-target="#topNavbarContent"
-			aria-controls="topNavbarContent"
-			aria-expanded="false"
-			aria-label="Toggle navigation"
-		>
-			<span class="navbar-toggler-icon"></span>
-		</button>
+    <div class="topbar-actions">
+      <button class="icon-btn" title="Notifications">
+        <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+          <path d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"
+                stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/>
+          <path d="M13.73 21a2 2 0 01-3.46 0" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/>
+        </svg>
+        <span class="notif-dot"></span>
+      </button>
 
-		<div class="collapse navbar-collapse" id="topNavbarContent">
-			<form class="d-none d-lg-flex mx-lg-auto navbar-search" role="search">
-				<div class="input-group input-group-sm">
-					<span class="input-group-text bg-light border-0 text-muted">Search</span>
-					<input
-						class="form-control border-0 bg-light"
-						type="search"
-						placeholder="Search files, users, departments"
-						aria-label="Search"
-					/>
-				</div>
-			</form>
+      <div class="user-menu-wrap">
+        <button class="user-trigger" (click)="toggleUserMenu($event)">
+          <div class="user-avatar">{{ userInitials }}</div>
+          <div class="user-text">
+            <span class="user-name">{{ userEmail }}</span>
+            <span class="user-role">{{ userRole }}</span>
+          </div>
+          <svg class="chevron" [class.open]="showUserMenu" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+            <path d="M6 9l6 6 6-6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </button>
 
-			<ul class="navbar-nav ms-auto align-items-lg-center gap-2 mt-3 mt-lg-0">
-				<li class="nav-item">
-					<a class="nav-link px-3" routerLink="/dashboard" routerLinkActive="active">Dashboard</a>
-				</li>
-				<li class="nav-item">
-					<a class="nav-link px-3" routerLink="/files" routerLinkActive="active">Files</a>
-				</li>
-				<li class="nav-item dropdown" *ngIf="isAdmin">
-					<button
-						class="btn btn-outline-primary btn-sm dropdown-toggle"
-						type="button"
-						data-bs-toggle="dropdown"
-						aria-expanded="false"
-					>
-						Admin
-					</button>
-					<ul class="dropdown-menu dropdown-menu-end shadow-sm">
-						<li><a class="dropdown-item" routerLink="/departments">Departments</a></li>
-						<li><a class="dropdown-item" routerLink="/users">Users</a></li>
-						<li><a class="dropdown-item" routerLink="/roles">Roles</a>
-						</li>
-					</ul>
-				</li>
-			</ul>
-		</div>
-	</div>
-</nav>
+        <div class="user-dropdown" *ngIf="showUserMenu" (click)="$event.stopPropagation()">
+          <div class="dropdown-header">
+            <div class="user-avatar">{{ userInitials }}</div>
+            <div>
+              <div class="dropdown-name">{{ userEmail }}</div>
+              <div class="dropdown-role">{{ userRole }}</div>
+            </div>
+          </div>
+          <div class="dropdown-divider"></div>
+          <a class="dropdown-item" routerLink="/profile">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2M12 11a4 4 0 100-8 4 4 0 000 8z" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+            My Profile
+          </a>
+          <div class="dropdown-divider"></div>
+          <button class="dropdown-item danger" (click)="logout()">
+            <svg viewBox="0 0 24 24" fill="none"><path d="M16 17l5-5-5-5M21 12H9M12 3H6a2 2 0 00-2 2v14a2 2 0 002 2h6" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Sign out
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+</header>

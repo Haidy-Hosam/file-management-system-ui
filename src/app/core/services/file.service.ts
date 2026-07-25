@@ -1,13 +1,12 @@
 import { Injectable } from '@angular/core';
-import { HttpClient } from '@angular/common/http';
+import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
 
 export interface FileResponse {
   id: number;
   name: string;
   extension: string;
-  departmentName: string;
-  departmentId: number;
+  departmentNames: string[]; // CHANGED
   size: string;
   modifiedDate: string;
   status: string;
@@ -18,6 +17,17 @@ export interface FileRequest {
   file: File;
   department_id: number;
   fileType_id: number;
+}
+
+export interface PageResponse<T> {
+  content: T[];
+  totalElements: number ;
+  totalPages: number;
+  size: number;
+  number: number;
+
+  first: boolean;
+  last: boolean;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -65,13 +75,14 @@ export class FileService {
   }
 
   // GET /api/files/all -> getAllFiles
-  getAllFiles(): Observable<FileResponse[]> {
-    return this.http.get<FileResponse[]>(`${this.baseUrl}/all`);
+  getAllFiles(page: number, size:number): Observable<PageResponse<FileResponse>> {
+    const params = new HttpParams().set('page', page).set('size', size);
+    return this.http.get<PageResponse<FileResponse>>(`${this.baseUrl}/all`, {params});
   }
 
   // GET /api/files/dept/{deptId} -> getAllFilesByDepartment
-  getAllFilesByDepartment(deptId: number): Observable<FileResponse[]> {
-    return this.http.get<FileResponse[]>(`${this.baseUrl}/dept/${deptId}`);
+  getAllFilesByDepartment(deptId: number, page:number , size: number): Observable<PageResponse<FileResponse>> {
+    return this.http.get<PageResponse<FileResponse>>(`${this.baseUrl}/dept/${deptId}?page=${page}&size=${size}`);
   }
 
   // GET /api/files/{fileId} -> getFileData
@@ -88,4 +99,8 @@ export class FileService {
   updateFileStatus(fileId: number, status: string): Observable<FileResponse> {
     return this.http.put<FileResponse>(`${this.baseUrl}/${fileId}/status`, { status });
   }
+
+  downloadFilesBulk(fileIds: number[]): Observable<Blob> {
+  return this.http.post(`${this.baseUrl}/download-bulk`, fileIds, { responseType: 'blob' });
+}
 }

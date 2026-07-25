@@ -1,8 +1,10 @@
 import { Login } from './pages/login/login';
 import { Dashboard } from './pages/dashboard/dashboard';
 import { Files } from './pages/files/files';
+import { Profile } from './pages/profile/profile';
 import { FileDetails } from './pages/file-details/file-details';
 import { Departments } from './pages/departments/departments';
+import { DepartmentDetailsComponent } from './pages/department-details/department-details';
 import { Users } from './pages/users/users';
 import { Roles } from './pages/roles/roles';
 import { MainLayout } from './layout/main-layout/main-layout';
@@ -35,6 +37,10 @@ export const routes: Routes = [
         component: Departments,
         canActivate: [roleGuard(['ADMIN'])],
       },
+      { path: 'departments/:id',
+       component: DepartmentDetailsComponent,
+       canActivate: [roleGuard(['ADMIN'])],
+      },
       {
         path: 'users',
         component: Users,
@@ -45,7 +51,10 @@ export const routes: Routes = [
         component: Roles,
         canActivate: [roleGuard(['ADMIN'])],
       },
-      
+      {
+         path: 'profile', 
+         component: Profile
+       }
     ],
   },
 ];

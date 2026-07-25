@@ -10,8 +10,8 @@ export interface UserResponse {
   role: string;
   departmentName: string;
   isDeleted: boolean;
-  filesCount?: number;      // not yet in backend DTO
-  lastLogin?: string;       // not yet in backend DTO
+  filesCount?: number;
+  lastLogin?: string;
 }
 
 export interface RegisterRequest {
