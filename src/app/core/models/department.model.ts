@@ -12,16 +12,8 @@ export interface ReassignmentItem {
   targetDepartmentId: number;
 }
 
-export interface FileResponse {
-  id: number;
-  name: string;
-  extension: string;
-  departmentNames: string[];
-  status: string;
-  fileType: string;
-  size: number;
-  modifiedDate: string;
-}
+import type { FileResponse } from '../services/file.service';
+export type { FileResponse };
 
 
 export interface DepartmentDetails {

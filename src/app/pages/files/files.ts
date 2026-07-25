@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FileService, FileResponse, FileRequest } from '../../core/services/file.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -9,6 +9,7 @@ import { DepartmentService } from '../../core/services/department.service';
 import { Department } from '../../core/models/department.model';
 import { FileTypeService, FileType } from '../../core/services/filetype.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { TrashService } from '../../core/services/trash.service';
 
 // interface FileGroup {
 //   groupId: string;
@@ -22,7 +23,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 @Component({
   selector: 'app-files',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterLink],
   templateUrl: './files.html',
   styleUrl: './files.css'
 })
@@ -31,6 +32,26 @@ export class Files implements OnInit {
   filteredFiles: FileResponse[] = [];
   isLoading = true;
   errorMessage = '';
+
+  constructor(
+    private fileService: FileService,
+    private authService: AuthService,
+    private departmentService: DepartmentService,
+    private fileTypeService: FileTypeService,
+    private trashService: TrashService,
+    private router: Router,
+    private sanitizer: DomSanitizer
+
+  ) {}
+
+  get isAdmin(): boolean {
+    return this.authService.getRole() === 'ADMIN';
+  }
+
+  get trashCount(): number {
+    return this.trashService.trashCount;
+  }
+
 //Backend pagination parameters
   page = 0;
   size = 10;
@@ -49,16 +70,6 @@ export class Files implements OnInit {
   // pagination
   // currentPage = 1;
   // pageSize = 10;
-
-  constructor(
-    private fileService: FileService,
-    private authService: AuthService,
-    private departmentService: DepartmentService,
-    private fileTypeService: FileTypeService,
-    private router: Router,
-    private sanitizer: DomSanitizer
-
-  ) {}
 
   ngOnInit(): void {
     this.loadFiles();
@@ -331,21 +342,23 @@ openUploadModal(): void {
     this.uploadItems.splice(index, 1);
   }
 
-  toggleDepartmentSelection(deptId: number): void {
-    const idx = this.selectedDepartmentIds.indexOf(deptId);
+  toggleDepartmentSelection(deptId: number | string): void {
+    const numId = Number(deptId);
+    const idx = this.selectedDepartmentIds.indexOf(numId);
     if (idx > -1) {
       this.selectedDepartmentIds.splice(idx, 1);
     } else {
-      this.selectedDepartmentIds.push(deptId);
+      this.selectedDepartmentIds.push(numId);
     }
   }
 
-  isDepartmentSelected(deptId: number): boolean {
-    return this.selectedDepartmentIds.includes(deptId);
+  isDepartmentSelected(deptId: number | string): boolean {
+    return this.selectedDepartmentIds.includes(Number(deptId));
   }
 
-  getDepartmentName(deptId: number): string {
-    return this.departments.find(d => d.id === deptId)?.name ?? 'Unknown';
+  getDepartmentName(deptId: number | string): string {
+    const numId = Number(deptId);
+    return this.departments.find(d => Number(d.id) === numId)?.name ?? 'Unknown';
   }
 
   getFileTypeName(fileTypeId: number | null): string {
@@ -453,12 +466,14 @@ downloadPreviewedFile(): void {
   }
 
   deleteFile(file: FileResponse): void {
-    if (!confirm(`Delete "${file.name}"? This cannot be undone.`)) return;
+    if (!confirm(`Delete "${file.name}"?`)) return;
 
+    this.trashService.moveToTrash(file);
     this.fileService.deleteFile(file.id).subscribe({
       next: () => this.loadFiles(),
       error: (err: HttpErrorResponse) => {
-        this.errorMessage = 'Delete failed. You may not have permission.';
+        // Even if backend fails, file is in local trash or refreshed
+        this.loadFiles();
       }
     });
     this.closeMenu();
@@ -546,12 +561,22 @@ deleteSelectedFiles(): void {
   }
 
   const ids = [...this.selectedFileIds];
+  const filesToTrash = this.allFiles.filter(f => ids.includes(f.id));
+  if (filesToTrash.length > 0) {
+    this.trashService.moveToTrashBulk(filesToTrash);
+  }
 
   ids.forEach(id => {
     this.fileService.deleteFile(id).subscribe({
       next: () => {
         this.selectedFileIds.delete(id);
 
+        if (this.selectedFileIds.size === 0) {
+          this.loadFiles();
+        }
+      },
+      error: () => {
+        this.selectedFileIds.delete(id);
         if (this.selectedFileIds.size === 0) {
           this.loadFiles();
         }
