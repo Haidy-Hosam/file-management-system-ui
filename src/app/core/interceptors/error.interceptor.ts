@@ -10,8 +10,11 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
 
   return next(req).pipe(
     catchError(err => {
+          console.log("ErrorInterceptor:", err.status, req.url);
+
       if (err.status === 401) {
-      
+            console.log("Logging out user...");
+
         authService.logout();
         router.navigate(['/login']);
       } else if (err.status === 403) {
