@@ -1,1 +1,360 @@
-<p>dashboard works!</p>
+<div class="dashboard-page">
+  <!-- Top Greeting & Header Toolbar -->
+  <div class="dashboard-header d-flex align-items-center justify-content-between flex-wrap gap-3 mb-4">
+    <div>
+      <div class="d-flex align-items-center gap-2 mb-1">
+        <h1 class="greeting-title m-0">{{ greeting }}, <span class="user-highlight">{{ userEmail }}</span>! 👋</h1>
+        <span class="badge bg-primary-subtle text-primary border border-primary-subtle rounded-pill px-3 py-1">
+          {{ userRole }}
+        </span>
+      </div>
+      <p class="subtitle m-0">Here is the real-time overview of the ADIB Archiving System.</p>
+    </div>
+
+    <div class="d-flex align-items-center gap-3 flex-wrap">
+      <!-- Period Selector -->
+      <div class="period-selector btn-group p-1 bg-white border rounded-pill shadow-sm">
+        <button
+          class="btn btn-sm rounded-pill px-3"
+          [class.active]="selectedPeriod === 'TODAY'"
+          (click)="setPeriod('TODAY')"
+        >
+          Today
+        </button>
+        <button
+          class="btn btn-sm rounded-pill px-3"
+          [class.active]="selectedPeriod === 'WEEK'"
+          (click)="setPeriod('WEEK')"
+        >
+          This Week
+        </button>
+        <button
+          class="btn btn-sm rounded-pill px-3"
+          [class.active]="selectedPeriod === 'MONTH'"
+          (click)="setPeriod('MONTH')"
+        >
+          This Month
+        </button>
+        <button
+          class="btn btn-sm rounded-pill px-3"
+          [class.active]="selectedPeriod === 'ALL'"
+          (click)="setPeriod('ALL')"
+        >
+          All Time
+        </button>
+      </div>
+
+      <!-- Quick Action Buttons -->
+      <div class="d-flex gap-2">
+        <a routerLink="/files" class="btn btn-primary rounded-pill px-4 d-flex align-items-center gap-2 shadow-sm">
+          <i class="bi bi-cloud-upload"></i>
+          <span>Upload File</span>
+        </a>
+        <a
+          *ngIf="userRole === 'ADMIN'"
+          routerLink="/trash"
+          class="btn btn-outline-danger rounded-pill px-3 d-flex align-items-center gap-2"
+          title="Go to Trash"
+        >
+          <i class="bi bi-trash"></i>
+          <span>Trash</span>
+          <span class="badge bg-danger text-white rounded-circle ms-1" *ngIf="trashCount > 0">{{ trashCount }}</span>
+        </a>
+      </div>
+    </div>
+  </div>
+
+  <!-- KPI Cards Row -->
+  <div class="row g-3 mb-4">
+    <!-- Card 1: Total Documents -->
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card shadow-sm rounded-4 p-3 bg-white border h-100 position-relative overflow-hidden">
+        <div class="kpi-icon-wrapper bg-blue-subtle text-blue">
+          <i class="bi bi-files fs-4"></i>
+        </div>
+        <div class="mt-3">
+          <span class="text-muted small fw-medium">Total Documents</span>
+          <h2 class="kpi-number my-1 fw-bold text-dark">{{ totalFiles }}</h2>
+          <div class="d-flex align-items-center gap-1 text-success small fw-semibold">
+            <i class="bi bi-graph-up-arrow"></i>
+            <span>+14.5% from last month</span>
+          </div>
+        </div>
+        <div class="kpi-accent-bar bg-primary"></div>
+      </div>
+    </div>
+
+    <!-- Card 2: Pending Approvals -->
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card shadow-sm rounded-4 p-3 bg-white border h-100 position-relative overflow-hidden">
+        <div class="kpi-icon-wrapper bg-warning-subtle text-warning">
+          <i class="bi bi-hourglass-split fs-4"></i>
+        </div>
+        <div class="mt-3">
+          <span class="text-muted small fw-medium">Pending Reviews</span>
+          <h2 class="kpi-number my-1 fw-bold text-dark">{{ pendingCount }}</h2>
+          <div class="d-flex align-items-center gap-1 text-warning small fw-semibold">
+            <i class="bi bi-exclamation-circle"></i>
+            <span>Requires action</span>
+          </div>
+        </div>
+        <div class="kpi-accent-bar bg-warning"></div>
+      </div>
+    </div>
+
+    <!-- Card 3: Approved Archives -->
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card shadow-sm rounded-4 p-3 bg-white border h-100 position-relative overflow-hidden">
+        <div class="kpi-icon-wrapper bg-success-subtle text-success">
+          <i class="bi bi-check2-circle fs-4"></i>
+        </div>
+        <div class="mt-3">
+          <span class="text-muted small fw-medium">Approved Archives</span>
+          <h2 class="kpi-number my-1 fw-bold text-dark">{{ approvedCount }}</h2>
+          <div class="d-flex align-items-center gap-1 text-success small fw-semibold">
+            <i class="bi bi-shield-check"></i>
+            <span>{{ approvedPercent }}% approval rate</span>
+          </div>
+        </div>
+        <div class="kpi-accent-bar bg-success"></div>
+      </div>
+    </div>
+
+    <!-- Card 4: Active Departments -->
+    <div class="col-12 col-sm-6 col-xl-3">
+      <div class="kpi-card shadow-sm rounded-4 p-3 bg-white border h-100 position-relative overflow-hidden">
+        <div class="kpi-icon-wrapper bg-purple-subtle text-purple">
+          <i class="bi bi-building fs-4"></i>
+        </div>
+        <div class="mt-3">
+          <span class="text-muted small fw-medium">Active Departments</span>
+          <h2 class="kpi-number my-1 fw-bold text-dark">{{ totalDepartments }}</h2>
+          <div class="d-flex align-items-center gap-1 text-muted small">
+            <i class="bi bi-hdd-network"></i>
+            <span>System storage active</span>
+          </div>
+        </div>
+        <div class="kpi-accent-bar bg-indigo"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Analytics & Visualizations Section -->
+  <div class="row g-3 mb-4">
+    <!-- Chart 1: Document Status Breakdown (Donut Chart) -->
+    <div class="col-12 col-lg-5">
+      <div class="chart-card shadow-sm rounded-4 p-4 bg-white border h-100">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h5 class="fw-bold m-0 text-dark">Status Breakdown</h5>
+          <span class="badge bg-light text-secondary border">Real-time</span>
+        </div>
+
+        <div class="d-flex align-items-center justify-content-center my-3 position-relative">
+          <!-- Native SVG Donut Chart -->
+          <svg class="donut-chart" viewBox="0 0 36 36">
+            <!-- Background Ring -->
+            <path
+              class="donut-ring"
+              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+              fill="none"
+              stroke="#f1f5f9"
+              stroke-width="3.8"
+            />
+            <!-- Segment: Approved -->
+            <path
+              class="donut-segment segment-approved"
+              [attr.stroke-dasharray]="strokeDashArrayApproved"
+              stroke-dashoffset="0"
+              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+              fill="none"
+              stroke="#10b981"
+              stroke-width="3.8"
+              stroke-linecap="round"
+            />
+          </svg>
+          <!-- Center Text Overlay -->
+          <div class="donut-center text-center">
+            <span class="donut-number fw-bold text-dark d-block fs-3">{{ totalFiles }}</span>
+            <span class="donut-label text-muted small">Total Files</span>
+          </div>
+        </div>
+
+        <!-- Legend Items -->
+        <div class="legend-container mt-4 pt-3 border-top">
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <div class="d-flex align-items-center gap-2">
+              <span class="dot bg-success"></span>
+              <span class="small text-dark fw-medium">Approved</span>
+            </div>
+            <span class="small fw-bold text-dark">{{ approvedCount }} ({{ approvedPercent }}%)</span>
+          </div>
+          <div class="d-flex align-items-center justify-content-between mb-2">
+            <div class="d-flex align-items-center gap-2">
+              <span class="dot bg-warning"></span>
+              <span class="small text-dark fw-medium">Pending Review</span>
+            </div>
+            <span class="small fw-bold text-dark">{{ pendingCount }} ({{ pendingPercent }}%)</span>
+          </div>
+          <div class="d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-2">
+              <span class="dot bg-danger"></span>
+              <span class="small text-dark fw-medium">Rejected</span>
+            </div>
+            <span class="small fw-bold text-dark">{{ rejectedCount }} ({{ rejectedPercent }}%)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Chart 2: Archiving Activity Trend (Bar Chart) -->
+    <div class="col-12 col-lg-7">
+      <div class="chart-card shadow-sm rounded-4 p-4 bg-white border h-100">
+        <div class="d-flex align-items-center justify-content-between mb-4">
+          <div>
+            <h5 class="fw-bold m-0 text-dark">Archiving Activity</h5>
+            <p class="text-muted small m-0">Monthly document archiving volume</p>
+          </div>
+          <div class="badge bg-primary-subtle text-primary border border-primary-subtle px-3 py-1">
+            Monthly Trend
+          </div>
+        </div>
+
+        <!-- Native SVG Bar Chart -->
+        <div class="bar-chart-container d-flex align-items-end justify-content-between pt-4 px-2">
+          <div
+            *ngFor="let item of monthlyTrends"
+            class="bar-item d-flex flex-column align-items-center gap-2 flex-grow-1"
+          >
+            <div class="bar-value text-muted extra-small fw-semibold">{{ item.filesCount }} files</div>
+            <div class="bar-track rounded-top">
+              <div
+                class="bar-fill rounded-top"
+                [style.height.%]="item.heightPercent"
+                [title]="item.month + ': ' + item.filesCount + ' files'"
+              ></div>
+            </div>
+            <span class="bar-label text-muted small fw-medium mt-1">{{ item.month }}</span>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Bottom Grid: Recent Uploads & Department Breakdown -->
+  <div class="row g-3">
+    <!-- Recent Activity Table -->
+    <div class="col-12 col-xl-8">
+      <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
+        <div class="card-header bg-white border-bottom p-4 d-flex align-items-center justify-content-between">
+          <div>
+            <h5 class="fw-bold m-0 text-dark">Recent Document Activity</h5>
+            <p class="text-muted small m-0">Latest uploaded documents in the system</p>
+          </div>
+          <a routerLink="/files" class="btn btn-sm btn-light border rounded-pill px-3">
+            View All Files →
+          </a>
+        </div>
+
+        <div class="table-responsive">
+          <table class="table table-hover align-middle mb-0">
+            <thead class="bg-light">
+              <tr>
+                <th class="ps-4">Document Name</th>
+                <th>Department</th>
+                <th>Size</th>
+                <th>Date</th>
+                <th>Status</th>
+                <th class="text-end pe-4">Action</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr *ngFor="let file of recentFiles">
+                <td class="ps-4">
+                  <div class="d-flex align-items-center gap-2">
+                    <i [class]="'fs-5 ' + getFileIcon(file.extension)"></i>
+                    <div>
+                      <span class="fw-semibold text-dark">{{ file.name }}</span>
+                      <span class="text-muted small ms-1" *ngIf="file.extension">.{{ file.extension }}</span>
+                    </div>
+                  </div>
+                </td>
+                <td>
+                  <span
+                    class="badge bg-light text-dark border me-1"
+                    *ngFor="let dept of file.departmentNames"
+                  >
+                    {{ dept }}
+                  </span>
+                  <span *ngIf="!file.departmentNames || file.departmentNames.length === 0" class="text-muted small">-</span>
+                </td>
+                <td><span class="text-muted small">{{ file.size || 'N/A' }}</span></td>
+                <td><span class="text-muted small">{{ file.modifiedDate }}</span></td>
+                <td>
+                  <span class="badge border rounded-pill px-2 py-1 small" [ngClass]="getStatusBadgeClass(file.status)">
+                    {{ file.status }}
+                  </span>
+                </td>
+                <td class="text-end pe-4">
+                  <a [routerLink]="['/files', file.id]" class="btn btn-sm btn-outline-primary rounded-pill px-3">
+                    Details
+                  </a>
+                </td>
+              </tr>
+              <tr *ngIf="recentFiles.length === 0">
+                <td colspan="6" class="text-center py-4 text-muted">
+                  No recent files available.
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+    </div>
+
+    <!-- Department Storage Breakdown & System Health -->
+    <div class="col-12 col-xl-4">
+      <!-- Department Storage Progress -->
+      <div class="card border-0 shadow-sm rounded-4 bg-white p-4 mb-3">
+        <div class="d-flex align-items-center justify-content-between mb-3">
+          <h5 class="fw-bold m-0 text-dark">Department Distribution</h5>
+          <a routerLink="/departments" class="small text-primary text-decoration-none">Manage →</a>
+        </div>
+
+        <div class="department-progress-list d-flex flex-column gap-3">
+          <div *ngFor="let dept of departmentsList.slice(0, 4)" class="dept-item">
+            <div class="d-flex justify-content-between align-items-center mb-1">
+              <span class="small fw-semibold text-dark">{{ dept.name }}</span>
+              <span class="extra-small text-muted">{{ dept.files }} files · {{ dept.storage }}</span>
+            </div>
+            <div class="progress" style="height: 6px;">
+              <div
+                class="progress-bar rounded-pill"
+                [style.width.%]="Math.min(100, (dept.files * 10) + 15)"
+                [style.background-color]="dept.themeColor || '#2563eb'"
+              ></div>
+            </div>
+          </div>
+
+          <div *ngIf="departmentsList.length === 0" class="text-muted small text-center py-2">
+            Loading department data...
+          </div>
+        </div>
+      </div>
+
+      <!-- System Status Banner -->
+      <div class="card border-0 shadow-sm rounded-4 bg-dark text-white p-4">
+        <div class="d-flex align-items-center gap-3">
+          <div class="system-icon bg-success-subtle text-success p-3 rounded-circle">
+            <i class="bi bi-shield-check fs-3"></i>
+          </div>
+          <div>
+            <h6 class="fw-bold m-0 text-white">ADIB Security Active</h6>
+            <p class="text-white-50 extra-small m-0 mt-1">
+              SSL Encrypted · 256-bit Security · Daily Backups Enabled
+            </p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
