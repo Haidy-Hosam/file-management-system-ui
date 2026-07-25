@@ -5,6 +5,9 @@ import { AuthService } from '../../core/services/auth.service';
 import { PageService } from '../../core/services/page.service';
 import { Page } from '../../core/models/page.model';
 
+import { UserService } from '../../core/services/user.service';
+import { User } from '../../core/models/user.model';
+
 @Component({
   selector: 'app-sidebar',
   imports: [RouterLink, RouterLinkActive, CommonModule],
@@ -13,6 +16,7 @@ import { Page } from '../../core/models/page.model';
 })
 export class Sidebar implements OnInit {
   pages = signal<Page[]>([]);
+  currentUser = signal<User | null>(null);
   isLoading = signal(true);
 
   visiblePages = computed(() =>
@@ -25,10 +29,19 @@ export class Sidebar implements OnInit {
   constructor(
     private authService: AuthService,
     private pageService: PageService,
-    private router: Router
+    private userService: UserService,
+    private router: Router,
   ) {}
 
   ngOnInit(): void {
+    this.userService.getCurrentUser().subscribe({
+      next: (user) => {
+        this.currentUser.set(user);
+      },
+      error: (err) => {
+        console.error(err);
+      },
+    });
     this.pageService.getMyPages().subscribe({
       next: (pages) => {
         this.pages.set(pages);
@@ -37,7 +50,7 @@ export class Sidebar implements OnInit {
       error: (err) => {
         console.error('Failed to load pages', err);
         this.isLoading.set(false);
-      }
+      },
     });
   }
 

@@ -1,6 +1,7 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
+import { User } from '../models/user.model';
 
 export interface UserResponse {
   id: number;
@@ -30,9 +31,8 @@ export class UserService {
   getAllUsers(): Observable<UserResponse[]> {
     return this.http.get<UserResponse[]>(this.baseUrl);
   }
-
-  getCurrentUser(): Observable<UserResponse> {
-    return this.http.get<UserResponse>(`${this.baseUrl}/me`);
+  getCurrentUser(): Observable<User> {
+    return this.http.get<User>(`${this.baseUrl}/userRole`);
   }
 
   createUser(request: RegisterRequest): Observable<UserResponse> {

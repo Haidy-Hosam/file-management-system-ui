@@ -3,17 +3,15 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
-import { HttpErrorResponse } from '@angular/common/http';
 import { TranslatePipe } from '@ngx-translate/core';
+import { HttpErrorResponse } from '@angular/common/http';
 import { LanguageService } from '../../core/services/language.service';
-
-
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, FormsModule,TranslatePipe],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './login.html',
-  styleUrl: './login.css'
+  styleUrl: './login.css',
 })
 export class Login {
   email = '';
@@ -23,13 +21,13 @@ export class Login {
   isLoading = false;
 
   constructor(
-     private languageService: LanguageService,
     private authService: AuthService,
-    private router: Router
+    private languageService: LanguageService,
+    private router: Router,
   ) {}
-   changeLanguage(language: string): void {
-  this.languageService.ChangeLanguage(language);
-}
+  changeLanguage(language: string): void {
+    this.languageService.ChangeLanguage(language);
+  }
 
   onSubmit(): void {
     if (!this.email || !this.password) {
@@ -41,18 +39,18 @@ export class Login {
     this.errorMessage = '';
 
     this.authService.login(this.email, this.password, this.rememberMe).subscribe({
-  next: () => {
-    this.isLoading = false;
-    this.router.navigate(['/dashboard']);
-  },
-  error: (err: HttpErrorResponse) => {
-    this.isLoading = false;
-    if (err.status === 401 || err.status === 400) {
-      this.errorMessage = 'Invalid email or password.';
-    } else {
-      this.errorMessage = 'Something went wrong. Please try again.';
-    }
-  }
-});
+      next: () => {
+        this.isLoading = false;
+        this.router.navigate(['/dashboard']);
+      },
+      error: (err: HttpErrorResponse) => {
+        this.isLoading = false;
+        if (err.status === 401 || err.status === 400) {
+          this.errorMessage = 'Invalid email or password.';
+        } else {
+          this.errorMessage = 'Something went wrong. Please try again.';
+        }
+      },
+    });
   }
 }

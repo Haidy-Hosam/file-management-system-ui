@@ -5,7 +5,8 @@ import { Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { FileService, FileResponse, FileRequest } from '../../core/services/file.service';
 import { AuthService } from '../../core/services/auth.service';
-import { DepartmentService, Department } from '../../core/services/department.service';
+import { DepartmentService } from '../../core/services/department.service';
+import { Department } from '../../core/models/department.model';
 import { FileTypeService, FileType } from '../../core/services/filetype.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 
