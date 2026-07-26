@@ -1,7 +1,7 @@
 import { Login } from './pages/login/login';
 import { Dashboard } from './pages/dashboard/dashboard';
 import { Files } from './pages/files/files';
-import { Profile } from './pages/profile/profile';
+import { ProfileComponent as Profile } from './pages/profile/profile';
 import { FileDetails } from './pages/file-details/file-details';
 import { Departments } from './pages/departments/departments';
 import { DepartmentDetailsComponent } from './pages/department-details/department-details';
@@ -11,6 +11,7 @@ import { Trash } from './pages/trash/trash';
 import { MainLayout } from './layout/main-layout/main-layout';
 import { authGuard, roleGuard } from './core/guards/auth.guard';
 import { Routes } from '@angular/router';
+
 export const routes: Routes = [
   {
     path: 'login',
