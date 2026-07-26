@@ -21,8 +21,14 @@ export class Sidebar implements OnInit {
 
   visiblePages = computed(() =>
     this.pages().filter(page => {
-      const normalized = page.route?.replace(/^\/+/, '');
-      return normalized !== 'file-details' && !normalized?.startsWith('files/');
+      const normalizedRoute = page.route?.replace(/^\/+/, '').toLowerCase() || '';
+      const normalizedName = page.name?.toLowerCase() || '';
+      
+      return !normalizedRoute.startsWith('file-details') && 
+             !normalizedRoute.startsWith('department-details') && 
+             !normalizedRoute.startsWith('files/') &&
+             !normalizedName.includes('file-details') &&
+             !normalizedName.includes('department-details');
     })
   );
 
