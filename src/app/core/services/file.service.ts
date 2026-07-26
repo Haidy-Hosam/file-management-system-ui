@@ -11,6 +11,7 @@ export interface FileResponse {
   modifiedDate: string;
   status: string;
   fileType: string;
+  ownerName: string;
 }
 
 export interface FileRequest {
