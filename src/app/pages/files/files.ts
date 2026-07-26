@@ -468,13 +468,22 @@ downloadPreviewedFile(): void {
   deleteFile(file: FileResponse): void {
     if (!confirm(`Delete "${file.name}"?`)) return;
 
-    this.trashService.moveToTrash(file);
-    this.fileService.deleteFile(file.id).subscribe({
-      next: () => this.loadFiles(),
-      error: (err: HttpErrorResponse) => {
-        // Even if backend fails, file is in local trash or refreshed
-        this.loadFiles();
-      }
+    const rejectedFile: FileResponse = { ...file, status: 'REJECTED' };
+    this.trashService.moveToTrash(rejectedFile);
+
+    this.fileService.updateFileStatus(file.id, 'REJECTED').subscribe({
+      next: () => {
+        this.fileService.deleteFile(file.id).subscribe({
+          next: () => this.loadFiles(),
+          error: () => this.loadFiles(),
+        });
+      },
+      error: () => {
+        this.fileService.deleteFile(file.id).subscribe({
+          next: () => this.loadFiles(),
+          error: () => this.loadFiles(),
+        });
+      },
     });
     this.closeMenu();
   }

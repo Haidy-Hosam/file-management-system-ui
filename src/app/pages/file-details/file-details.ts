@@ -10,6 +10,7 @@ import {
   FilePermission,
 } from '../../core/services/file-details.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { TrashService } from '../../core/services/trash.service';
 
 type TabId = 'overview' | 'activity' | 'permissions';
 
@@ -43,7 +44,8 @@ export class FileDetails implements OnInit {
     private router: Router,
     private fileService: FileService,
     private fileDetailsService: FileDetailsService,
-      private sanitizer: DomSanitizer
+    private trashService: TrashService,
+    private sanitizer: DomSanitizer
 
   ) {}
 
@@ -160,10 +162,27 @@ export class FileDetails implements OnInit {
   }
 
   deleteFile(): void {
-    if (!confirm(`Delete "${this.fileDisplayName()}"? This cannot be undone.`)) return;
-    this.fileService.deleteFile(this.fileId).subscribe({
-      next: () => this.router.navigate(['/files']),
-      error: () => (this.errorMessage = 'Delete failed. You may not have permission.'),
+    if (!confirm(`Delete "${this.fileDisplayName()}"?`)) return;
+
+    if (this.file) {
+      const rejectedFile: FileResponse = { ...this.file, status: 'REJECTED' };
+      this.trashService.moveToTrash(rejectedFile);
+    }
+
+    // Call status update endpoint to persist REJECTED state, then delete/navigate
+    this.fileService.updateFileStatus(this.fileId, 'REJECTED').subscribe({
+      next: () => {
+        this.fileService.deleteFile(this.fileId).subscribe({
+          next: () => this.router.navigate(['/files']),
+          error: () => this.router.navigate(['/files']),
+        });
+      },
+      error: () => {
+        this.fileService.deleteFile(this.fileId).subscribe({
+          next: () => this.router.navigate(['/files']),
+          error: () => this.router.navigate(['/files']),
+        });
+      },
     });
   }
 
