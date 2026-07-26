@@ -7,6 +7,7 @@ import { Departments } from './pages/departments/departments';
 import { DepartmentDetailsComponent } from './pages/department-details/department-details';
 import { Users } from './pages/users/users';
 import { Roles } from './pages/roles/roles';
+import { Trash } from './pages/trash/trash';
 import { MainLayout } from './layout/main-layout/main-layout';
 import { authGuard, roleGuard } from './core/guards/auth.guard';
 import { Routes } from '@angular/router';
@@ -31,6 +32,11 @@ export const routes: Routes = [
       {
         path: 'files/:id',
         component: FileDetails,
+      },
+      {
+        path: 'trash',
+        component: Trash,
+        canActivate: [roleGuard(['ADMIN'])],
       },
       {
         path: 'departments',

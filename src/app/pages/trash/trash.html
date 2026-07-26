@@ -1,0 +1,157 @@
+<div class="trash-page">
+  <div class="page-header d-flex align-items-center justify-content-between">
+    <div>
+      <a routerLink="/files" class="back-link mb-2 d-inline-flex align-items-center gap-1">
+        <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+          <line x1="19" y1="12" x2="5" y2="12"></line>
+          <polyline points="12 19 5 12 12 5"></polyline>
+        </svg>
+        Back to Files
+      </a>
+      <div class="d-flex align-items-center gap-2">
+        <div class="trash-header-icon">
+          <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
+            <polyline points="3 6 5 6 21 6"></polyline>
+            <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          </svg>
+        </div>
+        <div>
+          <h2 class="m-0">Trash Bin</h2>
+          <p class="subtitle m-0">View, restore, or permanently delete removed files</p>
+        </div>
+      </div>
+    </div>
+
+    <button
+      *ngIf="deletedFiles.length > 0"
+      class="btn btn-outline-danger d-flex align-items-center gap-2"
+      (click)="clearAllTrash()"
+    >
+      <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
+        <polyline points="3 6 5 6 21 6"></polyline>
+        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+        <line x1="10" y1="11" x2="10" y2="17"></line>
+        <line x1="14" y1="11" x2="14" y2="17"></line>
+      </svg>
+      Empty Trash
+    </button>
+  </div>
+
+  <div class="toolbar my-3">
+    <div class="search-box">
+      <svg class="search-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8">
+        <circle cx="11" cy="11" r="7" />
+        <path d="M21 21L16.65 16.65" stroke-linecap="round" />
+      </svg>
+      <input
+        type="text"
+        placeholder="Search in trash..."
+        [(ngModel)]="searchTerm"
+        (ngModelChange)="onSearchChange()"
+      />
+    </div>
+
+    <div class="bulk-actions d-flex align-items-center gap-2" *ngIf="selectedIds.size > 0">
+      <span class="selected-count">{{ selectedIds.size }} selected</span>
+      <button class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1" (click)="restoreSelected()">
+        <i class="bi bi-arrow-counterclockwise"></i>
+        Restore Selected
+      </button>
+      <button class="btn btn-sm btn-danger d-flex align-items-center gap-1" (click)="permanentlyDeleteSelected()">
+        <i class="bi bi-trash"></i>
+        Delete Permanently
+      </button>
+    </div>
+  </div>
+
+  <!-- Trash File Table -->
+  <div class="table-container shadow-sm rounded bg-white" *ngIf="filteredFiles.length > 0; else emptyState">
+    <table class="table table-hover align-middle mb-0">
+      <thead>
+        <tr>
+          <th style="width: 40px;">
+            <input
+              type="checkbox"
+              class="form-check-input"
+              [checked]="isAllSelected()"
+              (change)="toggleSelectAll($event)"
+            />
+          </th>
+          <th>Name</th>
+          <th>Departments</th>
+          <th>Size</th>
+          <th>Date Deleted</th>
+          <th class="text-end">Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let file of filteredFiles">
+          <td>
+            <input
+              type="checkbox"
+              class="form-check-input"
+              [checked]="selectedIds.has(file.id)"
+              (change)="toggleSelect(file.id)"
+            />
+          </td>
+          <td>
+            <div class="d-flex align-items-center gap-2">
+              <i [class]="'fs-5 ' + getFileIcon(file.extension)"></i>
+              <div>
+                <span class="fw-semibold text-dark">{{ file.name }}</span>
+                <span class="text-muted small ms-1" *ngIf="file.extension">.{{ file.extension }}</span>
+              </div>
+            </div>
+          </td>
+          <td>
+            <span class="badge bg-light text-dark border me-1" *ngFor="let dept of file.departmentNames">
+              {{ dept }}
+            </span>
+            <span *ngIf="!file.departmentNames || file.departmentNames.length === 0" class="text-muted small">-</span>
+          </td>
+          <td>{{ file.size || 'N/A' }}</td>
+          <td>
+            <span class="text-muted small">{{ file.deletedDate }}</span>
+          </td>
+          <td class="text-end">
+            <div class="d-inline-flex gap-2">
+              <button
+                class="btn btn-sm btn-outline-success d-inline-flex align-items-center gap-1"
+                (click)="restoreSingle(file)"
+                title="Restore File"
+              >
+                <i class="bi bi-arrow-counterclockwise"></i>
+                Restore
+              </button>
+              <button
+                class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1"
+                (click)="permanentlyDeleteSingle(file)"
+                title="Delete Permanently"
+              >
+                <i class="bi bi-trash"></i>
+                Delete
+              </button>
+            </div>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- Empty State -->
+  <ng-template #emptyState>
+    <div class="empty-state text-center py-5 shadow-sm rounded bg-white mt-3">
+      <div class="empty-icon mb-3">
+        <svg viewBox="0 0 24 24" width="64" height="64" fill="none" stroke="#94a3b8" stroke-width="1.5">
+          <polyline points="3 6 5 6 21 6"></polyline>
+          <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+          <line x1="10" y1="11" x2="10" y2="17"></line>
+          <line x1="14" y1="11" x2="14" y2="17"></line>
+        </svg>
+      </div>
+      <h4 class="text-dark fw-bold mb-1">Trash is Empty</h4>
+      <p class="text-muted mb-4">No deleted files found in the trash bin.</p>
+      <a routerLink="/files" class="btn btn-primary px-4 rounded-pill">Return to Files</a>
+    </div>
+  </ng-template>
+</div>

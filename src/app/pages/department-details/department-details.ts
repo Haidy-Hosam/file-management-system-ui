@@ -66,8 +66,9 @@ export class DepartmentDetailsComponent implements OnInit {
     this.router.navigate(['/departments']);
   }
 
-  formatFileSize(bytes: number): string {
-    return formatBytes(bytes);
+  formatFileSize(bytes: number | string): string {
+    const num = typeof bytes === 'number' ? bytes : parseFloat(bytes) || 0;
+    return formatBytes(num);
   }
 
   openDeleteModal(): void {

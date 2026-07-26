@@ -108,6 +108,10 @@ export class Sidebar implements OnInit {
         <path d="M10 14h4"></path>
         <path d="M10 18h4"></path>
       `,
+      '/trash': `
+        <polyline points="3 6 5 6 21 6"></polyline>
+        <path d="M19 6v14a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V6m3 0V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path>
+      `,
     };
     return icons[route] ?? `
       <line x1="4" y1="6" x2="20" y2="6"></line>
