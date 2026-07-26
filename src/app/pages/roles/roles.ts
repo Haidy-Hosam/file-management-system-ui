@@ -1,88 +1,242 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, signal, computed } from '@angular/core';
 import { CommonModule } from '@angular/common';
-import { RouterModule } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-import { RolesService, Role } from '../../core/services/roles.service';
+import { RoleService } from '../../core/services/roles.service';
+import { PageService } from '../../core/services/page.service';
+import { PermissionService } from '../../core/services/permission.service';
+import { Role, RoleRequest, PagePermissionRequest } from '../../core/models/role.model';
+import { Page } from '../../core/models/page.model';
+import { Permission } from '../../core/models/permission.model';
+import { UserService, UserResponse } from '../../core/services/user.service';
+import { forkJoin } from 'rxjs';
+
 
 @Component({
-  selector: 'app-roles',
+  selector: 'app-roles-permissions',
   standalone: true,
-  imports: [CommonModule, RouterModule, FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './roles.html',
   styleUrl: './roles.css',
 })
 export class Roles implements OnInit {
-  roles: Role[] = [];
-  searchTerm = '';
+    roles = signal<Role[]>([]);
+  allPages = signal<Page[]>([]);
+  roleUserCounts = signal<Map<number, number>>(new Map());
+  allPermissions = signal<Permission[]>([]);
+assignedUsers = signal<UserResponse[]>([]);
+  selectedRoleId = signal<number | null>(null);
+  editMode = signal(false);
+  showCreateModal = signal(false);
 
-  isLoading = true;
-  errorMessage = '';
+  // working copy while editing: pageId -> Set of permissionId
+  draftName = signal('');
+  draftDescription = signal('');
+  draftGrid = signal<Map<number, Set<number>>>(new Map());
 
-  selectedIds = new Set<number>();
+  selectedRole = computed(() =>
+    this.roles().find(r => r.id === this.selectedRoleId()) ?? null
+  );
 
-  constructor(private rolesService: RolesService) {}
+  permissionCount = (role: Role) =>
+    role.pagePermissions.reduce((sum, pp) => sum + pp.permissions.length, 0);
+
+  constructor(
+    private roleService: RoleService,
+    private pageService: PageService,
+    private permissionService: PermissionService,
+    private userService: UserService,
+  ) {}
 
   ngOnInit(): void {
+    this.pageService.getAllPages().subscribe(pages => this.allPages.set(pages));
+    this.permissionService.getAllPermissions().subscribe(perms => this.allPermissions.set(perms));
     this.loadRoles();
   }
 
-  loadRoles(): void {
-    this.isLoading = true;
-    this.errorMessage = '';
+  loadRoles(selectFirst = true): void {
+  this.roleService.getAllRoles().subscribe(roles => {
+    this.roles.set(roles);
+    if (selectFirst && roles.length && this.selectedRoleId() === null) {
+      this.selectRole(roles[0].id);
+    }
+    this.loadAllRoleUserCounts(roles);
+  });
+}
 
-    this.rolesService.getAllRoles().subscribe({
-      next: (roles) => {
-        this.roles = roles;
-        this.isLoading = false;
-      },
-      error: () => {
-        this.errorMessage = 'Failed to load roles.';
-        this.isLoading = false;
-      },
+userCountFor(roleId: number): number {
+  return this.roleUserCounts().get(roleId) ?? 0;
+}
+
+loadAllRoleUserCounts(roles: Role[]): void {
+  if (!roles.length) return;
+  const requests = roles.map(r =>
+    this.userService.searchUsers(undefined, r.id)
+  );
+  forkJoin(requests).subscribe(results => {
+    const counts = new Map<number, number>();
+    roles.forEach((r, i) => counts.set(r.id, results[i].length));
+    this.roleUserCounts.set(counts);
+  });
+}
+
+  selectRole(id: number): void {
+    this.selectedRoleId.set(id);
+    this.editMode.set(false);
+    this.loadAssignedUsers(id);
+  }
+
+  loadAssignedUsers(roleId: number): void {
+    this.userService.searchUsers(undefined, roleId).subscribe(users => {
+      this.assignedUsers.set(users);
     });
   }
 
-  get filteredRoles(): Role[] {
-    const term = this.searchTerm.trim().toLowerCase();
-    if (!term) return this.roles;
-    return this.roles.filter((r) => r.name.toLowerCase().includes(term));
+  hasPermission(pageId: number, permissionId: number): boolean {
+    const role = this.selectedRole();
+    if (!role) return false;
+    const group = role.pagePermissions.find(pp => pp.page.pageId === pageId);
+    return !!group?.permissions.some(p => p.permissionId === permissionId);
   }
 
-  get allSelected(): boolean {
-    return (
-      this.filteredRoles.length > 0 &&
-      this.filteredRoles.every((r) => this.selectedIds.has(r.id))
-    );
-  }
+  startEdit(): void {
+    const role = this.selectedRole();
+    if (!role) return;
 
-  toggleSelectAll(): void {
-    if (this.allSelected) {
-      this.filteredRoles.forEach((r) => this.selectedIds.delete(r.id));
-    } else {
-      this.filteredRoles.forEach((r) => this.selectedIds.add(r.id));
+    const grid = new Map<number, Set<number>>();
+    for (const page of this.allPages()) {
+      const group = role.pagePermissions.find(pp => pp.page.pageId === page.id);
+      grid.set(page.id, new Set(group?.permissions.map(p => p.permissionId) ?? []));
     }
+
+    this.draftName.set(role.name);
+    this.draftDescription.set(role.description ?? '');
+    this.draftGrid.set(grid);
+    this.editMode.set(true);
   }
 
-  toggleSelect(role: Role): void {
-    if (this.selectedIds.has(role.id)) {
-      this.selectedIds.delete(role.id);
+  cancelEdit(): void {
+    this.editMode.set(false);
+  }
+
+  toggleDraftPermission(pageId: number, permissionId: number): void {
+    const grid = this.draftGrid();
+    const set = grid.get(pageId) ?? new Set<number>();
+    if (set.has(permissionId)) {
+      set.delete(permissionId);
     } else {
-      this.selectedIds.add(role.id);
+      set.add(permissionId);
     }
+    grid.set(pageId, set);
+    this.draftGrid.set(new Map(grid));
   }
 
-  isSelected(role: Role): boolean {
-    return this.selectedIds.has(role.id);
+  isDraftChecked(pageId: number, permissionId: number): boolean {
+    return this.draftGrid().get(pageId)?.has(permissionId) ?? false;
   }
 
-  deleteRole(role: Role): void {
-    if (!confirm(`Delete role "${role.name}"? This cannot be undone.`)) return;
-    this.rolesService.deleteRole(role.id).subscribe({
-      next: () => {
-        this.roles = this.roles.filter((r) => r.id !== role.id);
-        this.selectedIds.delete(role.id);
-      },
-      error: () => (this.errorMessage = 'Delete failed. You may not have permission.'),
+  saveEdit(): void {
+    const role = this.selectedRole();
+    if (!role) return;
+
+    const pagePermissions: PagePermissionRequest[] = [];
+    this.draftGrid().forEach((permIds, pageId) => {
+      if (permIds.size > 0) {
+        pagePermissions.push({ pageId, permissionIds: Array.from(permIds) });
+      }
+    });
+
+    const request: RoleRequest = {
+      name: this.draftName(),
+      description: this.draftDescription(),
+      pagePermissions,
+    };
+
+    this.roleService.updateRole(role.id, request).subscribe(() => {
+      this.editMode.set(false);
+      this.loadRoles(false);
     });
   }
+
+  // deleteRole(): void {
+  //   const role = this.selectedRole();
+  //   if (!role) return;
+  //   if (!confirm(`Delete role "${role.name}"? This cannot be undone.`)) return;
+
+  //   this.roleService.deleteRole(role.id).subscribe(() => {
+  //     this.selectedRoleId.set(null);
+  //     this.loadRoles();
+  //   });
+  // }
+
+  openCreateModal(): void {
+    this.draftName.set('');
+    this.draftDescription.set('');
+    this.draftGrid.set(new Map(this.allPages().map(p => [p.id, new Set<number>()])));
+    this.showCreateModal.set(true);
+  }
+
+  closeCreateModal(): void {
+    this.showCreateModal.set(false);
+  }
+
+  createRole(): void {
+    const pagePermissions: PagePermissionRequest[] = [];
+    this.draftGrid().forEach((permIds, pageId) => {
+      if (permIds.size > 0) {
+        pagePermissions.push({ pageId, permissionIds: Array.from(permIds) });
+      }
+    });
+
+    const request: RoleRequest = {
+      name: this.draftName(),
+      description: this.draftDescription(),
+      pagePermissions,
+    };
+
+    this.roleService.createRole(request).subscribe(role => {
+      this.showCreateModal.set(false);
+      this.loadRoles(false);
+      this.selectRole(role.id);
+    });
+  }
+
+  private roleColors: Record<string, string> = {
+  ADMIN: '#e03131',
+  MANAGER: '#1971c2',
+  EDITOR: '#228be6',
+  EMPLOYEE: '#228be6',
+  VIEWER: '#868e96',
+};
+
+private palette = ['#e03131', '#1971c2', '#228be6', '#868e96', '#f08c00', '#2f9e44'];
+
+roleColor(role: Role): string {
+  const key = role.name?.toUpperCase();
+  if (key && this.roleColors[key]) return this.roleColors[key];
+  const idx = this.roles().findIndex(r => r.id === role.id);
+  return this.palette[idx % this.palette.length];
+}
+
+// add these signals near your other signals:
+showDeleteConfirm = signal(false);
+
+// replace your existing deleteRole() with this:
+deleteRole(): void {
+  this.showDeleteConfirm.set(true);
+}
+
+confirmDelete(): void {
+  const role = this.selectedRole();
+  if (!role) return;
+
+  this.roleService.deleteRole(role.id).subscribe(() => {
+    this.selectedRoleId.set(null);
+    this.showDeleteConfirm.set(false);
+    this.loadRoles();
+  });
+}
+
+cancelDelete(): void {
+  this.showDeleteConfirm.set(false);
+}
 }

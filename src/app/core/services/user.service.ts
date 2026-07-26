@@ -2,6 +2,7 @@ import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
 import { Observable } from 'rxjs';
 import { User } from '../models/user.model';
+import { HttpParams } from '@angular/common/http';
 export interface UserResponse {
   u_id: number;
   name: string;
@@ -40,6 +41,18 @@ export class UserService {
   getAllUsers(): Observable<UserResponse[]> {
     return this.http.get<UserResponse[]>(this.baseUrl);
   }
+  
+  searchUsers(search?: string, roleId?: number): Observable<UserResponse[]> {
+  let params = new HttpParams();
+  if (search) {
+    params = params.set('search', search);
+  }
+  if (roleId != null) {
+    params = params.set('roleId', roleId.toString());
+  }
+  return this.http.get<UserResponse[]>(`${this.baseUrl}/search`, { params });
+}
+
   getCurrentUser(): Observable<User> {
     return this.http.get<User>(`${this.baseUrl}/userRole`);
   }

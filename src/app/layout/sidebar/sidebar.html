@@ -13,18 +13,16 @@
  <nav class="nav flex-column px-3 pt-4">
     <div class="nav-label text-uppercase">Navigation</div>
 
-    @if (!isLoading()) {
-      @for (page of visiblePages(); track page.route) {
-        <a class="nav-link" [routerLink]="page.route" routerLinkActive="active">
-          <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-               stroke-width="2" stroke-linecap="round" stroke-linejoin="round"
-               [innerHTML]="getIconInner(page.route)"></svg>
-          <span>{{ page.name }}</span>
-        </a>
-      }
-    } @else {
-      <span class="text-secondary small px-2">Loading menu...</span>
-    }
+   @if (!isLoading()) {
+  @for (page of visiblePages(); track page.route) {
+    <a class="nav-link" [routerLink]="page.route" routerLinkActive="active">
+      <i class="bi {{ getIconClass(page.route) }} nav-icon"></i>
+      <span>{{ page.name }}</span>
+    </a>
+  }
+} @else {
+  <span class="text-secondary small px-2">Loading menu...</span>
+}
   </nav>
 
   <div class="user-section">
