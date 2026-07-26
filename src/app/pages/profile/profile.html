@@ -1,1 +1,79 @@
-<p>Profile Works!</p>
+<div class="profile-page">
+
+  <!-- Profile header -->
+  <section class="profile-header" *ngIf="!profileLoading && profile; else profileState">
+    <div class="avatar">{{ initials }}</div>
+    <div class="header-info">
+      <h1 class="name">{{ profile.name }}</h1>
+      <span class="role-badge">{{ profile.role }}</span>
+      <div class="meta-row">
+        <span>{{ profile.email }}</span>
+        <span class="dot">&middot;</span>
+        <span>{{ profile.departmentName || 'No department' }}</span>
+        <span class="dot">&middot;</span>
+      </div>
+    </div>
+  </section>
+
+  <ng-template #profileState>
+    <div class="state-message" *ngIf="profileLoading">Loading profile...</div>
+    <div class="state-message error" *ngIf="!profileLoading && profileError">
+      {{ profileError }}
+      <button (click)="loadProfile()">Retry</button>
+    </div>
+  </ng-template>
+
+  <!-- My files -->
+  <section class="files-section">
+    <div class="section-header">
+      <h2>My Files</h2>
+      <span class="file-count" *ngIf="!filesLoading">{{ totalElements }} file(s)</span>
+    </div>
+
+    <div class="state-message" *ngIf="filesLoading">Loading files...</div>
+    <div class="state-message error" *ngIf="!filesLoading && filesError">
+      {{ filesError }}
+      <button (click)="loadMyFiles()">Retry</button>
+    </div>
+
+    <div class="empty-state" *ngIf="!filesLoading && !filesError && files.length === 0">
+      You haven't uploaded any files yet.
+    </div>
+
+    <table class="files-table" *ngIf="!filesLoading && !filesError && files.length > 0">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Department(s)</th>
+          <th>Status</th>
+          <th>Size</th>
+          <th>Modified</th>
+          <th></th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let file of files">
+          <td class="file-name">{{ file.name }}.{{ file.extension }}</td>
+          <td>{{ file.fileType }}</td>
+          <td>{{ file.departmentNames.join(', ') || '—' }}</td>
+          <td>
+            <span class="status-badge" [ngClass]="file.status.toLowerCase()">{{ file.status }}</span>
+          </td>
+          <td>{{ file.size }}</td>
+          <td>{{ file.modifiedDate }}</td>
+          <td class="actions">
+            <button class="download-btn" (click)="download(file)">Download</button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <div class="pagination" *ngIf="!filesLoading && !filesError && totalPages > 1">
+      <button (click)="prevPage()" [disabled]="page === 0">Previous</button>
+      <span>Page {{ page + 1 }} of {{ totalPages }}</span>
+      <button (click)="nextPage()" [disabled]="page + 1 >= totalPages">Next</button>
+    </div>
+  </section>
+
+</div>

@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
-import { UserService, UserResponse } from '../../core/services/user.service';
+import { UserService, UserResponse, RegisterRequest, UpdateUserRequest } from '../../core/services/user.service';
 
 @Component({
   selector: 'app-users',
@@ -18,6 +18,7 @@ export class Users implements OnInit {
   errorMessage = '';
 
   searchTerm = '';
+  formUsername = '';
   roleFilter = '';
   openMenuUserId: number | null = null;
 
@@ -100,13 +101,40 @@ export class Users implements OnInit {
   deleteUser(user: UserResponse): void {
     if (!confirm(`Delete user "${user.name}"? This cannot be undone.`)) return;
 
-    this.userService.deleteUser(user.id).subscribe({
+    this.userService.deleteUser(user.u_id).subscribe({
       next: () => this.loadUsers(),
       error: (err: HttpErrorResponse) => {
         this.errorMessage = 'Delete failed. You may not have permission.';
+        console.error('Delete failed:', err.status, err.error);
       }
     });
     this.closeMenu();
+  }
+
+  toggleStatus(user: UserResponse): void {
+    this.userService.toggleStatus(user.u_id).subscribe({
+      next: () => this.loadUsers(),
+      error: (err: HttpErrorResponse) => {
+        this.errorMessage = 'Status update failed.';
+        console.error('Status toggle failed:', err.status, err.error);
+      }
+    });
+    this.closeMenu();
+  }
+
+  // ---- View modal ----
+  showViewModal = false;
+  viewUser: UserResponse | null = null;
+
+  openViewModal(user: UserResponse): void {
+    this.viewUser = user;
+    this.showViewModal = true;
+    this.closeMenu();
+  }
+
+  closeViewModal(): void {
+    this.showViewModal = false;
+    this.viewUser = null;
   }
 
   // ---- Add/Edit modal ----
@@ -126,23 +154,24 @@ export class Users implements OnInit {
     this.showModal = true;
   }
 
-  openEditModal(user: UserResponse): void {
-    this.isEditMode = true;
-    this.modalUser = user;
-    this.formName = user.name;
-    this.formEmail = user.email;
-    this.formPassword = '';
-    this.showModal = true;
-    this.closeMenu();
-  }
-
   closeModal(): void {
     this.showModal = false;
     this.resetForm();
   }
 
+  openEditModal(user: UserResponse): void {
+    this.isEditMode = true;
+    this.modalUser = user;
+    this.formName = user.name;
+    this.formUsername = (user as any).username ?? '';
+    this.formEmail = user.email;
+    this.showModal = true;
+    this.closeMenu();
+  }
+
   resetForm(): void {
     this.formName = '';
+    this.formUsername = '';
     this.formEmail = '';
     this.formPassword = '';
     this.formRoleId = null;
@@ -151,32 +180,35 @@ export class Users implements OnInit {
   }
 
   submitForm(): void {
-    const request = {
-      name: this.formName,
-      email: this.formEmail,
-      password: this.formPassword,
-      roleId: this.formRoleId!,
-      departmentId: this.formDepartmentId!
-    };
-
     if (this.isEditMode && this.modalUser) {
-      this.userService.updateUser(this.modalUser.id, request).subscribe({
-        next: () => {
-          this.closeModal();
-          this.loadUsers();
-        },
+      const request: UpdateUserRequest = {
+        name: this.formName,
+        username: this.formUsername,
+        email: this.formEmail,
+        roleId: this.formRoleId!,
+        departmentId: this.formDepartmentId!
+      };
+      this.userService.updateUser(this.modalUser.u_id, request).subscribe({
+        next: () => { this.closeModal(); this.loadUsers(); },
         error: (err: HttpErrorResponse) => {
           this.errorMessage = 'Update failed.';
+          console.error('Update failed:', err.status, err.error);
         }
       });
     } else {
+      const request: RegisterRequest = {
+        name: this.formName,
+        username: this.formUsername,
+        email: this.formEmail,
+        password: this.formPassword,
+        roleId: this.formRoleId!,
+        departmentId: this.formDepartmentId!
+      };
       this.userService.createUser(request).subscribe({
-        next: () => {
-          this.closeModal();
-          this.loadUsers();
-        },
+        next: () => { this.closeModal(); this.loadUsers(); },
         error: (err: HttpErrorResponse) => {
           this.errorMessage = 'Create failed.';
+          console.error('Create failed:', err.status, err.error);
         }
       });
     }

@@ -217,8 +217,43 @@
   cursor: pointer;
   font-size: 0.9rem;
 }
+.user-modal {
+  background: white;
+  border-radius: 10px;
+  padding: 1rem 1.2rem;
+  width: 100%;
+  max-width: 300px;
+}
 
-.modal-overlay {
+.user-modal h3 {
+  margin-top: 0;
+  margin-bottom: 0.5rem;
+  font-size: 1rem;
+}
+
+.user-modal label {
+  display: block;
+  font-size: 0.75rem;
+  font-weight: 600;
+  margin: 0.5rem 0 0.2rem;
+}
+
+.user-modal input,
+.user-modal select {
+  width: 100%;
+  padding: 0.45rem;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  font-size: 0.8rem;
+  box-sizing: border-box;
+}
+
+.user-modal p {
+  font-size: 0.8rem;
+  margin: 0.35rem 0;
+  color: #374151;
+}
+.user-modal-overlay {
   position: fixed;
   inset: 0;
   background: rgba(0,0,0,0.4);
@@ -226,42 +261,6 @@
   align-items: center;
   justify-content: center;
   z-index: 100;
-}
-
-.modal {
-  background: white;
-  border-radius: 10px;
-  padding: 1.5rem;
-  width: 100%;
-  max-width: 400px;
-}
-
-.modal h3 {
-  margin-top: 0;
-  font-size: 1.1rem;
-}
-
-.modal label {
-  display: block;
-  font-size: 0.8rem;
-  font-weight: 600;
-  margin: 0.8rem 0 0.3rem;
-}
-
-.modal input {
-  width: 100%;
-  padding: 0.6rem;
-  border: 1px solid #e5e7eb;
-  border-radius: 6px;
-  font-size: 0.85rem;
-  box-sizing: border-box;
-}
-
-.modal-actions {
-  display: flex;
-  justify-content: flex-end;
-  gap: 0.6rem;
-  margin-top: 1.2rem;
 }
 
 .cancel-btn {

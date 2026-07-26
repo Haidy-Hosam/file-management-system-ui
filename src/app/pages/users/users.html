@@ -41,10 +41,11 @@
           </div>
         </div>
 
-        <button class="menu-btn" (click)="toggleMenu(user.id, $event)">⋮</button>
+        <button class="menu-btn" (click)="toggleMenu(user.u_id, $event)">⋮</button>
 
-        <div class="action-menu" *ngIf="openMenuUserId === user.id" (click)="$event.stopPropagation()">
+        <div class="action-menu" *ngIf="openMenuUserId === user.u_id" (click)="$event.stopPropagation()">
           <button (click)="openEditModal(user)">Edit</button>
+          <button (click)="toggleStatus(user)">{{ user.isDeleted ? 'Activate' : 'Deactivate' }}</button>
           <button class="danger" (click)="deleteUser(user)">Delete</button>
         </div>
       </div>
@@ -67,7 +68,7 @@
         </div>
         <div class="info-block">
           <span class="info-label">Last Login</span>
-          <span class="info-value">{{ user.lastLogin ?? '—' }}</span>
+          <span class="info-value">{{ user.lastLogin ? (user.lastLogin | date:'short') : '—' }}</span>
         </div>
       </div>
 
@@ -76,7 +77,7 @@
           {{ user.isDeleted ? 'Inactive' : 'Active' }}
         </span>
         <div class="footer-icons">
-          <button class="icon-btn" title="View">👁️</button>
+          <button class="icon-btn" title="View" (click)="openViewModal(user)">👁️</button>
           <button class="icon-btn" title="Edit" (click)="openEditModal(user)">✏️</button>
         </div>
       </div>
@@ -86,19 +87,37 @@
   </div>
 </div>
 
+<!-- View User Modal -->
+<div class="user-modal-overlay" *ngIf="showViewModal" (click)="closeViewModal()">
+  <div class="user-modal" (click)="$event.stopPropagation()">
+    <h3>{{ viewUser?.name }}</h3>
+    <p><strong>Email:</strong> {{ viewUser?.email }}</p>
+    <p><strong>Role:</strong> {{ viewUser?.role }}</p>
+    <p><strong>Department:</strong> {{ viewUser?.departmentName }}</p>
+    <p><strong>Files:</strong> {{ viewUser?.filesCount ?? '—' }}</p>
+    <p><strong>Last Login:</strong> {{ viewUser?.lastLogin ? (viewUser?.lastLogin | date:'short') : '—' }}</p>
+    <p><strong>Status:</strong> {{ viewUser?.isDeleted ? 'Inactive' : 'Active' }}</p>
+    <div class="modal-actions">
+      <button class="cancel-btn" (click)="closeViewModal()">Close</button>
+    </div>
+  </div>
+</div>
+
 <!-- Add/Edit User Modal -->
-<div class="modal-overlay" *ngIf="showModal" (click)="closeModal()">
-  <div class="modal" (click)="$event.stopPropagation()">
+<div class="user-modal-overlay" *ngIf="showModal" (click)="closeModal()">
+  <div class="user-modal" (click)="$event.stopPropagation()">
     <h3>{{ isEditMode ? 'Edit User' : 'Add User' }}</h3>
 
     <label>Name</label>
     <input type="text" [(ngModel)]="formName" placeholder="Full name" />
+    <label>Username</label>
+    <input type="text" [(ngModel)]="formUsername" placeholder="username" />
 
     <label>Email</label>
     <input type="email" [(ngModel)]="formEmail" placeholder="email@arkive.co" />
 
-    <label>Password {{ isEditMode ? '(leave blank to keep unchanged)' : '' }}</label>
-    <input type="password" [(ngModel)]="formPassword" placeholder="••••••••" />
+    <label *ngIf="!isEditMode">Password</label>
+    <input *ngIf="!isEditMode" type="password" [(ngModel)]="formPassword" placeholder="••••••••" />
 
     <label>Role ID</label>
     <input type="number" [(ngModel)]="formRoleId" placeholder="e.g. 1" />

@@ -45,18 +45,15 @@ export class FileService {
     formData.append('fileType_id', request.fileType_id.toString());
     return this.http.post<FileResponse>(this.baseUrl, formData);
   }
-  // POST /api/files/bulk (multipart/form-data) -> createFilesBulk
-  // Sends N files (each with its own file type) fanned out across M departments.
-  // The backend creates one File record per (file, department) pair.
+  
+
   uploadFilesBulk(
     items: { file: File; fileTypeId: number }[],
     departmentIds: number[]
   ): Observable<FileResponse[]> {
     const formData = new FormData();
  
-    // 'files' and 'fileTypeIds' are parallel arrays — index i of one
-    // corresponds to index i of the other. We control the append order
-    // here in a single loop, so it's safe to rely on it.
+    
     items.forEach(item => {
       formData.append('files', item.file);
       formData.append('fileTypeIds', item.fileTypeId.toString());
@@ -70,33 +67,36 @@ export class FileService {
   }
  
 
-  // DELETE /api/files/{fileId} -> deleteFile
+  
   deleteFile(fileId: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${fileId}`);
   }
 
-  // GET /api/files/all -> getAllFiles
+
   getAllFiles(page: number, size:number): Observable<PageResponse<FileResponse>> {
     const params = new HttpParams().set('page', page).set('size', size);
     return this.http.get<PageResponse<FileResponse>>(`${this.baseUrl}/all`, {params});
   }
 
-  // GET /api/files/dept/{deptId} -> getAllFilesByDepartment
+  
   getAllFilesByDepartment(deptId: number, page:number , size: number): Observable<PageResponse<FileResponse>> {
     return this.http.get<PageResponse<FileResponse>>(`${this.baseUrl}/dept/${deptId}?page=${page}&size=${size}`);
   }
-
-  // GET /api/files/{fileId} -> getFileData
+   
+  getMyFiles(page: number, size: number): Observable<PageResponse<FileResponse>> {
+  const params = new HttpParams().set('page', page).set('size', size);
+  return this.http.get<PageResponse<FileResponse>>(`${this.baseUrl}/my`, { params });
+}
   getFileData(fileId: number): Observable<FileResponse> {
     return this.http.get<FileResponse>(`${this.baseUrl}/${fileId}`);
   }
 
-  // GET /api/files/{fileId}/download -> downloadFile
+
   downloadFile(fileId: number): Observable<Blob> {
     return this.http.get(`${this.baseUrl}/${fileId}/download`, { responseType: 'blob' });
   }
 
-  // PUT /api/files/{fileId}/status -> updateFileStatus
+
   updateFileStatus(fileId: number, status: string): Observable<FileResponse> {
     return this.http.put<FileResponse>(`${this.baseUrl}/${fileId}/status`, { status });
   }
@@ -104,4 +104,5 @@ export class FileService {
   downloadFilesBulk(fileIds: number[]): Observable<Blob> {
   return this.http.post(`${this.baseUrl}/download-bulk`, fileIds, { responseType: 'blob' });
 }
+
 }
