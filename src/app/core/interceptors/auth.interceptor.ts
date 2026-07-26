@@ -6,6 +6,7 @@ import { catchError, switchMap, throwError } from 'rxjs';
 export const authInterceptor: HttpInterceptorFn = (req, next) => {
   const authService = inject(AuthService);
   const token = authService.getToken();
+  console.log("AuthInterceptor:", req.url);
 
   const isAuthUrl = req.url.includes('/api/auth/');
 
@@ -14,41 +15,52 @@ export const authInterceptor: HttpInterceptorFn = (req, next) => {
       setHeaders: { Authorization: `Bearer ${token}` }
     });
   }
-
+console.log("Sending request...");
   return next(req).pipe(
 
-    catchError(error => {
+  catchError(error => {
 
-        if (error.status === 401 && !isAuthUrl) {
+    console.log("AuthInterceptor caught:", error.status, req.url);
 
-            return authService.refreshToken().pipe(
+    if (error.status === 403 && !isAuthUrl) {
 
-                switchMap(res => {
+      console.log("Trying Refresh...");
 
-authService.saveAccessToken(res.accessToken);
+      return authService.refreshToken().pipe(
 
-      if (res.refreshToken) {
-          authService.saveRefreshToken(res.refreshToken);
-      }
-            const cloned = req.clone({
+        switchMap(res => {
 
-                setHeaders: {
-                    Authorization: `Bearer ${res.accessToken}`
-                }
+          console.log("Refresh Success");
 
-            });
+          authService.saveAccessToken(res.accessToken);
 
-            return next(cloned);
+          if (res.refreshToken) {
+            authService.saveRefreshToken(res.refreshToken);
+          }
 
+          const cloned = req.clone({
+            setHeaders: {
+              Authorization: `Bearer ${res.accessToken}`
+            }
+          });
+
+          console.log("Retrying original request");
+
+          return next(cloned);
+        }),
+
+        catchError(err => {
+
+          console.log("Refresh Failed", err.status);
+
+          return throwError(() => err);
         })
+      );
+    }
 
-    );
-
-}
-
+    console.log(error);
     return throwError(() => error);
 
   })
-
 );
-};
+}

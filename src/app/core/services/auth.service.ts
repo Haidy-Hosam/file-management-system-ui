@@ -100,8 +100,10 @@ export class AuthService {
 saveAccessToken(token: string): void {
 
   if (localStorage.getItem('accessToken')) {
+    localStorage.removeItem('accessToken');
     localStorage.setItem('accessToken', token);
   } else {
+    sessionStorage.removeItem('accessToken');
     sessionStorage.setItem('accessToken', token);
   }
 
@@ -110,8 +112,10 @@ saveAccessToken(token: string): void {
 saveRefreshToken(token: string): void {
 
   if (localStorage.getItem('refreshToken')) {
+    localStorage.removeItem('refreshToken');
     localStorage.setItem('refreshToken', token);
   } else {
+    sessionStorage.removeItem('refreshToken');
     sessionStorage.setItem('refreshToken', token);
   }
 
