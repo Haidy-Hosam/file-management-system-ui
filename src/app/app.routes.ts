@@ -11,6 +11,7 @@ import { Trash } from './pages/trash/trash';
 import { MainLayout } from './layout/main-layout/main-layout';
 import { authGuard, roleGuard } from './core/guards/auth.guard';
 import { Routes } from '@angular/router';
+import { NotificationsPage } from './pages/notifications-page/notifications-page';
 
 export const routes: Routes = [
   {
@@ -61,7 +62,9 @@ export const routes: Routes = [
       {
          path: 'profile', 
          component: Profile
-       }
+       },
+       { path: 'notifications',
+        component: NotificationsPage }
     ],
   },
 ];

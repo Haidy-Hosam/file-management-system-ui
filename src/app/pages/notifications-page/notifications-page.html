@@ -1,0 +1,29 @@
+<!-- notifications-page.html -->
+<div class="notifications-page">
+  <h1>Notifications</h1>
+  <p class="subtitle">All files forwarded or uploaded to you</p>
+
+  @if (loading) {
+    <div class="loading-state">Loading notifications...</div>
+  } @else if (notifications.length === 0) {
+    <div class="empty-state">You have no notifications yet.</div>
+  } @else {
+    <div class="notif-list">
+      @for (n of notifications; track n.id) {
+        <div class="notif-row" [class.unread]="!n.isRead" (click)="open(n)">
+          <div class="notif-main">
+            <div class="notif-title">
+              <strong>{{ n.senderName }}</strong>
+              {{ n.type === 'DEPARTMENT_UPLOAD' ? 'uploaded' : 'forwarded' }}
+              "{{ n.fileName }}"
+            </div>
+            @if (n.message) {
+              <div class="notif-message">"{{ n.message }}"</div>
+            }
+          </div>
+          <div class="notif-time">{{ n.forwardedAt | date:'short' }}</div>
+        </div>
+      }
+    </div>
+  }
+</div>

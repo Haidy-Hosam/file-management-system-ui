@@ -134,12 +134,9 @@
               <button (click)="viewDetails(file.id)">View Details</button>
               <button (click)="previewFile(file)">Preview</button>
               <button (click)="downloadFile(file)">Download</button>
-
-              <ng-container *ngIf="role === 'ADMIN' || role === 'MANAGER'">
+              <button (click)="onForward(file)">Forward</button>
                 <button (click)="openStatusModal(file)">Edit Status</button>
-              </ng-container>
-
-              <button class="danger" *ngIf="role === 'ADMIN'" (click)="deleteFile(file)">Delete</button>
+              <button class="danger"  (click)="deleteFile(file)">Delete</button>
             </div>
           </td>
         </tr>
@@ -300,6 +297,8 @@
   </div>
 </div>
 
+
+
 <!-- Edit Status Modal -->
 <div class="status-overlay" *ngIf="showStatusModal" (click)="closeStatusModal()">
   <div class="status-modal" (click)="$event.stopPropagation()">
@@ -364,3 +363,11 @@
     </div>
   </div>
 </div>
+
+@if (forwardingFileId !== null) {
+  <app-forward-file-dialog
+    [fileId]="forwardingFileId"
+    (closed)="onForwardDialogClosed()"
+    (forwarded)="onForwardSuccess()">
+  </app-forward-file-dialog>
+}

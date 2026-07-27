@@ -1,0 +1,19 @@
+<!-- forward-file-dialog.html -->
+<div class="overlay" (click)="cancel()">
+  <div class="dialog" (click)="$event.stopPropagation()">
+    <h3>Forward file</h3>
+    <div class="user-list">
+      @for (u of users; track u.u_id) {
+        <label class="user-row">
+          <input type="checkbox" [checked]="selectedIds.has(u.u_id)" (change)="toggleUser(u.u_id)" />
+          {{ u.name }}
+        </label>
+      }
+    </div>
+    <textarea [(ngModel)]="message" placeholder="Optional message..."></textarea>
+    <div class="actions">
+      <button (click)="cancel()">Cancel</button>
+      <button class="primary" [disabled]="submitting || selectedIds.size === 0" (click)="submit()">Send</button>
+    </div>
+  </div>
+</div>

@@ -3,6 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
+import { NotificationBell } from "../../shared/notification-bell/notification-bell";
 
 @Component({
   selector: 'app-navbar',
@@ -10,8 +11,9 @@ import { AuthService } from '../../core/services/auth.service';
     imports: [
     CommonModule,
     FormsModule,
-    RouterModule
-  ],
+    RouterModule,
+    NotificationBell
+],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })

@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router, RouterLink } from '@angular/router'; // add ActivatedRoute here
 import { HttpErrorResponse } from '@angular/common/http';
 import { FileService, FileResponse, FileRequest } from '../../core/services/file.service';
 import { AuthService } from '../../core/services/auth.service';
@@ -10,6 +10,7 @@ import { Department } from '../../core/models/department.model';
 import { FileTypeService, FileType } from '../../core/services/filetype.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { TrashService } from '../../core/services/trash.service';
+import { ForwardFileDialog } from '../../shared/forward-file-dialog/forward-file-dialog'; // adjust path
 
 // interface FileGroup {
 //   groupId: string;
@@ -23,7 +24,7 @@ import { TrashService } from '../../core/services/trash.service';
 @Component({
   selector: 'app-files',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink,ForwardFileDialog],
   templateUrl: './files.html',
   styleUrl: './files.css'
 })
@@ -40,6 +41,7 @@ export class Files implements OnInit {
     private fileTypeService: FileTypeService,
     private trashService: TrashService,
     private router: Router,
+    private route: ActivatedRoute, // ADD
     private sanitizer: DomSanitizer
 
   ) {}
@@ -75,6 +77,20 @@ export class Files implements OnInit {
     this.loadFiles();
     this.loadDepartments();
     this.loadFileTypes();
+
+     this.route.queryParams.subscribe(params => {
+      const previewId = params['previewFileId'];
+      if (previewId) {
+        this.previewFileById(Number(previewId));
+      }
+    });
+  }
+
+   previewFileById(fileId: number): void {
+    this.fileService.getFileData(fileId).subscribe({
+      next: (file: FileResponse) => this.previewFile(file),
+      error: () => this.errorMessage = 'Could not load that file — it may have been removed.'
+    });
   }
 
   departments: Department[] = [];
@@ -624,6 +640,21 @@ private getPreviewKind(extension: string): 'image' | 'pdf' | 'text' | 'unsupport
   if (ext === 'pdf') return 'pdf';
   if (this.textExtensions.includes(ext)) return 'text';
   return 'unsupported';
+}
+
+onForward(file: FileResponse): void {
+  this.forwardingFileId = file.id;
+  this.closeMenu();
+}
+forwardingFileId: number | null = null;
+
+onForwardDialogClosed(): void {
+  this.forwardingFileId = null;
+}
+
+onForwardSuccess(): void {
+  this.forwardingFileId = null;
+  this.loadFiles(); // optional — refresh the list after forwarding
 }
 
 }

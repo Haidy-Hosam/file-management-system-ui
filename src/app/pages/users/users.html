@@ -21,7 +21,9 @@
       <option *ngFor="let role of uniqueRoles" [value]="role">{{ role }}</option>
     </select>
 
-    <button class="add-btn" (click)="openAddModal()">+ Add User</button>
+    <button class="add-btn" (click)="openAddModal()">
+      <i class="bi bi-plus-lg me-1"></i> Add User
+    </button>
   </div>
 
   <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
@@ -41,12 +43,20 @@
           </div>
         </div>
 
-        <button class="menu-btn" (click)="toggleMenu(user.u_id, $event)">⋮</button>
+        <button class="menu-btn" (click)="toggleMenu(user.u_id, $event)">
+          <i class="bi bi-three-dots-vertical"></i>
+        </button>
 
         <div class="action-menu" *ngIf="openMenuUserId === user.u_id" (click)="$event.stopPropagation()">
-          <button (click)="openEditModal(user)">Edit</button>
-          <button (click)="toggleStatus(user)">{{ user.isDeleted ? 'Activate' : 'Deactivate' }}</button>
-          <button class="danger" (click)="deleteUser(user)">Delete</button>
+          <button (click)="openEditModal(user)">
+            <i class="bi bi-pencil me-2"></i>Edit
+          </button>
+          <button (click)="toggleStatus(user)">
+            <i class="bi" [ngClass]="user.isDeleted ? 'bi-check-circle' : 'bi-slash-circle'" class="me-2"></i>{{ user.isDeleted ? 'Activate' : 'Deactivate' }}
+          </button>
+          <button class="danger" (click)="deleteUser(user)">
+            <i class="bi bi-trash me-2"></i>Delete
+          </button>
         </div>
       </div>
 
@@ -77,8 +87,12 @@
           {{ user.isDeleted ? 'Inactive' : 'Active' }}
         </span>
         <div class="footer-icons">
-          <button class="icon-btn" title="View" (click)="openViewModal(user)">👁️</button>
-          <button class="icon-btn" title="Edit" (click)="openEditModal(user)">✏️</button>
+          <button class="icon-btn" title="View" (click)="openViewModal(user)">
+            <i class="bi bi-eye"></i>
+          </button>
+          <button class="icon-btn" title="Edit" (click)="openEditModal(user)">
+            <i class="bi bi-pencil"></i>
+          </button>
         </div>
       </div>
     </div>
