@@ -56,7 +56,9 @@ export class UserService {
   getCurrentUser(): Observable<User> {
     return this.http.get<User>(`${this.baseUrl}/userRole`);
   }
-
+  getUserById(id: number): Observable<UserResponse> {
+  return this.http.get<UserResponse>(`${this.baseUrl}/${id}`);
+}
   createUser(request: RegisterRequest): Observable<UserResponse> {
     return this.http.post<UserResponse>(this.baseUrl, request);
   }

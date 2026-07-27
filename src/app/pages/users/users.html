@@ -87,12 +87,17 @@
           {{ user.isDeleted ? 'Inactive' : 'Active' }}
         </span>
         <div class="footer-icons">
+<<<<<<< HEAD
           <button class="icon-btn" title="View" (click)="openViewModal(user)">
             <i class="bi bi-eye"></i>
           </button>
           <button class="icon-btn" title="Edit" (click)="openEditModal(user)">
             <i class="bi bi-pencil"></i>
           </button>
+=======
+        <button class="icon-btn" title="View Profile" [routerLink]="['/users', user.u_id]">👁️</button>
+        <button class="icon-btn" title="Edit" (click)="openEditModal(user)">✏️</button>
+>>>>>>> 64c6d76b95e736663103a9fccea11a5e66e04f02
         </div>
       </div>
     </div>
@@ -133,11 +138,17 @@
     <label *ngIf="!isEditMode">Password</label>
     <input *ngIf="!isEditMode" type="password" [(ngModel)]="formPassword" placeholder="••••••••" />
 
-    <label>Role ID</label>
-    <input type="number" [(ngModel)]="formRoleId" placeholder="e.g. 1" />
+   <label>Role</label>
+<select [(ngModel)]="formRoleId">
+  <option [ngValue]="null" disabled>Select a role</option>
+  <option *ngFor="let role of roles" [ngValue]="role.id">{{ role.name }}</option>
+</select>
 
-    <label>Department ID</label>
-    <input type="number" [(ngModel)]="formDepartmentId" placeholder="e.g. 2" />
+<label>Department</label>
+<select [(ngModel)]="formDepartmentId">
+  <option [ngValue]="null" disabled>Select a department</option>
+  <option *ngFor="let dept of departments" [ngValue]="dept.id">{{ dept.name }}</option>
+</select>
 
     <div class="modal-actions">
       <button class="cancel-btn" (click)="closeModal()">Cancel</button>
