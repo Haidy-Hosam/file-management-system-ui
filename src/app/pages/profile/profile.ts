@@ -1,8 +1,9 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
+import { ActivatedRoute } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
-import { UserService, UserResponse } from '../../core/services/user.service'; // adjust path if UserService lives elsewhere
-import { FileService, FileResponse, PageResponse } from '../../core/services/file.service'; // adjust path if FileService lives elsewhere
+import { UserService, UserResponse } from '../../core/services/user.service';
+import { FileService, FileResponse, PageResponse } from '../../core/services/file.service';
 
 @Component({
   selector: 'app-profile',
@@ -12,12 +13,12 @@ import { FileService, FileResponse, PageResponse } from '../../core/services/fil
   styleUrls: ['./profile.css'],
 })
 export class ProfileComponent implements OnInit {
-  // profile header state
+  userId: number | null = null; // null = viewing your own profile
+
   profile: UserResponse | null = null;
   profileLoading = true;
   profileError: string | null = null;
 
-  // file list state
   files: FileResponse[] = [];
   filesLoading = true;
   filesError: string | null = null;
@@ -28,20 +29,28 @@ export class ProfileComponent implements OnInit {
   totalElements = 0;
 
   constructor(
+    private route: ActivatedRoute,
     private userService: UserService,
     private fileService: FileService
   ) {}
 
   ngOnInit(): void {
+    const idParam = this.route.snapshot.paramMap.get('id');
+    this.userId = idParam ? Number(idParam) : null;
+
     this.loadProfile();
-    this.loadMyFiles();
+    this.loadFiles();
   }
 
   loadProfile(): void {
     this.profileLoading = true;
     this.profileError = null;
 
-    this.userService.getMyProfile().subscribe({
+    const request$ = this.userId
+      ? this.userService.getUserById(this.userId)
+      : this.userService.getMyProfile();
+
+    request$.subscribe({
       next: (data: UserResponse) => {
         this.profile = data;
         this.profileLoading = false;
@@ -56,11 +65,15 @@ export class ProfileComponent implements OnInit {
     });
   }
 
-  loadMyFiles(): void {
+  loadFiles(): void {
     this.filesLoading = true;
     this.filesError = null;
 
-    this.fileService.getMyFiles(this.page, this.size).subscribe({
+    const request$ = this.userId
+      ? this.fileService.getFilesByUser(this.userId, this.page, this.size)
+      : this.fileService.getMyFiles(this.page, this.size);
+
+    request$.subscribe({
       next: (result: PageResponse<FileResponse>) => {
         this.files = result.content;
         this.totalPages = result.totalPages;
@@ -68,7 +81,7 @@ export class ProfileComponent implements OnInit {
         this.filesLoading = false;
       },
       error: () => {
-        this.filesError = 'Could not load your files. Please try again.';
+        this.filesError = 'Could not load files. Please try again.';
         this.filesLoading = false;
       },
     });
@@ -77,14 +90,14 @@ export class ProfileComponent implements OnInit {
   nextPage(): void {
     if (this.page + 1 < this.totalPages) {
       this.page++;
-      this.loadMyFiles();
+      this.loadFiles();
     }
   }
 
   prevPage(): void {
     if (this.page > 0) {
       this.page--;
-      this.loadMyFiles();
+      this.loadFiles();
     }
   }
 

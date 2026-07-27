@@ -3,11 +3,16 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { HttpErrorResponse } from '@angular/common/http';
 import { UserService, UserResponse, RegisterRequest, UpdateUserRequest } from '../../core/services/user.service';
+import { RouterModule } from '@angular/router';
+import { RoleService } from '../../core/services/roles.service';
+import { DepartmentService } from '../../core/services/department.service';
+import { Role } from '../../core/models/role.model';
+import { Department } from '../../core/models/department.model';
 
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, RouterModule],
   templateUrl: './users.html',
   styleUrl: './users.css'
 })
@@ -17,16 +22,40 @@ export class Users implements OnInit {
   isLoading = true;
   errorMessage = '';
 
+  roles: Role[] = [];
+  departments: Department[] = [];
+
   searchTerm = '';
   formUsername = '';
   roleFilter = '';
   openMenuUserId: number | null = null;
 
-  constructor(private userService: UserService) {}
+  constructor(
+    private userService: UserService,
+    private roleService: RoleService,
+    private departmentService: DepartmentService
+  ) {}
 
   ngOnInit(): void {
     this.loadUsers();
+    this.loadRoles();
+    this.loadDepartments();
   }
+
+  loadRoles(): void {
+    this.roleService.getAllRoles().subscribe({
+      next: (roles: Role[]) => this.roles = roles,
+      error: (err: HttpErrorResponse) => console.error('Failed to load roles:', err.status, err.error)
+    });
+  }
+
+  loadDepartments(): void {
+    this.departmentService.getLookupDepartments().subscribe({
+      next: (departments: Department[]) => this.departments = departments,
+      error: (err: HttpErrorResponse) => console.error('Failed to load departments:', err.status, err.error)
+    });
+  }
+
 
   loadUsers(): void {
     this.isLoading = true;
@@ -158,13 +187,14 @@ export class Users implements OnInit {
     this.showModal = false;
     this.resetForm();
   }
-
   openEditModal(user: UserResponse): void {
     this.isEditMode = true;
     this.modalUser = user;
     this.formName = user.name;
     this.formUsername = (user as any).username ?? '';
     this.formEmail = user.email;
+    this.formRoleId = this.roles.find(r => r.name === user.role)?.id ?? null;
+    this.formDepartmentId = this.departments.find(d => d.name === user.departmentName)?.id ?? null;
     this.showModal = true;
     this.closeMenu();
   }

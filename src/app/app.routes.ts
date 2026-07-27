@@ -1,7 +1,7 @@
 import { Login } from './pages/login/login';
 import { Dashboard } from './pages/dashboard/dashboard';
 import { Files } from './pages/files/files';
-import { ProfileComponent as Profile } from './pages/profile/profile';
+import { ProfileComponent } from './pages/profile/profile';
 import { FileDetails } from './pages/file-details/file-details';
 import { Departments } from './pages/departments/departments';
 import { DepartmentDetailsComponent } from './pages/department-details/department-details';
@@ -59,9 +59,13 @@ export const routes: Routes = [
         canActivate: [roleGuard(['ADMIN'])],
       },
       {
-         path: 'profile', 
-         component: Profile
-       }
+      path: 'profile',
+      component: ProfileComponent
+     },
+     {
+     path: 'users/:id',
+     component: ProfileComponent
+     }
     ],
   },
 ];

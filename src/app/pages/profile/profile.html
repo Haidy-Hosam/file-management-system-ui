@@ -10,7 +10,7 @@
         <span>{{ profile.email }}</span>
         <span class="dot">&middot;</span>
         <span>{{ profile.departmentName || 'No department' }}</span>
-        <span class="dot">&middot;</span>
+        
       </div>
     </div>
   </section>
@@ -33,7 +33,7 @@
     <div class="state-message" *ngIf="filesLoading">Loading files...</div>
     <div class="state-message error" *ngIf="!filesLoading && filesError">
       {{ filesError }}
-      <button (click)="loadMyFiles()">Retry</button>
+     <button (click)="loadFiles()">Retry</button>
     </div>
 
     <div class="empty-state" *ngIf="!filesLoading && !filesError && files.length === 0">

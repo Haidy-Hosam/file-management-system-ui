@@ -78,7 +78,10 @@ export class FileService {
     return this.http.get<PageResponse<FileResponse>>(`${this.baseUrl}/all`, {params});
   }
 
-  
+  getFilesByUser(userId: number, page: number, size: number): Observable<PageResponse<FileResponse>> {
+  const params = new HttpParams().set('page', page).set('size', size);
+  return this.http.get<PageResponse<FileResponse>>(`${this.baseUrl}/user/${userId}`, { params });
+}
   getAllFilesByDepartment(deptId: number, page:number , size: number): Observable<PageResponse<FileResponse>> {
     return this.http.get<PageResponse<FileResponse>>(`${this.baseUrl}/dept/${deptId}?page=${page}&size=${size}`);
   }
