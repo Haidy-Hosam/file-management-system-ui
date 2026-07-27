@@ -243,7 +243,7 @@
   <!-- Bottom Grid: Recent Uploads & Department Breakdown -->
   <div class="row g-3">
     <!-- Recent Activity Table -->
-    <div class="col-12 col-xl-8">
+    <div [ngClass]="userRole === 'ADMIN' ? 'col-12 col-xl-8' : 'col-12'">
       <div class="card border-0 shadow-sm rounded-4 bg-white overflow-hidden">
         <div class="card-header bg-white border-bottom p-4 d-flex align-items-center justify-content-between">
           <div>
@@ -311,8 +311,8 @@
       </div>
     </div>
 
-    <!-- Department Storage Breakdown & System Health -->
-    <div class="col-12 col-xl-4">
+    <!-- Department Storage Breakdown & System Health (ADMIN ONLY) -->
+    <div class="col-12 col-xl-4" *ngIf="userRole === 'ADMIN'">
       <!-- Department Storage Progress -->
       <div class="card border-0 shadow-sm rounded-4 bg-white p-4 mb-3">
         <div class="d-flex align-items-center justify-content-between mb-3">

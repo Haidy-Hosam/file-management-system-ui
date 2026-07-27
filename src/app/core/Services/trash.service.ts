@@ -43,6 +43,7 @@ export class TrashService {
     if (!exists) {
       const trashItem: TrashItem = {
         ...file,
+        status: 'REJECTED',
         deletedDate: new Date().toISOString().split('T')[0],
       };
       const updated = [trashItem, ...current];
@@ -57,6 +58,7 @@ export class TrashService {
       .filter((file) => !current.some((item) => item.id === file.id))
       .map((file) => ({
         ...file,
+        status: 'REJECTED',
         deletedDate: now,
       }));
     if (newItems.length > 0) {

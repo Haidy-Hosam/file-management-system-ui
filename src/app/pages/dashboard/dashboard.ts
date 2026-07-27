@@ -7,6 +7,8 @@ import { DepartmentService } from '../../core/services/department.service';
 import { Department } from '../../core/models/department.model';
 import { TrashService } from '../../core/services/trash.service';
 import { AuthService } from '../../core/services/auth.service';
+import { DashboardService } from '../../core/services/dashboard.service';
+import { DashboardStatistics } from '../../core/models/DashboardStatistics';
 
 interface MonthlyActivity {
   month: string;
@@ -27,6 +29,8 @@ export class Dashboard implements OnInit {
   userEmail = '';
   userRole = '';
   greeting = '';
+
+  statistics: DashboardStatistics | null = null;
 
   totalFiles = 0;
   pendingCount = 0;
@@ -55,7 +59,8 @@ export class Dashboard implements OnInit {
     private fileService: FileService,
     private departmentService: DepartmentService,
     private trashService: TrashService,
-    private authService: AuthService
+    private authService: AuthService,
+    private dashboardService: DashboardService
   ) {}
 
   ngOnInit(): void {
@@ -63,6 +68,22 @@ export class Dashboard implements OnInit {
     this.userRole = this.authService.getRole() ?? 'USER';
     this.greeting = this.computeGreeting();
     this.loadDashboardData();
+    this.getStatistics();
+  }
+
+  getStatistics(): void {
+    this.dashboardService.getStatistics().subscribe({
+      next: (response) => {
+        this.statistics = response;
+        this.totalFiles = response.totalDocuments;
+        this.pendingCount = response.pendingReviews;
+        this.approvedCount = response.approvedArchives;
+        this.totalDepartments = response.activeDepartments;
+      },
+      error: (error) => {
+        console.error(error);
+      },
+    });
   }
 
   private computeGreeting(): string {
@@ -80,21 +101,7 @@ export class Dashboard implements OnInit {
     this.fileService.getAllFiles(0, 50).subscribe({
       next: (res) => {
         const files = res.content || [];
-        this.totalFiles = res.totalElements || files.length;
         this.recentFiles = files.slice(0, 6);
-
-        // Calculate status counts
-        this.pendingCount = files.filter((f) => f.status === 'PENDING').length;
-        this.approvedCount = files.filter((f) => f.status === 'APPROVED').length;
-        this.rejectedCount = files.filter((f) => f.status === 'REJECTED').length;
-
-        // If backend returns 0 for status filters because of page size limit, compute default ratios
-        if (this.totalFiles > 0 && this.pendingCount === 0 && this.approvedCount === 0) {
-          this.approvedCount = Math.ceil(this.totalFiles * 0.7);
-          this.pendingCount = Math.floor(this.totalFiles * 0.2);
-          this.rejectedCount = this.totalFiles - this.approvedCount - this.pendingCount;
-        }
-
         this.isLoading = false;
       },
       error: () => {
@@ -106,7 +113,6 @@ export class Dashboard implements OnInit {
     this.departmentService.getAllDepartments().subscribe({
       next: (depts) => {
         this.departmentsList = depts;
-        this.totalDepartments = depts.length;
       },
       error: () => {},
     });
