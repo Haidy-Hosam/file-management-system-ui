@@ -82,8 +82,10 @@
           </th>
           <th>NAME</th>
           <th>DEPARTMENT</th>
+          <th>OWNER</th>
           <th>SIZE</th>
-          <th>MODIFIED</th>
+          <th>CREATED AT</th>
+          <th>MODIFIED AT</th>
           <th>STATUS</th>
           <th class="col-actions"></th>
         </tr>
@@ -106,7 +108,9 @@
             </div>
           </td>
           <td>{{ file.departmentNames.join(', ') }}</td>
+          <td>{{ file.ownerName }}</td>
           <td>{{ file.size }}</td>
+          <td>{{ file.createdDate }}</td>
           <td>{{ file.modifiedDate }}</td>
          <td>
   <div class="status-progress" [ngClass]="file.status.toLowerCase()">

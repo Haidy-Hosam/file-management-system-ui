@@ -64,6 +64,10 @@ export const routes: Routes = [
       component: ProfileComponent
      },
      {
+      path:'notifications',
+      component:NotificationsPage
+     },
+     {
      path: 'users/:id',
      component: ProfileComponent
      }

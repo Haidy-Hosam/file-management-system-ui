@@ -9,6 +9,7 @@ export interface FileResponse {
   departmentNames: string[]; // CHANGED
   size: string;
   modifiedDate: string;
+  createdDate: string;
   status: string;
   fileType: string;
   ownerName: string;

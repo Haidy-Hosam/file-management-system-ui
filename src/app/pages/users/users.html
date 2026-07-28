@@ -87,17 +87,9 @@
           {{ user.isDeleted ? 'Inactive' : 'Active' }}
         </span>
         <div class="footer-icons">
-<<<<<<< HEAD
-          <button class="icon-btn" title="View" (click)="openViewModal(user)">
-            <i class="bi bi-eye"></i>
-          </button>
-          <button class="icon-btn" title="Edit" (click)="openEditModal(user)">
-            <i class="bi bi-pencil"></i>
-          </button>
-=======
-        <button class="icon-btn" title="View Profile" [routerLink]="['/users', user.u_id]">👁️</button>
-        <button class="icon-btn" title="Edit" (click)="openEditModal(user)">✏️</button>
->>>>>>> 64c6d76b95e736663103a9fccea11a5e66e04f02
+
+        <button class="icon-btn" title="View Profile" [routerLink]="['/users', user.u_id]"><i class="bi bi-eye"></i></button>
+        <button class="icon-btn" title="Edit" (click)="openEditModal(user)"><i class="bi bi-pencil"></i></button>
         </div>
       </div>
     </div>

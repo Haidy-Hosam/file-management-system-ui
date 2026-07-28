@@ -41,7 +41,7 @@ export class Files implements OnInit {
     private fileTypeService: FileTypeService,
     private trashService: TrashService,
     private router: Router,
-    private route: ActivatedRoute, // ADD
+    private route: ActivatedRoute, 
     private sanitizer: DomSanitizer
 
   ) { }
@@ -68,10 +68,6 @@ export class Files implements OnInit {
   openMenuFileId: number | null = null;
   openGroupMenuId: string | null = null;
 
-
-  // pagination
-  // currentPage = 1;
-  // pageSize = 10;
 
   ngOnInit(): void {
     this.loadFiles();
@@ -128,18 +124,6 @@ export class Files implements OnInit {
       }
       request$ = this.fileService.getAllFilesByDepartment(deptId, this.page, this.size);
     }
-
-    // request$.subscribe({
-    //   next: (files: FileResponse[]) => {
-    //     this.allFiles = files;
-    //     this.applyFilters();
-    //     this.isLoading = false;
-    //   },
-    //   error: (err: HttpErrorResponse) => {
-    //     this.errorMessage = 'Failed to load files.';
-    //     this.isLoading = false;
-    //   }
-    // });
 
     request$.subscribe({
       next: (response) => {
