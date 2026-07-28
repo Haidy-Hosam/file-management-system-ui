@@ -1,12 +1,10 @@
-<div class="files-page" (click)="closeMenu()">
+<div class="files-page">
   <div class="page-header">
     <div>
       <h1>Files</h1>
       <p class="subtitle">Manage and archive documents</p>
     </div>
   </div>
-
-
 
   <div class="toolbar">
     <div class="search-box">
@@ -22,19 +20,18 @@
       />
     </div>
 
-    <div class="tabs">
-      <button [class.active]="activeTab === 'ALL'" (click)="setTab('ALL')">All</button>
-      <button [class.active]="activeTab === 'PENDING'" (click)="setTab('PENDING')">Pending</button>
-      <button [class.active]="activeTab === 'APPROVED'" (click)="setTab('APPROVED')">Approved</button>
-      <button [class.active]="activeTab === 'REJECTED'" (click)="setTab('REJECTED')">Rejected</button>
-    </div>
+    <button class="all-btn" [class.active]="activeTab === 'ALL'" (click)="setTab('ALL')">All</button>
 
-    <!-- <button class="filter-btn">
-      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-        <path d="M4 6H20M7 12H17M10 18H14" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
-      </svg>
-      Filter
-    </button> -->
+    <div class="dropdown">
+      <button class="filter-btn" (click)="toggleFilterMenu($event)">
+        Filter by<span *ngIf="activeTab !== 'ALL'"> · {{ activeTab | titlecase }}</span>
+      </button>
+      <div class="dropdown-menu" *ngIf="showFilterMenu" (click)="$event.stopPropagation()">
+        <button [class.active]="activeTab === 'PENDING'" (click)="setTab('PENDING')">Pending</button>
+        <button [class.active]="activeTab === 'APPROVED'" (click)="setTab('APPROVED')">Approved</button>
+        <button [class.active]="activeTab === 'REJECTED'" (click)="setTab('REJECTED')">Rejected</button>
+      </div>
+    </div>
 
     <button class="upload-btn" (click)="openUploadModal(); $event.stopPropagation()">
       <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -76,20 +73,35 @@
   <div class="table-wrapper" *ngIf="!isLoading; else loadingState">
     <table class="files-table">
       <thead>
-        <tr>
-          <th class="col-checkbox">
-            <input type="checkbox" (change)="toggleSelectAll($event)" />
-          </th>
-          <th>NAME</th>
-          <th>DEPARTMENT</th>
-          <th>OWNER</th>
-          <th>SIZE</th>
-          <th>CREATED AT</th>
-          <th>MODIFIED AT</th>
-          <th>STATUS</th>
-          <th class="col-actions"></th>
-        </tr>
-      </thead>
+  <tr>
+    <th class="col-checkbox">
+      <input type="checkbox" (change)="toggleSelectAll($event)" />
+    </th>
+    <th class="sortable" (click)="setSort('NAME')">
+      NAME
+      <span class="sort-arrow" *ngIf="sortBy === 'NAME'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+    </th>
+    <th>DEPARTMENT</th>
+    <th class="sortable" (click)="setSort('OWNER')">
+      OWNER
+      <span class="sort-arrow" *ngIf="sortBy === 'OWNER'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+    </th>
+    <th class="sortable" (click)="setSort('SIZE')">
+      SIZE
+      <span class="sort-arrow" *ngIf="sortBy === 'SIZE'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+    </th>
+    <th class="sortable" (click)="setSort('CREATED')">
+      CREATED AT
+      <span class="sort-arrow" *ngIf="sortBy === 'CREATED'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+    </th>
+    <th class="sortable" (click)="setSort('MODIFIED')">
+      MODIFIED AT
+      <span class="sort-arrow" *ngIf="sortBy === 'MODIFIED'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
+    </th>
+    <th>STATUS</th>
+    <th class="col-actions"></th>
+  </tr>
+</thead>
       <tbody>
        <tr *ngFor="let file of filteredFiles">
           <td class="col-checkbox">

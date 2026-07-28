@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import { Component, OnInit, ElementRef, HostListener } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router'; // add ActivatedRoute here
@@ -12,19 +12,10 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { TrashService } from '../../core/services/trash.service';
 import { ForwardFileDialog } from '../../shared/forward-file-dialog/forward-file-dialog'; // adjust path
 
-// interface FileGroup {
-//   groupId: string;
-//   name: string;
-//   fileType: string;
-//   size: string;
-//   modifiedDate: string;
-//   entries: FileResponse[]; // one per department this file was sent to
-// }
-
 @Component({
   selector: 'app-files',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink,ForwardFileDialog],
+  imports: [CommonModule, FormsModule, RouterLink, ForwardFileDialog],
   templateUrl: './files.html',
   styleUrl: './files.css'
 })
@@ -41,9 +32,9 @@ export class Files implements OnInit {
     private fileTypeService: FileTypeService,
     private trashService: TrashService,
     private router: Router,
-    private route: ActivatedRoute, 
-    private sanitizer: DomSanitizer
-
+    private route: ActivatedRoute,
+    private sanitizer: DomSanitizer,
+    private elementRef: ElementRef
   ) { }
 
   get isAdmin(): boolean {
@@ -54,7 +45,7 @@ export class Files implements OnInit {
     return this.trashService.trashCount;
   }
 
-  //Backend pagination parameters
+  // Backend pagination parameters
   page = 0;
   size = 10;
 
@@ -63,18 +54,21 @@ export class Files implements OnInit {
 
   searchTerm = '';
   activeTab: 'ALL' | 'PENDING' | 'APPROVED' | 'REJECTED' = 'ALL';
+  sortBy: 'NAME' | 'OWNER' | 'SIZE' | 'CREATED' | 'MODIFIED' | null = null;  
+  sortDirection: 'asc' | 'desc' = 'asc';
+  // showSortMenu = false;
+  showFilterMenu = false;
 
   selectedFileIds = new Set<number>();
   openMenuFileId: number | null = null;
   openGroupMenuId: string | null = null;
-
 
   ngOnInit(): void {
     this.loadFiles();
     this.loadDepartments();
     this.loadFileTypes();
 
-     this.route.queryParams.subscribe(params => {
+    this.route.queryParams.subscribe(params => {
       const previewId = params['previewFileId'];
       if (previewId) {
         this.previewFileById(Number(previewId));
@@ -82,7 +76,7 @@ export class Files implements OnInit {
     });
   }
 
-   previewFileById(fileId: number): void {
+  previewFileById(fileId: number): void {
     this.fileService.getFileData(fileId).subscribe({
       next: (file: FileResponse) => this.previewFile(file),
       error: () => this.errorMessage = 'Could not load that file — it may have been removed.'
@@ -157,28 +151,22 @@ export class Files implements OnInit {
       );
     }
 
-    this.filteredFiles = result;
-    // this.currentPage = 1;
-  }
+    if (this.sortBy) {
+      result = this.sortFiles(result);
+    }
 
+    this.filteredFiles = result;
+  }
 
   setTab(tab: 'ALL' | 'PENDING' | 'APPROVED' | 'REJECTED'): void {
     this.activeTab = tab;
+    this.showFilterMenu = false;
     this.applyFilters();
   }
 
   onSearchChange(): void {
     this.applyFilters();
   }
-
-  // get paginatedFiles(): FileResponse[] {
-  //   const start = (this.currentPage - 1) * this.pageSize;
-  //   return this.filteredFiles.slice(start, start + this.pageSize);
-  // }
-
-  // get totalPages(): number {
-  //   return Math.max(1, Math.ceil(this.filteredFiles.length / this.pageSize));
-  // }
 
   nextPage(): void {
     if (this.page < this.totalDisplayedPages - 1) {
@@ -223,11 +211,66 @@ export class Files implements OnInit {
     this.openMenuFileId = this.openMenuFileId === fileId ? null : fileId;
   }
 
-  closeMenu(): void {
-    this.openMenuFileId = null;
+ closeMenu(): void {
+  this.openMenuFileId = null;
+  this.showFilterMenu = false;
+}
+
+  // toggleSortMenu(event: Event): void {
+  //   event.stopPropagation();
+  //   this.showSortMenu = !this.showSortMenu;
+  //   this.showFilterMenu = false;
+  // }
+
+toggleFilterMenu(event: Event): void {
+  event.stopPropagation();
+  this.showFilterMenu = !this.showFilterMenu;
+}
+
+setSort(field: 'NAME' | 'OWNER' | 'SIZE' | 'CREATED' | 'MODIFIED'): void {
+  if (this.sortBy === field) {
+    this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+  } else {
+    this.sortBy = field;
+    this.sortDirection = 'asc';
+  }
+  this.applyFilters();
+}
+
+  private sortFiles(files: FileResponse[]): FileResponse[] {
+  const dir = this.sortDirection === 'asc' ? 1 : -1;
+  return [...files].sort((a, b) => {
+    switch (this.sortBy) {
+      case 'NAME':
+        return a.name.localeCompare(b.name) * dir;
+      case 'OWNER':
+        return a.ownerName.localeCompare(b.ownerName) * dir;
+      case 'SIZE':
+        return (this.parseSize(a.size) - this.parseSize(b.size)) * dir;
+      case 'CREATED':
+        return (new Date(a.createdDate).getTime() - new Date(b.createdDate).getTime()) * dir;
+      case 'MODIFIED':
+        return (new Date(a.modifiedDate).getTime() - new Date(b.modifiedDate).getTime()) * dir;
+      default:
+        return 0;
+    }
+  });
+}
+  private parseSize(size: string | number): number {
+    if (typeof size === 'number') return size;
+    const match = size.match(/([\d.]+)\s*(KB|MB|GB)?/i);
+    if (!match) return 0;
+    const value = parseFloat(match[1]);
+    const unit = (match[2] || '').toUpperCase();
+    const multipliers: Record<string, number> = { KB: 1024, MB: 1024 ** 2, GB: 1024 ** 3 };
+    return value * (multipliers[unit] || 1);
   }
 
-
+@HostListener('document:click', ['$event'])
+onDocumentClick(event: MouseEvent): void {
+  if (this.elementRef.nativeElement.contains(event.target)) return;
+  this.closeMenu();
+}
   showUploadModal = false;
   isDragging = false;
   isUploading = false;
@@ -384,7 +427,6 @@ export class Files implements OnInit {
       });
   }
 
-
   // ---- Row actions ----
   viewDetails(fileId: number): void {
     this.router.navigate(['/files', fileId]);
@@ -487,7 +529,6 @@ export class Files implements OnInit {
     });
     this.closeMenu();
   }
-
 
   // ---- Edit Status modal ----
   showStatusModal = false;
@@ -635,19 +676,18 @@ export class Files implements OnInit {
     return 'unsupported';
   }
 
-onForward(file: FileResponse): void {
-  this.forwardingFileId = file.id;
-  this.closeMenu();
-}
-forwardingFileId: number | null = null;
+  onForward(file: FileResponse): void {
+    this.forwardingFileId = file.id;
+    this.closeMenu();
+  }
+  forwardingFileId: number | null = null;
 
-onForwardDialogClosed(): void {
-  this.forwardingFileId = null;
-}
+  onForwardDialogClosed(): void {
+    this.forwardingFileId = null;
+  }
 
-onForwardSuccess(): void {
-  this.forwardingFileId = null;
-  this.loadFiles(); // optional — refresh the list after forwarding
-}
-
+  onForwardSuccess(): void {
+    this.forwardingFileId = null;
+    this.loadFiles(); // optional — refresh the list after forwarding
+  }
 }
