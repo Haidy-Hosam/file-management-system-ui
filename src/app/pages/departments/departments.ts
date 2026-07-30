@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { Department, CreateDepartmentRequest } from '../../core/models/department.model';
 import { DepartmentService } from '../../core/services/department.service';
 import { RouterLink } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-departments',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, TranslatePipe],
   templateUrl: './departments.html',
   styleUrl: './departments.css',
 })

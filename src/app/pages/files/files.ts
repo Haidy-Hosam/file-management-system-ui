@@ -11,11 +11,12 @@ import { FileTypeService, FileType } from '../../core/services/filetype.service'
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { TrashService } from '../../core/services/trash.service';
 import { ForwardFileDialog } from '../../shared/forward-file-dialog/forward-file-dialog'; // adjust path
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-files',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, ForwardFileDialog],
+  imports: [CommonModule, FormsModule, ForwardFileDialog, TranslatePipe],
   templateUrl: './files.html',
   styleUrl: './files.css'
 })

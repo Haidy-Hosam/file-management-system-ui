@@ -9,46 +9,46 @@
       <div class="meta-row">
         <span>{{ profile.email }}</span>
         <span class="dot">&middot;</span>
-        <span>{{ profile.departmentName || 'No department' }}</span>
+        <span>{{ profile.departmentName || ('PROFILE.NO_DEPARTMENT' | translate) }}</span>
         
       </div>
     </div>
   </section>
 
   <ng-template #profileState>
-    <div class="state-message" *ngIf="profileLoading">Loading profile...</div>
+    <div class="state-message" *ngIf="profileLoading">{{ 'PROFILE.LOADING' | translate }}</div>
     <div class="state-message error" *ngIf="!profileLoading && profileError">
       {{ profileError }}
-      <button (click)="loadProfile()">Retry</button>
+      <button (click)="loadProfile()">{{ 'COMMON.RETRY' | translate }}</button>
     </div>
   </ng-template>
 
   <!-- My files -->
   <section class="files-section">
     <div class="section-header">
-      <h2>My Files</h2>
-      <span class="file-count" *ngIf="!filesLoading">{{ totalElements }} file(s)</span>
+      <h2>{{ 'PROFILE.MY_FILES' | translate }}</h2>
+      <span class="file-count" *ngIf="!filesLoading">{{ totalElements }} {{ 'PROFILE.FILE_COUNT' | translate }}</span>
     </div>
 
-    <div class="state-message" *ngIf="filesLoading">Loading files...</div>
+    <div class="state-message" *ngIf="filesLoading">{{ 'FILES.LOADING_FILES' | translate }}</div>
     <div class="state-message error" *ngIf="!filesLoading && filesError">
       {{ filesError }}
-     <button (click)="loadFiles()">Retry</button>
+     <button (click)="loadFiles()">{{ 'COMMON.RETRY' | translate }}</button>
     </div>
 
     <div class="empty-state" *ngIf="!filesLoading && !filesError && files.length === 0">
-      You haven't uploaded any files yet.
+      {{ 'PROFILE.NO_FILES_YET' | translate }}
     </div>
 
     <table class="files-table" *ngIf="!filesLoading && !filesError && files.length > 0">
       <thead>
         <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Department(s)</th>
-          <th>Status</th>
-          <th>Size</th>
-          <th>Modified</th>
+          <th>{{ 'PROFILE.NAME' | translate }}</th>
+          <th>{{ 'PROFILE.TYPE' | translate }}</th>
+          <th>{{ 'PROFILE.DEPARTMENTS' | translate }}</th>
+          <th>{{ 'PROFILE.STATUS' | translate }}</th>
+          <th>{{ 'PROFILE.SIZE' | translate }}</th>
+          <th>{{ 'PROFILE.MODIFIED' | translate }}</th>
           <th></th>
         </tr>
       </thead>
@@ -58,21 +58,21 @@
           <td>{{ file.fileType }}</td>
           <td>{{ file.departmentNames.join(', ') || '—' }}</td>
           <td>
-            <span class="status-badge" [ngClass]="file.status.toLowerCase()">{{ file.status }}</span>
+            <span class="status-badge" [ngClass]="file.status.toLowerCase()">{{ ('STATUS.' + (file.status | uppercase) | translate) || file.status }}</span>
           </td>
           <td>{{ file.size }}</td>
           <td>{{ file.modifiedDate }}</td>
           <td class="actions">
-            <button class="download-btn" (click)="download(file)">Download</button>
+            <button class="download-btn" (click)="download(file)">{{ 'COMMON.DOWNLOAD' | translate }}</button>
           </td>
         </tr>
       </tbody>
     </table>
 
     <div class="pagination" *ngIf="!filesLoading && !filesError && totalPages > 1">
-      <button (click)="prevPage()" [disabled]="page === 0">Previous</button>
-      <span>Page {{ page + 1 }} of {{ totalPages }}</span>
-      <button (click)="nextPage()" [disabled]="page + 1 >= totalPages">Next</button>
+      <button (click)="prevPage()" [disabled]="page === 0">{{ 'COMMON.PREVIOUS' | translate }}</button>
+      <span>{{ 'PROFILE.PAGE' | translate }} {{ page + 1 }} {{ 'PROFILE.OF' | translate }} {{ totalPages }}</span>
+      <button (click)="nextPage()" [disabled]="page + 1 >= totalPages">{{ 'COMMON.NEXT' | translate }}</button>
     </div>
   </section>
 

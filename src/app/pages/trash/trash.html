@@ -6,7 +6,7 @@
           <line x1="19" y1="12" x2="5" y2="12"></line>
           <polyline points="12 19 5 12 12 5"></polyline>
         </svg>
-        Back to Files
+        {{ 'TRASH.BACK_TO_FILES' | translate }}
       </a>
       <div class="d-flex align-items-center gap-2">
         <div class="trash-header-icon">
@@ -16,8 +16,8 @@
           </svg>
         </div>
         <div>
-          <h2 class="m-0">Trash Bin</h2>
-          <p class="subtitle m-0">View, restore, or permanently delete removed files</p>
+          <h2 class="m-0">{{ 'TRASH.TITLE' | translate }}</h2>
+          <p class="subtitle m-0">{{ 'TRASH.SUBTITLE' | translate }}</p>
         </div>
       </div>
     </div>
@@ -33,7 +33,7 @@
         <line x1="10" y1="11" x2="10" y2="17"></line>
         <line x1="14" y1="11" x2="14" y2="17"></line>
       </svg>
-      Empty Trash
+      {{ 'TRASH.EMPTY_TRASH' | translate }}
     </button>
   </div>
 
@@ -45,21 +45,21 @@
       </svg>
       <input
         type="text"
-        placeholder="Search in trash..."
+        [placeholder]="'TRASH.SEARCH_PLACEHOLDER' | translate"
         [(ngModel)]="searchTerm"
         (ngModelChange)="onSearchChange()"
       />
     </div>
 
     <div class="bulk-actions d-flex align-items-center gap-2" *ngIf="selectedIds.size > 0">
-      <span class="selected-count">{{ selectedIds.size }} selected</span>
+      <span class="selected-count">{{ selectedIds.size }} {{ 'TRASH.SELECTED_COUNT' | translate }}</span>
       <button class="btn btn-sm btn-outline-primary d-flex align-items-center gap-1" (click)="restoreSelected()">
         <i class="bi bi-arrow-counterclockwise"></i>
-        Restore Selected
+        {{ 'TRASH.RESTORE_SELECTED' | translate }}
       </button>
       <button class="btn btn-sm btn-danger d-flex align-items-center gap-1" (click)="permanentlyDeleteSelected()">
         <i class="bi bi-trash"></i>
-        Delete Permanently
+        {{ 'TRASH.DELETE_PERMANENTLY' | translate }}
       </button>
     </div>
   </div>
@@ -77,11 +77,11 @@
               (change)="toggleSelectAll($event)"
             />
           </th>
-          <th>Name</th>
-          <th>Departments</th>
-          <th>Size</th>
-          <th>Date Deleted</th>
-          <th class="text-end">Actions</th>
+          <th>{{ 'TRASH.COL_NAME' | translate }}</th>
+          <th>{{ 'TRASH.COL_DEPTS' | translate }}</th>
+          <th>{{ 'TRASH.COL_SIZE' | translate }}</th>
+          <th>{{ 'TRASH.COL_DATE_DELETED' | translate }}</th>
+          <th class="text-end">{{ 'TRASH.COL_ACTIONS' | translate }}</th>
         </tr>
       </thead>
       <tbody>
@@ -109,7 +109,7 @@
             </span>
             <span *ngIf="!file.departmentNames || file.departmentNames.length === 0" class="text-muted small">-</span>
           </td>
-          <td>{{ file.size || 'N/A' }}</td>
+          <td>{{ file.size || ('COMMON.NA' | translate) }}</td>
           <td>
             <span class="text-muted small">{{ file.deletedDate }}</span>
           </td>
@@ -118,18 +118,18 @@
               <button
                 class="btn btn-sm btn-outline-success d-inline-flex align-items-center gap-1"
                 (click)="restoreSingle(file)"
-                title="Restore File"
+                [title]="'TRASH.RESTORE' | translate"
               >
                 <i class="bi bi-arrow-counterclockwise"></i>
-                Restore
+                {{ 'TRASH.RESTORE' | translate }}
               </button>
               <button
                 class="btn btn-sm btn-outline-danger d-inline-flex align-items-center gap-1"
                 (click)="permanentlyDeleteSingle(file)"
-                title="Delete Permanently"
+                [title]="'TRASH.DELETE' | translate"
               >
                 <i class="bi bi-trash"></i>
-                Delete
+                {{ 'TRASH.DELETE' | translate }}
               </button>
             </div>
           </td>
@@ -149,9 +149,9 @@
           <line x1="14" y1="11" x2="14" y2="17"></line>
         </svg>
       </div>
-      <h4 class="text-dark fw-bold mb-1">Trash is Empty</h4>
-      <p class="text-muted mb-4">No deleted files found in the trash bin.</p>
-      <a routerLink="/files" class="btn btn-primary px-4 rounded-pill">Return to Files</a>
+      <h4 class="text-dark fw-bold mb-1">{{ 'TRASH.TRASH_EMPTY_TITLE' | translate }}</h4>
+      <p class="text-muted mb-4">{{ 'TRASH.TRASH_EMPTY_SUBTITLE' | translate }}</p>
+      <a routerLink="/files" class="btn btn-primary px-4 rounded-pill">{{ 'TRASH.RETURN_TO_FILES' | translate }}</a>
     </div>
   </ng-template>
 </div>

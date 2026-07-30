@@ -11,13 +11,14 @@ import {
 } from '../../core/services/file-details.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { TrashService } from '../../core/services/trash.service';
+import { TranslatePipe } from '@ngx-translate/core';
 
 type TabId = 'overview' | 'activity' | 'permissions';
 
 @Component({
   selector: 'app-file-details',
   standalone: true,
-  imports: [CommonModule, RouterModule],
+  imports: [CommonModule, RouterModule, TranslatePipe],
   templateUrl: './file-details.html',
   styleUrl: './file-details.css',
 })

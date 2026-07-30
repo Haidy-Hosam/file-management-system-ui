@@ -4,11 +4,12 @@ import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { NotificationService } from '../../core/services/Notification.service';
 import {FileForwardResponse} from "../../core/models/FileForward.model"
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-notification-bell',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './notification-bell.html',
   styleUrl: './notification-bell.css'
 })

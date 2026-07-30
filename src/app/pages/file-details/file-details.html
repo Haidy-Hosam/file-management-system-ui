@@ -1,17 +1,17 @@
 <div class="fd-content" *ngIf="!isLoading && file; else loadingOrError">
   <div class="top-row">
     <button class="link-btn" (click)="goBack()">
-      <span class="icon">←</span> Back to Files
+      <span class="icon">←</span> {{ 'FILE_DETAILS.BACK_TO_FILES' | translate }}
     </button>
     <div class="actions">
         <button class="btn btn-outline" (click)="previewFile()">
-    <span class="icon">👁</span> Preview
+    <span class="icon">👁</span> {{ 'COMMON.PREVIEW' | translate }}
   </button>
       <button class="btn btn-outline" (click)="downloadFile()">
-        <span class="icon">⬇</span> Download
+        <span class="icon">⬇</span> {{ 'COMMON.DOWNLOAD' | translate }}
       </button>
       <button class="btn btn-primary">
-        <span class="icon">✎</span> Edit
+        <span class="icon">✎</span> {{ 'COMMON.EDIT' | translate }}
       </button>
     </div>
   </div>
@@ -34,7 +34,7 @@
       <div class="header-right">
         <span class="status">
           <span class="dot" [class.dot-active]="file.status === 'Active'"></span>
-          {{ file.status }}
+          {{ ('STATUS.' + (file.status | uppercase) | translate) || file.status }}
         </span>
       </div>
     </div>
@@ -46,7 +46,7 @@
         [class.tab-active]="activeTab === tab.id"
         (click)="setTab(tab.id)"
       >
-        {{ tab.label }}
+        {{ ('FILE_DETAILS.TAB_' + (tab.id | uppercase) | translate) || tab.label }}
       </button>
     </div>
   </div>
@@ -54,75 +54,58 @@
   <!-- Overview -->
   <div class="grid-2" *ngIf="activeTab === 'overview'">
     <div class="card">
-      <h3>File Information</h3>
+      <h3>{{ 'FILE_DETAILS.FILE_INFO' | translate }}</h3>
       <div class="info-grid">
         <div>
-          <div class="label">FILE ID</div>
+          <div class="label">{{ 'FILE_DETAILS.FILE_ID' | translate }}</div>
           <div class="value">{{ file.id }}</div>
         </div>
         <div>
-          <div class="label">FILE TYPE</div>
+          <div class="label">{{ 'FILE_DETAILS.FILE_TYPE' | translate }}</div>
           <div class="value">{{ file.fileType }}</div>
         </div>
         <div>
-          <div class="label">EXTENSION</div>
+          <div class="label">{{ 'FILE_DETAILS.EXTENSION' | translate }}</div>
           <div class="value">.{{ file.extension }}</div>
         </div>
         <div>
-          <div class="label">FILE SIZE</div>
+          <div class="label">{{ 'FILE_DETAILS.FILE_SIZE' | translate }}</div>
           <div class="value">{{ file.size }}</div>
         </div>
         <div>
-          <div class="label">STATUS</div>
-          <div class="value">{{ file.status }}</div>
+          <div class="label">{{ 'FILE_DETAILS.STATUS' | translate }}</div>
+          <div class="value">{{ ('STATUS.' + (file.status | uppercase) | translate) || file.status }}</div>
         </div>
         <div>
-          <div class="label">DEPARTMENT</div>
+          <div class="label">{{ 'FILE_DETAILS.DEPARTMENT' | translate }}</div>
           <div class="value">{{ file.departmentNames }}</div>
         </div>
         <div>
-          <div class="label">LAST MODIFIED</div>
+          <div class="label">{{ 'FILE_DETAILS.LAST_MODIFIED' | translate }}</div>
           <div class="value">{{ file.modifiedDate }}</div>
         </div>
       </div>
     </div>
 
     <div class="card">
-      <h3>Quick Actions</h3>
+      <h3>{{ 'FILE_DETAILS.QUICK_ACTIONS' | translate }}</h3>
       <div class="quick-actions">
         <button class="btn btn-outline full" (click)="downloadFile()">
-          <span class="icon">⬇</span> Download File
+          <span class="icon">⬇</span> {{ 'FILE_DETAILS.DOWNLOAD_FILE' | translate }}
         </button>
         <button class="btn btn-outline full">
-          <span class="icon">✎</span> Edit Metadata
+          <span class="icon">✎</span> {{ 'FILE_DETAILS.EDIT_METADATA' | translate }}
         </button>
         <button class="btn btn-outline full danger" (click)="deleteFile()">
-          <span class="icon">🗑</span> Delete File
+          <span class="icon">🗑</span> {{ 'FILE_DETAILS.DELETE_FILE' | translate }}
         </button>
       </div>
     </div>
   </div>
 
-  <!-- Versions -->
-  <!-- <div class="card" *ngIf="activeTab === 'versions'">
-    <h3>Version History</h3>
-    <div class="version-list">
-      <div class="version-row" *ngFor="let v of versions" [class.current]="v.isCurrent">
-        <div class="version-badge" [class.badge-current]="v.isCurrent">{{ v.version }}</div>
-        <div class="version-info">
-          <div class="version-title">{{ v.title }}</div>
-          <div class="version-sub">{{ v.author }} · {{ v.date }}</div>
-        </div>
-        <span class="pill" *ngIf="v.isCurrent">Current</span>
-        <button class="icon-btn" (click)="downloadVersion(v)">⬇</button>
-      </div>
-      <div class="state-msg" *ngIf="versions.length === 0">No versions found.</div>
-    </div>
-  </div> -->
-
   <!-- Activity -->
   <div class="card" *ngIf="activeTab === 'activity'">
-    <h3>Activity Log</h3>
+    <h3>{{ 'FILE_DETAILS.ACTIVITY_LOG' | translate }}</h3>
     <div class="activity-list">
       <div class="activity-row" *ngFor="let a of activity; let last = last">
         <div class="timeline">
@@ -136,12 +119,12 @@
           <div class="activity-date">{{ a.date }}</div>
         </div>
       </div>
-      <div class="state-msg" *ngIf="activity.length === 0">No activity yet.</div>
+      <div class="state-msg" *ngIf="activity.length === 0">{{ 'FILE_DETAILS.NO_ACTIVITY' | translate }}</div>
     </div>
   </div>
 
   <div class="card" *ngIf="activeTab === 'permissions'">
-    <h3>Access &amp; Permissions</h3>
+    <h3>{{ 'FILE_DETAILS.ACCESS_PERMISSIONS' | translate }}</h3>
     <div class="permission-list">
       <div class="permission-row" *ngFor="let p of permissions">
         <div class="avatar" [style.background]="getAvatarColor(p.name)">
@@ -154,14 +137,14 @@
         <span class="access-pill">{{ p.access }}</span>
         <button class="icon-btn">⋮</button>
       </div>
-      <div class="state-msg" *ngIf="permissions.length === 0">No permissions set.</div>
+      <div class="state-msg" *ngIf="permissions.length === 0">{{ 'FILE_DETAILS.NO_PERMISSIONS' | translate }}</div>
     </div>
-    <button class="add-permission">+ Add Permission</button>
+    <button class="add-permission">{{ 'FILE_DETAILS.ADD_PERMISSION' | translate }}</button>
   </div>
 </div>
 
 <ng-template #loadingOrError>
-  <div *ngIf="isLoading" class="state-msg">Loading file details...</div>
+  <div *ngIf="isLoading" class="state-msg">{{ 'FILE_DETAILS.LOADING' | translate }}</div>
   <div *ngIf="errorMessage" class="state-msg error">{{ errorMessage }}</div>
 </ng-template>
 
@@ -174,7 +157,7 @@
     </div>
 
     <div class="preview-body">
-      <div class="preview-loading" *ngIf="isLoadingPreview">Loading preview...</div>
+      <div class="preview-loading" *ngIf="isLoadingPreview">{{ 'FILES.PREVIEW_LOADING' | translate }}</div>
 
       <ng-container *ngIf="!isLoadingPreview">
         <img
@@ -193,8 +176,8 @@
         <pre *ngIf="previewKind === 'text'" class="preview-text">{{ previewText }}</pre>
 
         <div class="preview-unsupported" *ngIf="previewKind === 'unsupported'">
-          <p>Preview isn't available for this file type.</p>
-          <button class="btn btn-outline" (click)="downloadFile()">Download instead</button>
+          <p>{{ 'FILES.PREVIEW_UNSUPPORTED' | translate }}</p>
+          <button class="btn btn-outline" (click)="downloadFile()">{{ 'FILES.DOWNLOAD_INSTEAD' | translate }}</button>
         </div>
       </ng-container>
     </div>

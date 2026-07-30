@@ -8,11 +8,12 @@ import { RoleService } from '../../core/services/roles.service';
 import { DepartmentService } from '../../core/services/department.service';
 import { Role } from '../../core/models/role.model';
 import { Department } from '../../core/models/department.model';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule],
+  imports: [CommonModule, FormsModule, RouterModule, TranslatePipe],
   templateUrl: './users.html',
   styleUrl: './users.css'
 })

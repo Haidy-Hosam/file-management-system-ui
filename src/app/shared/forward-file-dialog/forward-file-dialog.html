@@ -1,7 +1,7 @@
 <!-- forward-file-dialog.html -->
 <div class="overlay" (click)="cancel()">
   <div class="dialog" (click)="$event.stopPropagation()">
-    <h3>Forward file</h3>
+    <h3>{{ 'FORWARD_DIALOG.TITLE' | translate }}</h3>
     <div class="user-list">
       @for (u of users; track u.u_id) {
         <label class="user-row">
@@ -10,10 +10,10 @@
         </label>
       }
     </div>
-    <textarea [(ngModel)]="message" placeholder="Optional message..."></textarea>
+    <textarea [(ngModel)]="message" [placeholder]="'FORWARD_DIALOG.OPTIONAL_MESSAGE' | translate"></textarea>
     <div class="actions">
-      <button (click)="cancel()">Cancel</button>
-      <button class="primary" [disabled]="submitting || selectedIds.size === 0" (click)="submit()">Send</button>
+      <button (click)="cancel()">{{ 'COMMON.CANCEL' | translate }}</button>
+      <button class="primary" [disabled]="submitting || selectedIds.size === 0" (click)="submit()">{{ 'FORWARD_DIALOG.SEND' | translate }}</button>
     </div>
   </div>
 </div>

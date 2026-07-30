@@ -4,11 +4,12 @@ import { ActivatedRoute } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { UserService, UserResponse } from '../../core/services/user.service';
 import { FileService, FileResponse, PageResponse } from '../../core/services/file.service';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-profile',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './profile.html',
   styleUrls: ['./profile.css'],
 })
