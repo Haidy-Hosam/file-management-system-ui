@@ -6,11 +6,13 @@ import { DepartmentService } from '../../core/services/department.service';
 import { formatBytes } from '../../core/utils/format-bytes';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
+import {HasPermissionDirective} from '../../core/directives/has-permission.directive'
+
 
 @Component({
   selector: 'app-department-details',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslatePipe],
+  imports: [CommonModule, FormsModule, TranslatePipe, HasPermissionDirective],
   templateUrl: './department-details.html',
   styleUrl: './department-details.css',
 })

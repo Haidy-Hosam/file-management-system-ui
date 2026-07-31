@@ -3,6 +3,8 @@ import { HttpClient } from '@angular/common/http';
 import { Observable, tap } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 import { authResponse, LoginRequest ,DecodedToken} from '../models/auth.model';
+import { PermissionsService } from './permissions.service';
+
 
 
 
@@ -10,12 +12,13 @@ import { authResponse, LoginRequest ,DecodedToken} from '../models/auth.model';
 export class AuthService {
   private baseUrl = 'http://localhost:8080/api/auth';
 
-  constructor(private http: HttpClient) {}
+  constructor(private http: HttpClient, private permissionsService: PermissionsService) {}
 
   login(email: string, password: string,  rememberMe: boolean): Observable<authResponse> {
     const body: LoginRequest = { email, password, rememberMe };
     return this.http.post<authResponse>(`${this.baseUrl}/login`, body).pipe(
       tap(res => {
+        this.permissionsService.clear(); 
         if (rememberMe) {
           sessionStorage.removeItem('accessToken');
           sessionStorage.removeItem('refreshToken');
@@ -38,6 +41,7 @@ export class AuthService {
   localStorage.removeItem('refreshToken');
   sessionStorage.removeItem('accessToken');
   sessionStorage.removeItem('refreshToken');
+  this.permissionsService.clear();
   }
 
   getToken(): string | null {

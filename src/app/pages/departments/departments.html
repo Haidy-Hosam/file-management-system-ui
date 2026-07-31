@@ -12,7 +12,7 @@
         (ngModelChange)="onSearchChange()">
     </div>
 
-    <button class="upload-btn" (click)="openModal()">
+    <button class="upload-btn" *appHasPermission="['Departments','CREATE']" (click)="openModal()">
       <i class="bi bi-plus-lg"></i>
       {{ 'DEPARTMENTS.NEW_DEPARTMENT' | translate }}
     </button>

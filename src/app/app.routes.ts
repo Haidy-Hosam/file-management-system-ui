@@ -9,7 +9,7 @@ import { Users } from './pages/users/users';
 import { Roles } from './pages/roles/roles';
 import { Trash } from './pages/trash/trash';
 import { MainLayout } from './layout/main-layout/main-layout';
-import { authGuard, roleGuard } from './core/guards/auth.guard';
+import { authGuard, roleGuard, permissionGuard } from './core/guards/auth.guard';
 import { Routes } from '@angular/router';
 import { NotificationsPage } from './pages/notifications-page/notifications-page';
 
@@ -43,21 +43,21 @@ export const routes: Routes = [
       {
         path: 'departments',
         component: Departments,
-        canActivate: [roleGuard(['ADMIN'])],
+        canActivate: [permissionGuard('Departments', 'READ')],
       },
       { path: 'departments/:id',
        component: DepartmentDetailsComponent,
-       canActivate: [roleGuard(['ADMIN'])],
+        canActivate: [permissionGuard('Departments', 'READ')],
       },
       {
         path: 'users',
         component: Users,
-        canActivate: [roleGuard(['ADMIN'])],
+        canActivate: [permissionGuard('Users', 'READ')],
       },
       {
         path: 'roles',
         component: Roles,
-        canActivate: [roleGuard(['ADMIN'])],
+        canActivate: [permissionGuard('Roles', 'READ')],
       },
       {
       path: 'profile',

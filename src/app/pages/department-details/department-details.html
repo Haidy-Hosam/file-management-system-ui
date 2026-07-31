@@ -37,11 +37,11 @@
             </div>
 
             @if (department()!.isActive) {
-              <button class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1" (click)="openDeleteModal()">
+              <button class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1" *appHasPermission="['Departments','DELETE']" (click)="openDeleteModal()">
                 <i class="bi bi-trash"></i> {{ 'DEPARTMENT_DETAILS.DELETE' | translate }}
               </button>
             } @else {
-              <button class="btn btn-outline-success btn-sm d-flex align-items-center gap-1" (click)="activateDepartment()" [disabled]="isActivating()">
+              <button class="btn btn-outline-success btn-sm d-flex align-items-center gap-1" *appHasPermission="['Departments','DELETE']" (click)="activateDepartment()" [disabled]="isActivating()">
                 <i class="bi bi-arrow-clockwise"></i> {{ (isActivating() ? 'COMMON.ACTIVATING' : 'DEPARTMENT_DETAILS.ACTIVATE') | translate }}
               </button>
             }

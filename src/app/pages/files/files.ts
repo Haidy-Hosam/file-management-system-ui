@@ -12,6 +12,7 @@ import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { TrashService } from '../../core/services/trash.service';
 import { ForwardFileDialog } from '../../shared/forward-file-dialog/forward-file-dialog'; // adjust path
 import { TranslatePipe } from '@ngx-translate/core';
+import {HasPermissionDirective} from '../../core/directives/has-permission.directive'
 
 interface AdvancedFilters {
   departments: Set<string>;
@@ -27,7 +28,7 @@ interface AdvancedFilters {
 @Component({
   selector: 'app-files',
   standalone: true,
-  imports: [CommonModule, FormsModule, ForwardFileDialog, TranslatePipe],
+  imports: [CommonModule, FormsModule, ForwardFileDialog, TranslatePipe,HasPermissionDirective],
   templateUrl: './files.html',
   styleUrl: './files.css'
 })
