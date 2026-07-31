@@ -990,3 +990,14 @@
   margin-left: 3px;
   display: inline-block;
 }
+
+.file-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.file-name i {
+  font-size: 18px;
+  flex-shrink: 0;
+}

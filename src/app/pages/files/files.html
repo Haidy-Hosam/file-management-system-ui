@@ -112,8 +112,7 @@
             />
           </td>
           <td class="name-cell" (click)="viewDetails(file.id)">
-            <span class="file-icon">{{ getFileIcon(file.fileType) }}</span>
-            <div>
+              <i class="bi" [ngClass]="getFileIcon(file.extension)" [style.color]="getFileIconColor(file.extension)"></i>            <div>
               <div class="file-name">{{ file.name }}</div>
               <div class="tags">
               </div>

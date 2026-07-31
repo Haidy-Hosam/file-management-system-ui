@@ -582,16 +582,40 @@ onDocumentClick(event: MouseEvent): void {
     return this.authService.getRole();
   }
 
-  getFileIcon(fileType: string): string {
-    const map: Record<string, string> = {
-      pdf: '📕', docx: '📘', doc: '📘',
-      xlsx: '📗', xls: '📗',
-      zip: '📦', gz: '📦',
-      png: '🖼️', jpg: '🖼️', jpeg: '🖼️'
-    };
-    return map[fileType.toLowerCase()] ?? '📄';
-  }
+getFileIcon(extension: string): string {
+  const map: Record<string, string> = {
+     pdf: 'bi-file-earmark-pdf',
+    docx: 'bi-file-earmark-word',
+    doc: 'bi-file-earmark-word',
+    xlsx: 'bi-file-earmark-excel',
+    xls: 'bi-file-earmark-excel',
+    zip: 'bi-file-earmark-zip',
+    gz: 'bi-file-earmark-zip',
+    png: 'bi-file-earmark-image',
+    jpg: 'bi-file-earmark-image',
+    jpeg: 'bi-file-earmark-image',
+    txt: 'bi-file-earmark-text'
+  };
 
+  return map[extension.toLowerCase()] ?? 'bi-file-earmark';
+}
+getFileIconColor(extension: string): string {
+  const map: Record<string, string> = {
+    pdf: '#ef4444',
+    docx: '#2563eb',
+    doc: '#2563eb',
+    xlsx: '#16a34a',
+    xls: '#16a34a',
+    zip: '#f59e0b',
+    gz: '#f59e0b',
+    png: '#10b981',
+    jpg: '#10b981',
+    jpeg: '#10b981',
+    txt: '#64748b'
+  };
+
+  return map[extension?.toLowerCase()] ?? '#64748b';
+}
   get selectedCount(): number {
     return this.selectedFileIds.size;
   }
