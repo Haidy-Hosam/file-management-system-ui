@@ -7,10 +7,12 @@ import { Page } from '../../core/models/page.model';
 
 import { UserService } from '../../core/services/user.service';
 import { User } from '../../core/models/user.model';
+import { TranslatePipe } from '@ngx-translate/core';
+import { LanguageService } from '../../core/services/language.service';
 
 @Component({
   selector: 'app-sidebar',
-  imports: [RouterLink, RouterLinkActive, CommonModule],
+  imports: [RouterLink, RouterLinkActive, CommonModule, TranslatePipe],
   templateUrl: './sidebar.html',
   styleUrl: './sidebar.css',
 })
@@ -36,8 +38,13 @@ export class Sidebar implements OnInit {
     private authService: AuthService,
     private pageService: PageService,
     private userService: UserService,
+    private languageService: LanguageService,
     private router: Router,
   ) {}
+
+  changeLanguage(lang: string): void {
+    this.languageService.ChangeLanguage(lang);
+  }
 
   ngOnInit(): void {
     this.userService.getCurrentUser().subscribe({

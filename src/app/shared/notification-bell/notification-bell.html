@@ -12,16 +12,16 @@
 
   @if (showDropdown) {
     <div class="dropdown" (click)="$event.stopPropagation()">
-      <div class="dropdown-header">Notifications</div>
+      <div class="dropdown-header">{{ 'NAVBAR.NOTIFICATIONS' | translate }}</div>
 
       @if (notificationService.notifications().length === 0) {
-        <div class="empty">No new notifications</div>
+        <div class="empty">{{ 'NOTIFICATIONS.NO_NEW' | translate }}</div>
       } @else {
         <div class="dropdown-list">
           @for (n of notificationService.notifications().slice(0, 6); track n.id) {
 <div class="dropdown-item" [class.unread]="!n.isRead" (click)="onNotificationClick(n)">              <div class="item-title">{{ n.senderName }}</div>
               <div class="item-message">
-                {{ n.type === 'DEPARTMENT_UPLOAD' ? 'uploaded' : 'forwarded' }} "{{ n.fileName }}"
+                {{ (n.type === 'DEPARTMENT_UPLOAD' ? 'NOTIFICATIONS.UPLOADED' : 'NOTIFICATIONS.FORWARDED') | translate }} "{{ n.fileName }}"
               </div>
               <div class="item-time">{{ n.forwardedAt | date:'short' }}</div>
             </div>
@@ -29,7 +29,7 @@
         </div>
       }
 
-      <button class="view-all" (click)="viewAll()">View all</button>
+      <button class="view-all" (click)="viewAll()">{{ 'NOTIFICATIONS.VIEW_ALL' | translate }}</button>
     </div>
   }
 </div>

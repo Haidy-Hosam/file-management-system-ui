@@ -1,27 +1,33 @@
 <aside class="sidebar d-flex flex-column">
 
-  <div class="sidebar-header d-flex align-items-center gap-3">
-    <div class="sidebar-brand-mark">
-      <img src="https://s3-symbol-logo.tradingview.com/abu-dhabi-islamic-bank--big.svg" alt="ADIB logo" class="brand-logo-img" />
+  <div class="sidebar-header d-flex align-items-center justify-content-between gap-2 px-3">
+    <div class="d-flex align-items-center gap-3">
+      <div class="sidebar-brand-mark">
+        <img src="https://s3-symbol-logo.tradingview.com/abu-dhabi-islamic-bank--big.svg" alt="ADIB logo" class="brand-logo-img" />
+      </div>
+      <div>
+        <div class="brand-name">{{ 'SIDEBAR.BRAND_NAME' | translate }}</div>
+        <div class="text-enterprise">{{ 'SIDEBAR.ENTERPRISE_SUBTITLE' | translate }}</div>
+      </div>
     </div>
-    <div>
-      <div class="brand-name">ADIB</div>
-      <div class="text-enterprise">Archiving System</div>
+    <div class="d-flex gap-1">
+      <button type="button" class="btn btn-sm btn-outline-light px-2 py-0" (click)="changeLanguage('en')">EN</button>
+      <button type="button" class="btn btn-sm btn-outline-light px-2 py-0" (click)="changeLanguage('ar')">AR</button>
     </div>
   </div>
 
  <nav class="nav flex-column px-3 pt-4">
-    <div class="nav-label text-uppercase">Navigation</div>
+    <div class="nav-label text-uppercase">{{ 'SIDEBAR.NAVIGATION' | translate }}</div>
 
    @if (!isLoading()) {
   @for (page of visiblePages(); track page.route) {
     <a class="nav-link" [routerLink]="page.route" routerLinkActive="active">
       <i class="bi {{ getIconClass(page.route) }} nav-icon"></i>
-      <span>{{ page.name }}</span>
+      <span>{{ 'SIDEBAR.PAGES.' + (page.route?.replace('/', '') | uppercase) | translate }}</span>
     </a>
   }
 } @else {
-  <span class="text-secondary small px-2">Loading menu...</span>
+  <span class="text-secondary small px-2">{{ 'SIDEBAR.LOADING_MENU' | translate }}</span>
 }
   </nav>
 
@@ -41,7 +47,7 @@
         <polyline points="16 17 21 12 16 7"></polyline>
         <line x1="21" y1="12" x2="9" y2="12"></line>
       </svg>
-      <span>Sign Out</span>
+      <span>{{ 'SIDEBAR.SIGN_OUT' | translate }}</span>
     </button>
   </div>
 

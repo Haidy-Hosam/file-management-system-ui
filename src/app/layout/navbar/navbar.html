@@ -7,7 +7,7 @@
       </svg>
       <input
         type="search"
-        placeholder="Search files, users, departments..."
+        [placeholder]="'NAVBAR.SEARCH_PLACEHOLDER' | translate"
         [(ngModel)]="searchTerm"
         (keyup.enter)="onSearchSubmit()"
         name="search"
@@ -16,7 +16,7 @@
     </div>
 
     <div class="topbar-actions">
-      <button class="icon-btn" title="Notifications">
+      <button class="icon-btn" [title]="'NAVBAR.NOTIFICATIONS' | translate">
         <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path
             d="M18 8a6 6 0 10-12 0c0 7-3 9-3 9h18s-3-2-3-9"
@@ -79,20 +79,20 @@
                 stroke-linecap="round"
               />
             </svg>
-            My Profile
+            {{ 'NAVBAR.MY_PROFILE' | translate }}
           </a>
           <div class="dropdown-divider"></div>
           <button class="dropdown-item danger" (click)="logout()">
             <svg viewBox="0 0 24 24" fill="none">
               <path
-                d="M16 17l5-5-5-5M21 12H9M12 3H6a2 2 0 00-2 2v14a2 2 0 002 2h6"
+                d="M16 17l5-5-5-5M21 12H9M12 3H6a2 2 0 0 1-2 2v14a2 2 0 022 2h6"
                 stroke="currentColor"
                 stroke-width="1.6"
                 stroke-linecap="round"
                 stroke-linejoin="round"
               />
             </svg>
-            Sign out
+            {{ 'NAVBAR.SIGN_OUT' | translate }}
           </button>
         </div>
       </div>

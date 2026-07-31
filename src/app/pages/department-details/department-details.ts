@@ -5,11 +5,12 @@ import { Department, DepartmentDetails, ReassignmentItem } from '../../core/mode
 import { DepartmentService } from '../../core/services/department.service';
 import { formatBytes } from '../../core/utils/format-bytes';
 import { FormsModule } from '@angular/forms';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-department-details',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './department-details.html',
   styleUrl: './department-details.css',
 })

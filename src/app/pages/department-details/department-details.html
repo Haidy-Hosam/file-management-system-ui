@@ -1,12 +1,12 @@
 <div class="details-page p-4">
   @if (isLoading()) {
-    <p class="text-muted">Loading department details...</p>
+    <p class="text-muted">{{ 'DEPARTMENT_DETAILS.LOADING' | translate }}</p>
   } @else if (errorMessage()) {
-    <p class="text-danger">{{ errorMessage() }}</p>
+    <p class="text-danger">{{ 'DEPARTMENT_DETAILS.FAILED_LOAD' | translate }}</p>
   } @else if (department()) {
     <!-- Back link -->
     <button class="btn btn-link text-decoration-none px-0 mb-3 d-flex align-items-center gap-1" (click)="goBack()">
-      <i class="bi bi-arrow-left"></i> Back to Departments
+      <i class="bi bi-arrow-left"></i> {{ 'DEPARTMENT_DETAILS.BACK_TO_DEPARTMENTS' | translate }}
     </button>
 
     <!-- Header card -->
@@ -20,11 +20,11 @@
             <div>
               <h4 class="fw-bold mb-1 d-flex align-items-center gap-2">
                 {{ department()!.name }}
-                <button class="btn btn-sm btn-link p-0 text-secondary" (click)="openEditModal()" title="Edit department name">
+                <button class="btn btn-sm btn-link p-0 text-secondary" (click)="openEditModal()" [title]="'DEPARTMENT_DETAILS.EDIT_NAME_TITLE' | translate">
                   <i class="bi bi-pencil-square"></i>
                 </button>
               </h4>
-              <div class="text-secondary">Head: {{ department()!.managerName ?? 'Unassigned' }}</div>
+              <div class="text-secondary">{{ 'DEPARTMENT_DETAILS.HEAD' | translate }}: {{ department()!.managerName ?? ('COMMON.NA' | translate) }}</div>
             </div>
           </div>
 
@@ -33,16 +33,16 @@
                 [class.status-active]="department()!.isActive"
                 [class.status-inactive]="!department()!.isActive">
                 <span class="status-dot rounded-circle"></span>
-                <span class="fw-semibold" style="font-size: 0.85rem;">{{ department()!.isActive ? 'Active' : 'Inactive' }}</span>
+                <span class="fw-semibold" style="font-size: 0.85rem;">{{ department()!.isActive ? ('STATUS.ACTIVE' | translate) : ('STATUS.INACTIVE' | translate) }}</span>
             </div>
 
             @if (department()!.isActive) {
               <button class="btn btn-outline-danger btn-sm d-flex align-items-center gap-1" (click)="openDeleteModal()">
-                <i class="bi bi-trash"></i> Delete
+                <i class="bi bi-trash"></i> {{ 'DEPARTMENT_DETAILS.DELETE' | translate }}
               </button>
             } @else {
               <button class="btn btn-outline-success btn-sm d-flex align-items-center gap-1" (click)="activateDepartment()" [disabled]="isActivating()">
-                <i class="bi bi-arrow-clockwise"></i> {{ isActivating() ? 'Activating...' : 'Activate' }}
+                <i class="bi bi-arrow-clockwise"></i> {{ (isActivating() ? 'COMMON.ACTIVATING' : 'DEPARTMENT_DETAILS.ACTIVATE') | translate }}
               </button>
             }
           </div>
@@ -57,25 +57,25 @@
           <div class="col-6 col-md-3">
             <div class="stat-box rounded-3 p-3 text-center">
               <div class="fw-bold fs-4 text-dark">{{ department()!.employeeCount }}</div>
-              <div class="text-secondary small">Members</div>
+              <div class="text-secondary small">{{ 'DEPARTMENT_DETAILS.MEMBERS' | translate }}</div>
             </div>
           </div>
           <div class="col-6 col-md-3">
             <div class="stat-box rounded-3 p-3 text-center">
               <div class="fw-bold fs-4 text-dark">{{ department()!.fileCount }}</div>
-              <div class="text-secondary small">Files</div>
+              <div class="text-secondary small">{{ 'DEPARTMENT_DETAILS.FILES' | translate }}</div>
             </div>
           </div>
           <div class="col-6 col-md-3">
             <div class="stat-box rounded-3 p-3 text-center">
               <div class="fw-bold fs-4 text-dark">{{ storageDisplay() }}</div>
-              <div class="text-secondary small">Storage Used</div>
+              <div class="text-secondary small">{{ 'DEPARTMENT_DETAILS.STORAGE_USED' | translate }}</div>
             </div>
           </div>
           <div class="col-6 col-md-3">
             <div class="stat-box rounded-3 p-3 text-center">
               <div class="fw-bold fs-4 text-dark">{{ department()!.id }}</div>
-              <div class="text-secondary small">Department ID</div>
+              <div class="text-secondary small">{{ 'DEPARTMENT_DETAILS.DEPARTMENT_ID' | translate }}</div>
             </div>
           </div>
         </div>
@@ -88,11 +88,11 @@
         <div class="card border-0 h-100">
           <div class="card-body p-4">
             <h6 class="fw-bold mb-3 d-flex align-items-center gap-2">
-              <i class="bi bi-people"></i> Employees ({{ department()!.employeeCount }})
+              <i class="bi bi-people"></i> {{ 'DEPARTMENT_DETAILS.EMPLOYEES' | translate }} ({{ department()!.employeeCount }})
             </h6>
 
             @if (!department()!.employees || department()!.employees!.length === 0) {
-              <p class="text-muted small mb-0">No employees in this department.</p>
+              <p class="text-muted small mb-0">{{ 'DEPARTMENT_DETAILS.NO_EMPLOYEES' | translate }}</p>
             } @else {
               <div class="list-group list-group-flush">
                 @for (emp of department()!.employees!; track emp.id) {
@@ -101,7 +101,7 @@
                       <div class="fw-medium">{{ emp.name }}</div>
                       <div class="text-secondary small">{{ emp.email }}</div>
                     </div>
-                    <span class="badge role-badge rounded-pill px-3 py-2">{{ emp.role ?? 'N/A' }}</span>
+                    <span class="badge role-badge rounded-pill px-3 py-2">{{ emp.role ?? ('COMMON.NA' | translate) }}</span>
                   </div>
                 }
               </div>
@@ -115,11 +115,11 @@
         <div class="card border-0 h-100">
           <div class="card-body p-4">
             <h6 class="fw-bold mb-3 d-flex align-items-center gap-2">
-              <i class="bi bi-file-earmark"></i> Files ({{ department()!.fileCount }})
+              <i class="bi bi-file-earmark"></i> {{ 'DEPARTMENT_DETAILS.FILES' | translate }} ({{ department()!.fileCount }})
             </h6>
 
             @if (!department()!.files || department()!.files!.length === 0) {
-              <p class="text-muted small mb-0">No files in this department.</p>
+              <p class="text-muted small mb-0">{{ 'DEPARTMENT_DETAILS.NO_FILES' | translate }}</p>
             } @else {
               <div class="list-group list-group-flush">
                 @for (file of department()!.files!; track file.id) {
@@ -131,7 +131,7 @@
                         <div class="text-secondary small">{{ formatFileSize(file.size) }} · {{ file.modifiedDate }}</div>
                       </div>
                     </div>
-                    <span class="badge status-file-badge rounded-pill px-3 py-2">{{ file.status }}</span>
+                    <span class="badge status-file-badge rounded-pill px-3 py-2">{{ ('STATUS.' + (file.status | uppercase) | translate) || file.status }}</span>
                   </div>
                 }
               </div>
@@ -147,7 +147,7 @@
   <div class="modal-backdrop-custom" (click)="closeDeleteModal()"></div>
   <div class="modal-custom" (click)="$event.stopPropagation()">
     <div class="modal-content-custom p-4">
-      <h5 class="fw-bold mb-3">Delete "{{ department()!.name }}"?</h5>
+      <h5 class="fw-bold mb-3">{{ 'DEPARTMENT_DETAILS.DELETE_CONFIRM_TITLE' | translate }}</h5>
 
       @if (deleteError()) {
         <div class="alert alert-danger py-2">{{ deleteError() }}</div>
@@ -155,7 +155,7 @@
 
       @if (department()!.employeeCount > 0) {
         <p class="text-secondary small mb-2">
-          Choose a department for each employee:
+          {{ 'DEPARTMENT_DETAILS.CHOOSE_DEPT_FOR_EMP' | translate }}
         </p>
         <div class="mb-3" style="max-height: 280px; overflow-y: auto;">
           @for (emp of department()!.employees!; track emp.id) {
@@ -178,7 +178,7 @@
                   [ngModel]="employeeAssignments()[emp.id]"
                   (ngModelChange)="setAssignment(emp.id, $event)"
                   [disabled]="isDeleting()">
-                  <option value="" disabled selected>Select a department</option>
+                  <option value="" disabled selected>{{ 'DEPARTMENT_DETAILS.SELECT_DEPARTMENT' | translate }}</option>
                   @for (dept of (emp.isManager ? departmentsWithoutManager() : availableDepartments()); track dept.id) {
                     <option [value]="dept.id">{{ dept.name }}</option>
                   }
@@ -188,13 +188,13 @@
           }
         </div>
       } @else {
-        <p class="text-secondary small mb-3">This department has no employees — it will be marked inactive.</p>
+        <p class="text-secondary small mb-3">{{ 'DEPARTMENT_DETAILS.NO_EMP_INACTIVE' | translate }}</p>
       }
 
       <div class="d-flex justify-content-end gap-2">
-        <button class="btn btn-outline-secondary" (click)="closeDeleteModal()" [disabled]="isDeleting()">Cancel</button>
+        <button class="btn btn-outline-secondary" (click)="closeDeleteModal()" [disabled]="isDeleting()">{{ 'COMMON.CANCEL' | translate }}</button>
         <button class="btn btn-danger" (click)="confirmDelete()" [disabled]="isDeleting()">
-          {{ isDeleting() ? 'Deleting...' : 'Delete' }}
+          {{ (isDeleting() ? 'COMMON.DELETING' : 'COMMON.DELETE') | translate }}
         </button>
       </div>
     </div>
@@ -206,14 +206,14 @@
   <div class="modal-backdrop-custom" (click)="closeEditModal()"></div>
   <div class="modal-custom" (click)="$event.stopPropagation()">
     <div class="modal-content-custom p-4">
-      <h5 class="fw-bold mb-3">Edit Department</h5>
+      <h5 class="fw-bold mb-3">{{ 'DEPARTMENT_DETAILS.EDIT_DEPARTMENT' | translate }}</h5>
 
       @if (editError()) {
         <div class="alert alert-danger py-2">{{ editError() }}</div>
       }
 
       <div class="mb-3">
-        <label class="form-label fw-medium">Department Name</label>
+        <label class="form-label fw-medium">{{ 'DEPARTMENTS.NAME_LABEL' | translate }}</label>
         <input
           type="text"
           class="form-control"
@@ -223,9 +223,9 @@
       </div>
 
       <div class="d-flex justify-content-end gap-2">
-        <button class="btn btn-outline-secondary" (click)="closeEditModal()" [disabled]="isSaving()">Cancel</button>
+        <button class="btn btn-outline-secondary" (click)="closeEditModal()" [disabled]="isSaving()">{{ 'COMMON.CANCEL' | translate }}</button>
         <button class="btn btn-primary" (click)="saveDepartmentName()" [disabled]="isSaving()">
-          {{ isSaving() ? 'Saving...' : 'Save' }}
+          {{ (isSaving() ? 'COMMON.SAVING' : 'COMMON.SAVE') | translate }}
         </button>
       </div>
     </div>

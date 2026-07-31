@@ -4,11 +4,12 @@ import { CommonModule } from '@angular/common';
 import { NotificationService } from '../../core/services/Notification.service';
 import { FileForwardResponse } from '../../core/models/FileForward.model';
 import { Router } from '@angular/router';
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-notifications-page',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, TranslatePipe],
   templateUrl: './notifications-page.html',
   styleUrl: './notifications-page.css'
 })

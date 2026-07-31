@@ -4,16 +4,18 @@ import { FormsModule } from '@angular/forms';
 import { Router, RouterModule } from '@angular/router';
 import { AuthService } from '../../core/services/auth.service';
 import { NotificationBell } from "../../shared/notification-bell/notification-bell";
+import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({
   selector: 'app-navbar',
   standalone: true,
-    imports: [
+  imports: [
     CommonModule,
     FormsModule,
     RouterModule,
-    NotificationBell
-],
+    NotificationBell,
+    TranslatePipe
+  ],
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })

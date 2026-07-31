@@ -1,8 +1,8 @@
 <div class="files-page">
   <div class="page-header">
     <div>
-      <h1>Files</h1>
-      <p class="subtitle">Manage and archive documents</p>
+      <h1>{{ 'FILES.TITLE' | translate }}</h1>
+      <p class="subtitle">{{ 'FILES.SUBTITLE' | translate }}</p>
     </div>
   </div>
 
@@ -14,22 +14,22 @@
       </svg>
       <input
         type="text"
-        placeholder="Search files..."
+        [placeholder]="'FILES.SEARCH_PLACEHOLDER' | translate"
         [(ngModel)]="searchTerm"
         (ngModelChange)="onSearchChange()"
       />
     </div>
 
-    <button class="all-btn" [class.active]="activeTab === 'ALL'" (click)="setTab('ALL')">All</button>
+    <button class="all-btn" [class.active]="activeTab === 'ALL'" (click)="setTab('ALL')">{{ 'COMMON.ALL' | translate }}</button>
 
     <div class="dropdown">
       <button class="filter-btn" (click)="toggleFilterMenu($event)">
-        Filter by<span *ngIf="activeTab !== 'ALL'"> · {{ activeTab | titlecase }}</span>
+        {{ 'FILES.FILTER_BY' | translate }}<span *ngIf="activeTab !== 'ALL'"> · {{ ('STATUS.' + activeTab | translate) }}</span>
       </button>
       <div class="dropdown-menu" *ngIf="showFilterMenu" (click)="$event.stopPropagation()">
-        <button [class.active]="activeTab === 'PENDING'" (click)="setTab('PENDING')">Pending</button>
-        <button [class.active]="activeTab === 'APPROVED'" (click)="setTab('APPROVED')">Approved</button>
-        <button [class.active]="activeTab === 'REJECTED'" (click)="setTab('REJECTED')">Rejected</button>
+        <button [class.active]="activeTab === 'PENDING'" (click)="setTab('PENDING')">{{ 'STATUS.PENDING' | translate }}</button>
+        <button [class.active]="activeTab === 'APPROVED'" (click)="setTab('APPROVED')">{{ 'STATUS.APPROVED' | translate }}</button>
+        <button [class.active]="activeTab === 'REJECTED'" (click)="setTab('REJECTED')">{{ 'STATUS.REJECTED' | translate }}</button>
       </div>
     </div>
 
@@ -38,7 +38,7 @@
         <path d="M12 16V4M12 4L7 9M12 4L17 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
         <path d="M4 16V18C4 19.1046 4.89543 20 6 20H18C19.1046 20 20 19.1046 20 18V16" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
       </svg>
-      Upload File
+      {{ 'FILES.UPLOAD_FILE' | translate }}
     </button>
   </div>
 
@@ -47,7 +47,7 @@
 
   <div class="selection-left">
     <span class="selected-count">
-      {{ selectedCount }} selected
+      {{ selectedCount }} {{ 'FILES.SELECTED_COUNT' | translate }}
     </span>
   </div>
 
@@ -55,7 +55,7 @@
 
     <button class="selection-btn" (click)="downloadSelectedFiles()">
       <i class="bi bi-download"></i>
-      Download
+      {{ 'COMMON.DOWNLOAD' | translate }}
     </button>
 
     <button
@@ -64,7 +64,7 @@
       (click)="deleteSelectedFiles()">
 
       <i class="bi bi-trash"></i>
-      Delete
+      {{ 'COMMON.DELETE' | translate }}
     </button>
 
   </div>
@@ -78,27 +78,27 @@
       <input type="checkbox" (change)="toggleSelectAll($event)" />
     </th>
     <th class="sortable" (click)="setSort('NAME')">
-      NAME
+      {{ 'FILES.COL_NAME' | translate }}
       <span class="sort-arrow" *ngIf="sortBy === 'NAME'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
     </th>
-    <th>DEPARTMENT</th>
+    <th>{{ 'FILES.COL_DEPARTMENT' | translate }}</th>
     <th class="sortable" (click)="setSort('OWNER')">
-      OWNER
+      {{ 'FILES.COL_OWNER' | translate }}
       <span class="sort-arrow" *ngIf="sortBy === 'OWNER'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
     </th>
     <th class="sortable" (click)="setSort('SIZE')">
-      SIZE
+      {{ 'FILES.COL_SIZE' | translate }}
       <span class="sort-arrow" *ngIf="sortBy === 'SIZE'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
     </th>
     <th class="sortable" (click)="setSort('CREATED')">
-      CREATED AT
+      {{ 'FILES.COL_CREATED' | translate }}
       <span class="sort-arrow" *ngIf="sortBy === 'CREATED'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
     </th>
     <th class="sortable" (click)="setSort('MODIFIED')">
-      MODIFIED AT
+      {{ 'FILES.COL_MODIFIED' | translate }}
       <span class="sort-arrow" *ngIf="sortBy === 'MODIFIED'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
     </th>
-    <th>STATUS</th>
+    <th>{{ 'FILES.COL_STATUS' | translate }}</th>
     <th class="col-actions"></th>
   </tr>
 </thead>
@@ -128,73 +128,73 @@
     <div class="status-progress-track">
       <div class="status-progress-fill"></div>
     </div>
-    <span class="status-progress-label">{{ file.status }}</span>
+    <span class="status-progress-label">{{ ('STATUS.' + (file.status | uppercase) | translate) || file.status }}</span>
   </div>
 </td>
           <td class="col-actions">
             <button class="menu-btn" (click)="toggleMenu(file.id, $event)">⋮</button>
 
             <div class="action-menu" *ngIf="openMenuFileId === file.id" (click)="$event.stopPropagation()">
-              <button (click)="viewDetails(file.id)">View Details</button>
-              <button (click)="previewFile(file)">Preview</button>
-              <button (click)="downloadFile(file)">Download</button>
-              <button (click)="onForward(file)">Forward</button>
-                <button (click)="openStatusModal(file)">Edit Status</button>
-              <button class="danger"  (click)="deleteFile(file)">Delete</button>
+              <button (click)="viewDetails(file.id)">{{ 'FILES.VIEW_DETAILS' | translate }}</button>
+              <button (click)="previewFile(file)">{{ 'COMMON.PREVIEW' | translate }}</button>
+              <button (click)="downloadFile(file)">{{ 'COMMON.DOWNLOAD' | translate }}</button>
+              <button (click)="onForward(file)">{{ 'COMMON.FORWARD' | translate }}</button>
+                <button (click)="openStatusModal(file)">{{ 'FILES.EDIT_STATUS' | translate }}</button>
+              <button class="danger"  (click)="deleteFile(file)">{{ 'COMMON.DELETE' | translate }}</button>
             </div>
           </td>
         </tr>
 
         <tr *ngIf="filteredFiles.length === 0">
-          <td colspan="7" class="empty-state">No files found.</td>
+          <td colspan="7" class="empty-state">{{ 'FILES.NO_FILES_FOUND' | translate }}</td>
         </tr>
       </tbody>
     </table>
   </div>
 
   <ng-template #loadingState>
-    <div class="loading-state">Loading files...</div>
+    <div class="loading-state">{{ 'FILES.LOADING_FILES' | translate }}</div>
   </ng-template>
 
   <div class="table-footer" *ngIf="!isLoading">
-  <span>Showing {{ filteredFiles.length }} of {{ totalElements }} files</span>
+  <span>{{ 'FILES.SHOWING' | translate }} {{ filteredFiles.length }} {{ 'FILES.OF' | translate }} {{ totalElements }} {{ 'FILES.FILES_LABEL' | translate }}</span>
   <div class="pagination">
     <button (click)="previousPage()" [disabled]="page === 0">
-      Previous
+      {{ 'COMMON.PREVIOUS' | translate }}
     </button>
 
     <span>{{ page + 1 }} / {{ totalDisplayedPages }}</span>
 
     <button (click)="nextPage()" [disabled]="page === totalDisplayedPages - 1">
-      Next
+      {{ 'COMMON.NEXT' | translate }}
     </button>
   </div>
 </div>
 <!-- Upload Modal -->
 <div class="upload-overlay" *ngIf="showUploadModal" (click)="closeUploadModal()">
   <div class="upload-modal upload-modal-wide" (click)="$event.stopPropagation()">
-    <h3>Upload Files</h3>
+    <h3>{{ 'FILES.UPLOAD_MODAL_TITLE' | translate }}</h3>
 
     <!-- Step indicator -->
     <div class="stepper">
       <div class="step" [class.active]="currentStep === 1" [class.done]="currentStep > 1" (click)="goToStep(1)">
         <span class="step-num">1</span>
-        <span class="step-label">Files</span>
+        <span class="step-label">{{ 'FILES.STEP_FILES' | translate }}</span>
       </div>
       <div class="step-line" [class.done]="currentStep > 1"></div>
       <div class="step" [class.active]="currentStep === 2" [class.done]="currentStep > 2" (click)="goToStep(2)">
         <span class="step-num">2</span>
-        <span class="step-label">Departments</span>
+        <span class="step-label">{{ 'FILES.STEP_DEPARTMENTS' | translate }}</span>
       </div>
       <div class="step-line" [class.done]="currentStep > 2"></div>
       <div class="step" [class.active]="currentStep === 3" [class.done]="currentStep > 3" (click)="goToStep(3)">
         <span class="step-num">3</span>
-        <span class="step-label">File Types</span>
+        <span class="step-label">{{ 'FILES.STEP_FILE_TYPES' | translate }}</span>
       </div>
       <div class="step-line" [class.done]="currentStep > 3"></div>
       <div class="step" [class.active]="currentStep === 4" (click)="goToStep(4)">
         <span class="step-num">4</span>
-        <span class="step-label">Preview</span>
+        <span class="step-label">{{ 'FILES.STEP_PREVIEW' | translate }}</span>
       </div>
     </div>
 
@@ -210,7 +210,7 @@
         (drop)="onDrop($event)"
         (click)="triggerBrowse(fileInput)"
       >
-        <p>Drag &amp; drop files here, or click to browse</p>
+        <p>{{ 'FILES.DROPZONE_TEXT' | translate }}</p>
       </div>
 
       <ul class="selected-files-list" *ngIf="uploadItems.length > 0">
@@ -223,7 +223,7 @@
 
     <!-- Step 2: Departments (multi-select) -->
     <div class="step-content" *ngIf="currentStep === 2">
-      <label>Send to Departments</label>
+      <label>{{ 'FILES.SEND_TO_DEPTS' | translate }}</label>
       <ul class="checkbox-list">
         <li *ngFor="let dept of departments">
           <label>
@@ -240,12 +240,12 @@
 
     <!-- Step 3: File Type per file -->
     <div class="step-content" *ngIf="currentStep === 3">
-      <label>File Type for Each File</label>
+      <label>{{ 'FILES.FILE_TYPE_FOR_EACH' | translate }}</label>
       <ul class="filetype-list">
         <li *ngFor="let item of uploadItems">
           <span class="filetype-list-name">{{ item.file.name }}</span>
           <select [(ngModel)]="item.fileTypeId">
-            <option [ngValue]="null" disabled>Select file type</option>
+            <option [ngValue]="null" disabled>{{ 'FILES.SELECT_FILE_TYPE' | translate }}</option>
             <option *ngFor="let type of fileTypes" [ngValue]="type.id">{{ type.name }}</option>
           </select>
         </li>
@@ -254,12 +254,12 @@
 
     <!-- Step 4: Preview -->
     <div class="step-content" *ngIf="currentStep === 4">
-      <label>Departments</label>
+      <label>{{ 'FILES.STEP_DEPARTMENTS' | translate }}</label>
       <div class="preview-tags">
         <span class="tag" *ngFor="let deptId of selectedDepartmentIds">{{ getDepartmentName(deptId) }}</span>
       </div>
 
-      <label>Files</label>
+      <label>{{ 'FILES.STEP_FILES' | translate }}</label>
       <ul class="preview-list">
         <li *ngFor="let item of uploadItems">
           <span class="preview-file-name">{{ item.file.name }}</span>
@@ -269,15 +269,15 @@
 
       <p class="preview-summary">
         {{ uploadItems.length }} file(s) × {{ selectedDepartmentIds.length }} department(s)
-        = {{ totalRecordsToCreate }} record(s) will be created.
+        = {{ totalRecordsToCreate }} {{ 'FILES.PREVIEW_SUMMARY_RECORD' | translate }}
       </p>
     </div>
 
     <div class="modal-actions">
-      <button class="cancel-btn" (click)="closeUploadModal()" [disabled]="isUploading">Cancel</button>
+      <button class="cancel-btn" (click)="closeUploadModal()" [disabled]="isUploading">{{ 'COMMON.CANCEL' | translate }}</button>
 
       <button *ngIf="currentStep > 1" class="back-btn" (click)="prevStep()" [disabled]="isUploading">
-        Back
+        {{ 'COMMON.BACK' | translate }}
       </button>
 
       <button
@@ -286,7 +286,7 @@
         (click)="nextStep()"
         [disabled]="!canGoNext()"
       >
-        Next
+        {{ 'COMMON.NEXT' | translate }}
       </button>
 
       <button
@@ -295,7 +295,7 @@
         (click)="submitUpload()"
         [disabled]="!canSubmitUpload"
       >
-        {{ isUploading ? 'Uploading...' : 'Upload' }}
+        {{ (isUploading ? 'COMMON.UPLOADING' : 'COMMON.UPLOAD') | translate }}
       </button>
     </div>
   </div>
@@ -306,27 +306,27 @@
 <!-- Edit Status Modal -->
 <div class="status-overlay" *ngIf="showStatusModal" (click)="closeStatusModal()">
   <div class="status-modal" (click)="$event.stopPropagation()">
-    <h3>Edit Status</h3>
+    <h3>{{ 'FILES.EDIT_STATUS_TITLE' | translate }}</h3>
     <p class="status-modal-file" *ngIf="statusModalFile">{{ statusModalFile.name }}</p>
 
-    <label>Current Status</label>
+    <label>{{ 'FILES.CURRENT_STATUS' | translate }}</label>
     <span class="status-badge" [ngClass]="statusModalFile?.status?.toLowerCase()" *ngIf="statusModalFile">
-      {{ statusModalFile.status }}
+      {{ ('STATUS.' + (statusModalFile.status | uppercase) | translate) || statusModalFile.status }}
     </span>
 
-    <label>New Status</label>
+    <label>{{ 'FILES.NEW_STATUS' | translate }}</label>
     <select [(ngModel)]="selectedStatus">
-      <option *ngFor="let option of statusOptions" [ngValue]="option">{{ option }}</option>
+      <option *ngFor="let option of statusOptions" [ngValue]="option">{{ ('STATUS.' + option | translate) || option }}</option>
     </select>
 
     <div class="modal-actions">
-      <button class="cancel-btn" (click)="closeStatusModal()" [disabled]="isUpdatingStatus">Cancel</button>
+      <button class="cancel-btn" (click)="closeStatusModal()" [disabled]="isUpdatingStatus">{{ 'COMMON.CANCEL' | translate }}</button>
       <button
         class="confirm-btn"
         (click)="confirmStatusUpdate()"
         [disabled]="!canConfirmStatus"
       >
-        {{ isUpdatingStatus ? 'Saving...' : 'Save Status' }}
+        {{ (isUpdatingStatus ? 'COMMON.SAVING' : 'FILES.SAVE_STATUS') | translate }}
       </button>
     </div>
   </div>
@@ -341,7 +341,7 @@
     </div>
 
     <div class="preview-body">
-      <div class="preview-loading" *ngIf="isLoadingPreview">Loading preview...</div>
+      <div class="preview-loading" *ngIf="isLoadingPreview">{{ 'FILES.PREVIEW_LOADING' | translate }}</div>
 
       <ng-container *ngIf="!isLoadingPreview">
         <img
@@ -360,8 +360,8 @@
         <pre *ngIf="previewKind === 'text'" class="preview-text">{{ previewText }}</pre>
 
         <div class="preview-unsupported" *ngIf="previewKind === 'unsupported'">
-          <p>Preview isn't available for this file type.</p>
-          <button class="confirm-btn" (click)="downloadPreviewedFile()">Download instead</button>
+          <p>{{ 'FILES.PREVIEW_UNSUPPORTED' | translate }}</p>
+          <button class="confirm-btn" (click)="downloadPreviewedFile()">{{ 'FILES.DOWNLOAD_INSTEAD' | translate }}</button>
         </div>
       </ng-container>
     </div>

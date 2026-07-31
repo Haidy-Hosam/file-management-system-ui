@@ -9,6 +9,7 @@ import { TrashService } from '../../core/services/trash.service';
 import { AuthService } from '../../core/services/auth.service';
 import { DashboardService } from '../../core/services/dashboard.service';
 import { DashboardStatistics } from '../../core/models/DashboardStatistics';
+import { TranslatePipe } from '@ngx-translate/core';
 
 interface MonthlyActivity {
   month: string;
@@ -19,7 +20,7 @@ interface MonthlyActivity {
 @Component({
   selector: 'app-dashboard',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink],
+  imports: [CommonModule, FormsModule, RouterLink, TranslatePipe],
   templateUrl: './dashboard.html',
   styleUrl: './dashboard.css',
 })
@@ -28,7 +29,7 @@ export class Dashboard implements OnInit {
   isLoading = true;
   userEmail = '';
   userRole = '';
-  greeting = '';
+  greetingKey = 'DASHBOARD.GOOD_MORNING';
 
   statistics: DashboardStatistics | null = null;
 
@@ -66,7 +67,7 @@ export class Dashboard implements OnInit {
   ngOnInit(): void {
     this.userEmail = this.authService.getDecodedToken()?.sub ?? 'User';
     this.userRole = this.authService.getRole() ?? 'USER';
-    this.greeting = this.computeGreeting();
+    this.greetingKey = this.computeGreeting();
     this.loadDashboardData();
     this.getStatistics();
   }
@@ -88,9 +89,9 @@ export class Dashboard implements OnInit {
 
   private computeGreeting(): string {
     const hour = new Date().getHours();
-    if (hour < 12) return 'Good morning';
-    if (hour < 18) return 'Good afternoon';
-    return 'Good evening';
+    if (hour < 12) return 'DASHBOARD.GOOD_MORNING';
+    if (hour < 18) return 'DASHBOARD.GOOD_AFTERNOON';
+    return 'DASHBOARD.GOOD_EVENING';
   }
 
   loadDashboardData(): void {

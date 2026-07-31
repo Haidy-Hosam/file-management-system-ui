@@ -12,16 +12,16 @@
             <span class="role-dot" [style.background]="roleColor(role)"></span>
             <span class="role-name">{{ role.name }}</span>
           </div>
-          <span class="text-muted small">{{ userCountFor(role.id) }} users</span>
+          <span class="text-muted small">{{ userCountFor(role.id) }} {{ 'ROLES.USERS_COUNT' | translate }}</span>
         </div>
         <div class="mt-2">
-          <span class="permission-count-link">{{ permissionCount(role) }} permissions</span>
+          <span class="permission-count-link">{{ permissionCount(role) }} {{ 'ROLES.PERMISSIONS_COUNT' | translate }}</span>
         </div>
       </div>
     }
 
     <button class="btn btn-outline-primary w-100" (click)="openCreateModal()">
-      <i class="bi bi-plus-lg me-1"></i> Create Role
+      <i class="bi bi-plus-lg me-1"></i> {{ 'ROLES.CREATE_ROLE' | translate }}
     </button>
   </div>
 
@@ -37,17 +37,17 @@
             </div>
             <div>
               <h4 class="mb-0">{{ role.name }}</h4>
-              <span class="text-muted">{{ assignedUsers().length }} users assigned</span>
+              <span class="text-muted">{{ assignedUsers().length }} {{ 'ROLES.USERS_ASSIGNED' | translate }}</span>
             </div>
           </div>
           <div>
-            <button class="btn btn-outline-secondary me-2" (click)="startEdit()">Edit Role</button>
-            <button class="btn btn-outline-danger" (click)="deleteRole()">Delete</button>
+            <button class="btn btn-outline-secondary me-2" (click)="startEdit()">{{ 'ROLES.EDIT_ROLE' | translate }}</button>
+            <button class="btn btn-outline-danger" (click)="deleteRole()">{{ 'COMMON.DELETE' | translate }}</button>
           </div>
         </div>
 
         <!-- VIEW MODE: read-only permissions, driven by hasPermission(), not clickable -->
-        <h6 class="text-uppercase text-muted small mt-4 mb-3">Permissions</h6>
+        <h6 class="text-uppercase text-muted small mt-4 mb-3">{{ 'ROLES.PERMISSIONS' | translate }}</h6>
         <div class="permission-grid">
           @for (page of allPages(); track page.id) {
             <div class="permission-page-card">
@@ -63,7 +63,7 @@
           }
         </div>
 
-        <h6 class="text-uppercase text-muted small mt-4 mb-2">Assigned Users</h6>
+        <h6 class="text-uppercase text-muted small mt-4 mb-2">{{ 'ROLES.ASSIGNED_USERS' | translate }}</h6>
         <div class="d-flex gap-2 flex-wrap">
           @for (user of assignedUsers(); track user.u_id) {
             <div class="d-flex align-items-center gap-2 border rounded-pill px-2 py-1">
@@ -76,11 +76,11 @@
       } @else {
         <!-- EDIT MODE -->
         <div class="mb-3">
-          <label class="form-label">Role Name</label>
+          <label class="form-label">{{ 'ROLES.ROLE_NAME' | translate }}</label>
           <input class="form-control" [ngModel]="draftName()" (ngModelChange)="draftName.set($event)" />
         </div>
 
-        <h6 class="text-uppercase text-muted small mt-4 mb-3">Permissions</h6>
+        <h6 class="text-uppercase text-muted small mt-4 mb-3">{{ 'ROLES.PERMISSIONS' | translate }}</h6>
         @for (page of allPages(); track page.id) {
           <div class="mb-3">
             <div class="fw-semibold small mb-2">{{ page.name }}</div>
@@ -99,13 +99,13 @@
         }
 
         <div class="d-flex gap-2 mt-4">
-          <button class="btn btn-primary" (click)="saveEdit()">Save Changes</button>
-          <button class="btn btn-outline-secondary" (click)="cancelEdit()">Cancel</button>
+          <button class="btn btn-primary" (click)="saveEdit()">{{ 'ROLES.SAVE_CHANGES' | translate }}</button>
+          <button class="btn btn-outline-secondary" (click)="cancelEdit()">{{ 'COMMON.CANCEL' | translate }}</button>
         </div>
       }
 
     } @else {
-      <p class="text-muted">Select a role to view details.</p>
+      <p class="text-muted">{{ 'ROLES.SELECT_ROLE' | translate }}</p>
     }
   </div>
 </div>
@@ -114,13 +114,13 @@
 @if (showCreateModal()) {
   <div class="modal-backdrop-custom">
     <div class="modal-box p-4">
-      <h5 class="mb-3">Create Role</h5>
+      <h5 class="mb-3">{{ 'ROLES.CREATE_ROLE' | translate }}</h5>
       <div class="mb-3">
-        <label class="form-label">Role Name</label>
+        <label class="form-label">{{ 'ROLES.ROLE_NAME' | translate }}</label>
         <input class="form-control" [ngModel]="draftName()" (ngModelChange)="draftName.set($event)" />
       </div>
 
-      <h6 class="text-uppercase text-muted small mt-3 mb-2">Permissions</h6>
+      <h6 class="text-uppercase text-muted small mt-3 mb-2">{{ 'ROLES.PERMISSIONS' | translate }}</h6>
       <div style="max-height: 300px; overflow-y: auto;">
         @for (page of allPages(); track page.id) {
           <div class="mb-3">
@@ -141,8 +141,8 @@
       </div>
 
       <div class="d-flex gap-2 mt-4">
-        <button class="btn btn-primary" (click)="createRole()">Create</button>
-        <button class="btn btn-outline-secondary" (click)="closeCreateModal()">Cancel</button>
+        <button class="btn btn-primary" (click)="createRole()">{{ 'COMMON.CREATE' | translate }}</button>
+        <button class="btn btn-outline-secondary" (click)="closeCreateModal()">{{ 'COMMON.CANCEL' | translate }}</button>
       </div>
     </div>
   </div>
@@ -156,16 +156,15 @@
           <i class="bi bi-exclamation-triangle-fill"></i>
         </div>
         <div>
-          <h5 class="mb-1">Delete this role?</h5>
+          <h5 class="mb-1">{{ 'ROLES.DELETE_CONFIRM_TITLE' | translate }}</h5>
           <p class="text-muted mb-0">
-            "{{ selectedRole()?.name }}" will be permanently removed from Arkive.
-            Any users assigned to it will need a new role. This cannot be undone.
+            "{{ selectedRole()?.name }}" {{ 'ROLES.DELETE_CONFIRM_TEXT' | translate }}
           </p>
         </div>
       </div>
       <div class="d-flex justify-content-end gap-2 mt-4">
-        <button class="btn btn-outline-secondary" (click)="cancelDelete()">Cancel</button>
-        <button class="btn btn-danger" (click)="confirmDelete()">Delete Role</button>
+        <button class="btn btn-outline-secondary" (click)="cancelDelete()">{{ 'COMMON.CANCEL' | translate }}</button>
+        <button class="btn btn-danger" (click)="confirmDelete()">{{ 'ROLES.DELETE_ROLE' | translate }}</button>
       </div>
     </div>
   </div>

@@ -5,12 +5,13 @@ import { FormsModule } from '@angular/forms';
 import { FileForwardService } from '../../core/services/file-forward.service';
 import { UserService } from '../../core/services/user.service'; // adjust to your actual service
 import { UserResponse } from '../../core/services/user.service';
+import { TranslatePipe } from '@ngx-translate/core';
 
 
 @Component({
   selector: 'app-forward-file-dialog',
   standalone: true,
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule, TranslatePipe],
   templateUrl: './forward-file-dialog.html',
   styleUrl: './forward-file-dialog.css'
 })

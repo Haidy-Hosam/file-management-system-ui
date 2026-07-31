@@ -7,23 +7,23 @@
       </svg>
       <input
         type="text"
-        placeholder="Search departments..."
+        [placeholder]="'DEPARTMENTS.SEARCH_PLACEHOLDER' | translate"
         [(ngModel)]="searchTerm"
         (ngModelChange)="onSearchChange()">
     </div>
 
     <button class="upload-btn" (click)="openModal()">
       <i class="bi bi-plus-lg"></i>
-      New Department
+      {{ 'DEPARTMENTS.NEW_DEPARTMENT' | translate }}
     </button>
   </div>
 
   @if (isLoading) {
-    <p class="text-muted">Loading departments...</p>
+    <p class="text-muted">{{ 'DEPARTMENTS.LOADING' | translate }}</p>
   } @else if (errorMessage) {
-    <p class="text-danger">{{ errorMessage }}</p>
+    <p class="text-danger">{{ 'DEPARTMENTS.FAILED_LOAD' | translate }}</p>
   } @else if (filteredDepartments.length === 0) {
-    <p class="text-muted">No departments match your search.</p>
+    <p class="text-muted">{{ 'DEPARTMENTS.NO_MATCH' | translate }}</p>
   } @else {
     <div class="row g-4">
       @for (dept of filteredDepartments; track dept.id) {
@@ -36,24 +36,24 @@
                 </div>
                 <div>
                   <h5 class="card-title fw-bold mb-1 fs-6 text-dark">{{ dept.name }}</h5>
-                  <div class="text-secondary small">Head: {{ dept.head }}</div>
+                  <div class="text-secondary small">{{ 'DEPARTMENTS.HEAD' | translate }}: {{ dept.head }}</div>
                 </div>
               </div>
 
               <div class="stats-container rounded-3 p-3 mb-4 d-flex justify-content-between text-center">
                 <div class="stat-item flex-fill">
                   <div class="fw-bold text-dark fs-6">{{ dept.members }}</div>
-                  <div class="text-secondary" style="font-size: 0.75rem;">Members</div>
+                  <div class="text-secondary" style="font-size: 0.75rem;">{{ 'DEPARTMENTS.MEMBERS' | translate }}</div>
                 </div>
                 <div class="stat-divider border-end border-secondary border-opacity-25 mx-2"></div>
                 <div class="stat-item flex-fill">
                   <div class="fw-bold text-dark fs-6">{{ dept.files | number }}</div>
-                  <div class="text-secondary" style="font-size: 0.75rem;">Files</div>
+                  <div class="text-secondary" style="font-size: 0.75rem;">{{ 'DEPARTMENTS.FILES' | translate }}</div>
                 </div>
                 <div class="stat-divider border-end border-secondary border-opacity-25 mx-2"></div>
                 <div class="stat-item flex-fill">
                   <div class="fw-bold text-dark fs-6">{{ dept.storage }}</div>
-                  <div class="text-secondary" style="font-size: 0.75rem;">Storage</div>
+                  <div class="text-secondary" style="font-size: 0.75rem;">{{ 'DEPARTMENTS.STORAGE' | translate }}</div>
                 </div>
               </div>
 
@@ -62,10 +62,10 @@
                      [class.status-active]="dept.status === 'Active'"
                      [class.status-inactive]="dept.status === 'Inactive'">
                   <span class="status-dot rounded-circle"></span>
-                  <span class="fw-semibold" style="font-size: 0.8rem;">{{ dept.status }}</span>
+                  <span class="fw-semibold" style="font-size: 0.8rem;">{{ ('STATUS.' + (dept.status | uppercase) | translate) || dept.status }}</span>
                 </div>
                <a [routerLink]="['/departments', dept.id]" class="text-primary text-decoration-none fw-medium" style="font-size: 0.85rem;">
-                   View <i class="bi bi-chevron-right ms-1"></i>
+                   {{ 'DEPARTMENTS.VIEW' | translate }} <i class="bi bi-chevron-right ms-1"></i>
                 </a>
               </div>
             </div>
@@ -82,7 +82,7 @@
   <div class="modal-custom">
     <div class="modal-content-custom p-4">
       <div class="d-flex justify-content-between align-items-center mb-3">
-        <h5 class="fw-bold mb-0">New Department</h5>
+        <h5 class="fw-bold mb-0">{{ 'DEPARTMENTS.NEW_DEPARTMENT' | translate }}</h5>
         <button class="btn-close" (click)="closeModal()" [disabled]="isSaving"></button>
       </div>
 
@@ -91,12 +91,12 @@
       }
 
       <div class="mb-3">
-        <label class="form-label fw-medium">Department Name</label>
+        <label class="form-label fw-medium">{{ 'DEPARTMENTS.NAME_LABEL' | translate }}</label>
         <input
           type="text"
           class="form-control"
           [(ngModel)]="newDepartment.name"
-          placeholder="e.g. Finance"
+          [placeholder]="'DEPARTMENTS.NAME_PLACEHOLDER' | translate"
           [disabled]="isSaving">
       </div>
 
@@ -107,13 +107,13 @@
           id="isActiveSwitch"
           [(ngModel)]="newDepartment.isActive"
           [disabled]="isSaving">
-        <label class="form-check-label" for="isActiveSwitch">Active</label>
+        <label class="form-check-label" for="isActiveSwitch">{{ 'DEPARTMENTS.ACTIVE_LABEL' | translate }}</label>
       </div>
 
       <div class="d-flex justify-content-end gap-2">
-        <button class="btn btn-outline-secondary" (click)="closeModal()" [disabled]="isSaving">Cancel</button>
+        <button class="btn btn-outline-secondary" (click)="closeModal()" [disabled]="isSaving">{{ 'COMMON.CANCEL' | translate }}</button>
         <button class="btn btn-primary" (click)="submitDepartment()" [disabled]="isSaving">
-          {{ isSaving ? 'Saving...' : 'Create' }}
+          {{ (isSaving ? 'COMMON.SAVING' : 'COMMON.CREATE') | translate }}
         </button>
       </div>
     </div>

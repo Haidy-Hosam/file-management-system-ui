@@ -1,8 +1,8 @@
 <div class="users-page" (click)="closeMenu()">
   <div class="page-header">
     <div>
-      <h1>Users</h1>
-      <p class="subtitle">Manage team members and access</p>
+      <h1>{{ 'USERS.TITLE' | translate }}</h1>
+      <p class="subtitle">{{ 'USERS.SUBTITLE' | translate }}</p>
     </div>
   </div>
 
@@ -10,25 +10,25 @@
     <div class="search-box">
       <input
         type="text"
-        placeholder="Search users..."
+        [placeholder]="'USERS.SEARCH_PLACEHOLDER' | translate"
         [(ngModel)]="searchTerm"
         (ngModelChange)="onSearchChange()"
       />
     </div>
 
     <select class="filter-select" (change)="onRoleFilterChange($any($event.target).value)">
-      <option value="">Filter by Role</option>
+      <option value="">{{ 'USERS.FILTER_BY_ROLE' | translate }}</option>
       <option *ngFor="let role of uniqueRoles" [value]="role">{{ role }}</option>
     </select>
 
     <button class="add-btn" (click)="openAddModal()">
-      <i class="bi bi-plus-lg me-1"></i> Add User
+      <i class="bi bi-plus-lg me-1"></i> {{ 'USERS.ADD_USER' | translate }}
     </button>
   </div>
 
   <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
 
-  <div *ngIf="isLoading" class="loading-state">Loading users...</div>
+  <div *ngIf="isLoading" class="loading-state">{{ 'COMMON.LOADING' | translate }}</div>
 
   <div class="users-grid" *ngIf="!isLoading">
     <div class="user-card" *ngFor="let user of filteredUsers">
@@ -49,52 +49,52 @@
 
         <div class="action-menu" *ngIf="openMenuUserId === user.u_id" (click)="$event.stopPropagation()">
           <button (click)="openEditModal(user)">
-            <i class="bi bi-pencil me-2"></i>Edit
+            <i class="bi bi-pencil me-2"></i>{{ 'COMMON.EDIT' | translate }}
           </button>
           <button (click)="toggleStatus(user)">
-            <i class="bi" [ngClass]="user.isDeleted ? 'bi-check-circle' : 'bi-slash-circle'" class="me-2"></i>{{ user.isDeleted ? 'Activate' : 'Deactivate' }}
+            <i class="bi" [ngClass]="user.isDeleted ? 'bi-check-circle' : 'bi-slash-circle'" class="me-2"></i>{{ user.isDeleted ? ('COMMON.ACTIVATE' | translate) : ('COMMON.DEACTIVATE' | translate) }}
           </button>
           <button class="danger" (click)="deleteUser(user)">
-            <i class="bi bi-trash me-2"></i>Delete
+            <i class="bi bi-trash me-2"></i>{{ 'COMMON.DELETE' | translate }}
           </button>
         </div>
       </div>
 
       <div class="card-info-row">
         <div class="info-block">
-          <span class="info-label">Role</span>
+          <span class="info-label">{{ 'USERS.ROLE' | translate }}</span>
           <span class="info-value">{{ user.role }}</span>
         </div>
         <div class="info-block">
-          <span class="info-label">Department</span>
+          <span class="info-label">{{ 'USERS.DEPARTMENT' | translate }}</span>
           <span class="info-value">{{ user.departmentName }}</span>
         </div>
       </div>
 
       <div class="card-info-row">
         <div class="info-block">
-          <span class="info-label">Files</span>
+          <span class="info-label">{{ 'USERS.FILES' | translate }}</span>
           <span class="info-value">{{ user.filesCount ?? '—' }}</span>
         </div>
         <div class="info-block">
-          <span class="info-label">Last Login</span>
+          <span class="info-label">{{ 'USERS.LAST_LOGIN' | translate }}</span>
           <span class="info-value">{{ user.lastLogin ? (user.lastLogin | date:'short') : '—' }}</span>
         </div>
       </div>
 
       <div class="card-footer">
         <span class="status-badge" [ngClass]="user.isDeleted ? 'inactive' : 'active'">
-          {{ user.isDeleted ? 'Inactive' : 'Active' }}
+          {{ user.isDeleted ? ('USERS.INACTIVE' | translate) : ('USERS.ACTIVE' | translate) }}
         </span>
         <div class="footer-icons">
 
-        <button class="icon-btn" title="View Profile" [routerLink]="['/users', user.u_id]"><i class="bi bi-eye"></i></button>
-        <button class="icon-btn" title="Edit" (click)="openEditModal(user)"><i class="bi bi-pencil"></i></button>
+        <button class="icon-btn" [title]="'COMMON.VIEW' | translate" [routerLink]="['/users', user.u_id]"><i class="bi bi-eye"></i></button>
+        <button class="icon-btn" [title]="'COMMON.EDIT' | translate" (click)="openEditModal(user)"><i class="bi bi-pencil"></i></button>
         </div>
       </div>
     </div>
 
-    <div class="empty-state" *ngIf="filteredUsers.length === 0">No users found.</div>
+    <div class="empty-state" *ngIf="filteredUsers.length === 0">{{ 'USERS.NO_USERS_FOUND' | translate }}</div>
   </div>
 </div>
 
@@ -102,14 +102,14 @@
 <div class="user-modal-overlay" *ngIf="showViewModal" (click)="closeViewModal()">
   <div class="user-modal" (click)="$event.stopPropagation()">
     <h3>{{ viewUser?.name }}</h3>
-    <p><strong>Email:</strong> {{ viewUser?.email }}</p>
-    <p><strong>Role:</strong> {{ viewUser?.role }}</p>
-    <p><strong>Department:</strong> {{ viewUser?.departmentName }}</p>
-    <p><strong>Files:</strong> {{ viewUser?.filesCount ?? '—' }}</p>
-    <p><strong>Last Login:</strong> {{ viewUser?.lastLogin ? (viewUser?.lastLogin | date:'short') : '—' }}</p>
-    <p><strong>Status:</strong> {{ viewUser?.isDeleted ? 'Inactive' : 'Active' }}</p>
+    <p><strong>{{ 'AUTH.EMAIL' | translate }}:</strong> {{ viewUser?.email }}</p>
+    <p><strong>{{ 'USERS.ROLE' | translate }}:</strong> {{ viewUser?.role }}</p>
+    <p><strong>{{ 'USERS.DEPARTMENT' | translate }}:</strong> {{ viewUser?.departmentName }}</p>
+    <p><strong>{{ 'USERS.FILES' | translate }}:</strong> {{ viewUser?.filesCount ?? '—' }}</p>
+    <p><strong>{{ 'USERS.LAST_LOGIN' | translate }}:</strong> {{ viewUser?.lastLogin ? (viewUser?.lastLogin | date:'short') : '—' }}</p>
+    <p><strong>{{ 'DASHBOARD.STATUS' | translate }}:</strong> {{ viewUser?.isDeleted ? ('USERS.INACTIVE' | translate) : ('USERS.ACTIVE' | translate) }}</p>
     <div class="modal-actions">
-      <button class="cancel-btn" (click)="closeViewModal()">Close</button>
+      <button class="cancel-btn" (click)="closeViewModal()">{{ 'COMMON.CLOSE' | translate }}</button>
     </div>
   </div>
 </div>
@@ -117,34 +117,34 @@
 <!-- Add/Edit User Modal -->
 <div class="user-modal-overlay" *ngIf="showModal" (click)="closeModal()">
   <div class="user-modal" (click)="$event.stopPropagation()">
-    <h3>{{ isEditMode ? 'Edit User' : 'Add User' }}</h3>
+    <h3>{{ (isEditMode ? 'USERS.EDIT_USER' : 'USERS.ADD_USER') | translate }}</h3>
 
-    <label>Name</label>
+    <label>{{ 'USERS.NAME' | translate }}</label>
     <input type="text" [(ngModel)]="formName" placeholder="Full name" />
-    <label>Username</label>
+    <label>{{ 'USERS.USERNAME' | translate }}</label>
     <input type="text" [(ngModel)]="formUsername" placeholder="username" />
 
-    <label>Email</label>
+    <label>{{ 'USERS.EMAIL' | translate }}</label>
     <input type="email" [(ngModel)]="formEmail" placeholder="email@arkive.co" />
 
-    <label *ngIf="!isEditMode">Password</label>
+    <label *ngIf="!isEditMode">{{ 'USERS.PASSWORD' | translate }}</label>
     <input *ngIf="!isEditMode" type="password" [(ngModel)]="formPassword" placeholder="••••••••" />
 
-   <label>Role</label>
+   <label>{{ 'USERS.ROLE' | translate }}</label>
 <select [(ngModel)]="formRoleId">
-  <option [ngValue]="null" disabled>Select a role</option>
+  <option [ngValue]="null" disabled>{{ 'USERS.SELECT_ROLE' | translate }}</option>
   <option *ngFor="let role of roles" [ngValue]="role.id">{{ role.name }}</option>
 </select>
 
-<label>Department</label>
+<label>{{ 'USERS.DEPARTMENT' | translate }}</label>
 <select [(ngModel)]="formDepartmentId">
-  <option [ngValue]="null" disabled>Select a department</option>
+  <option [ngValue]="null" disabled>{{ 'USERS.SELECT_DEPT' | translate }}</option>
   <option *ngFor="let dept of departments" [ngValue]="dept.id">{{ dept.name }}</option>
 </select>
 
     <div class="modal-actions">
-      <button class="cancel-btn" (click)="closeModal()">Cancel</button>
-      <button class="confirm-btn" (click)="submitForm()">{{ isEditMode ? 'Save' : 'Add' }}</button>
+      <button class="cancel-btn" (click)="closeModal()">{{ 'COMMON.CANCEL' | translate }}</button>
+      <button class="confirm-btn" (click)="submitForm()">{{ (isEditMode ? 'COMMON.SAVE' : 'COMMON.CREATE') | translate }}</button>
     </div>
   </div>
 </div>
