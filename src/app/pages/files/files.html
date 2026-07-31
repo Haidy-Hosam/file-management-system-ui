@@ -20,18 +20,24 @@
       />
     </div>
 
-    <button class="all-btn" [class.active]="activeTab === 'ALL'" (click)="setTab('ALL')">{{ 'COMMON.ALL' | translate }}</button>
-
-    <div class="dropdown">
-      <button class="filter-btn" (click)="toggleFilterMenu($event)">
-        {{ 'FILES.FILTER_BY' | translate }}<span *ngIf="activeTab !== 'ALL'"> · {{ ('STATUS.' + activeTab | translate) }}</span>
-      </button>
-      <div class="dropdown-menu" *ngIf="showFilterMenu" (click)="$event.stopPropagation()">
-        <button [class.active]="activeTab === 'PENDING'" (click)="setTab('PENDING')">{{ 'STATUS.PENDING' | translate }}</button>
-        <button [class.active]="activeTab === 'APPROVED'" (click)="setTab('APPROVED')">{{ 'STATUS.APPROVED' | translate }}</button>
-        <button [class.active]="activeTab === 'REJECTED'" (click)="setTab('REJECTED')">{{ 'STATUS.REJECTED' | translate }}</button>
-      </div>
+    <div class="tabs">
+      <button [class.active]="activeTab === 'ALL'" (click)="setTab('ALL')">{{ 'COMMON.ALL' | translate }}</button>
+      <button [class.active]="activeTab === 'PENDING'" (click)="setTab('PENDING')">{{ 'STATUS.PENDING' | translate }}</button>
+      <button [class.active]="activeTab === 'APPROVED'" (click)="setTab('APPROVED')">{{ 'STATUS.APPROVED' | translate }}</button>
+      <button [class.active]="activeTab === 'REJECTED'" (click)="setTab('REJECTED')">{{ 'STATUS.REJECTED' | translate }}</button>
     </div>
+
+    <button class="advanced-search-btn" [class.active]="showAdvancedSearch" (click)="toggleAdvancedSearch($event)">
+      <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <circle cx="11" cy="11" r="7" stroke="currentColor" stroke-width="1.8"/>
+        <path d="M21 21L16.65 16.65" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/>
+      </svg>
+      {{ 'FILES.ADVANCED_SEARCH' | translate }}
+      <span class="advanced-search-count" *ngIf="activeAdvancedFilterCount > 0">{{ activeAdvancedFilterCount }}</span>
+      <svg class="chevron" [class.open]="showAdvancedSearch" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <path d="M6 9L12 15L18 9" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+      </svg>
+    </button>
 
     <button class="upload-btn" (click)="openUploadModal(); $event.stopPropagation()">
       <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -40,6 +46,65 @@
       </svg>
       {{ 'FILES.UPLOAD_FILE' | translate }}
     </button>
+  </div>
+
+  <div class="advanced-search-panel" *ngIf="showAdvancedSearch" (click)="$event.stopPropagation()">
+    <div class="advanced-search-header">
+      <h4>{{ 'FILES.ADVANCED_SEARCH' | translate }}</h4>
+      <button class="clear-filters-btn" (click)="clearAdvancedFilters()" *ngIf="activeAdvancedFilterCount > 0">
+        {{ 'FILES.CLEAR_ALL' | translate }}
+      </button>
+    </div>
+
+    <div class="advanced-search-grid">
+      <div class="filter-column">
+        <span class="filter-column-title">{{ 'FILES.COL_DEPARTMENT' | translate }}</span>
+        <label class="filter-checkbox" *ngFor="let dept of departments">
+          <input type="checkbox" [checked]="isDeptFilterSelected(dept.name)" (change)="toggleDeptFilter(dept.name)" />
+          {{ dept.name }}
+        </label>
+      </div>
+
+      <div class="filter-column">
+        <span class="filter-column-title">{{ 'FILES.COL_OWNER' | translate }}</span>
+        <label class="filter-checkbox" *ngFor="let owner of uniqueOwners">
+          <input type="checkbox" [checked]="isOwnerFilterSelected(owner)" (change)="toggleOwnerFilter(owner)" />
+          {{ owner }}
+        </label>
+      </div>
+
+      <div class="filter-column">
+        <span class="filter-column-title">{{ 'FILES.COL_STATUS' | translate }}</span>
+        <label class="filter-checkbox" *ngFor="let status of statusOptions">
+          <input type="checkbox" [checked]="isStatusFilterSelected(status)" (change)="toggleStatusFilter(status)" />
+          {{ ('STATUS.' + status | translate) }}
+        </label>
+      </div>
+
+      <div class="filter-column">
+        <span class="filter-column-title">{{ 'FILES.FILE_TYPE' | translate }}</span>
+        <label class="filter-checkbox" *ngFor="let type of fileTypes">
+          <input type="checkbox" [checked]="isFileTypeFilterSelected(type.name)" (change)="toggleFileTypeFilter(type.name)" />
+          {{ type.name }}
+        </label>
+      </div>
+
+      <div class="filter-column">
+        <span class="filter-column-title">{{ 'FILES.CREATION_DATE' | translate }}</span>
+        <span class="date-label">{{ 'COMMON.FROM' | translate }}</span>
+        <input type="date" class="date-input" [(ngModel)]="advancedFilters.createdFrom" (ngModelChange)="applyFilters()" />
+        <span class="date-label">{{ 'COMMON.TO' | translate }}</span>
+        <input type="date" class="date-input" [(ngModel)]="advancedFilters.createdTo" (ngModelChange)="applyFilters()" />
+      </div>
+
+      <div class="filter-column">
+        <span class="filter-column-title">{{ 'FILES.MODIFIED_DATE' | translate }}</span>
+        <span class="date-label">{{ 'COMMON.FROM' | translate }}</span>
+        <input type="date" class="date-input" [(ngModel)]="advancedFilters.modifiedFrom" (ngModelChange)="applyFilters()" />
+        <span class="date-label">{{ 'COMMON.TO' | translate }}</span>
+        <input type="date" class="date-input" [(ngModel)]="advancedFilters.modifiedTo" (ngModelChange)="applyFilters()" />
+      </div>
+    </div>
   </div>
 
   <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>

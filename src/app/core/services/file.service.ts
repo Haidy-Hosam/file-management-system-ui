@@ -73,24 +73,38 @@ export class FileService {
     return this.http.delete<void>(`${this.baseUrl}/${fileId}`);
   }
 
-
-  getAllFiles(page: number, size:number): Observable<PageResponse<FileResponse>> {
-    const params = new HttpParams().set('page', page).set('size', size);
-    return this.http.get<PageResponse<FileResponse>>(`${this.baseUrl}/all`, {params});
+  /**
+   * Builds page + optional sort params in the format Spring Data's Pageable
+   * binder expects: ?page=0&size=10&sort=name,asc
+   */
+  private buildPageParams(page: number, size: number, sortBy?: string, sortDir?: 'asc' | 'desc'): HttpParams {
+    let params = new HttpParams().set('page', page).set('size', size);
+    if (sortBy) {
+      params = params.set('sort', `${sortBy},${sortDir ?? 'asc'}`);
+    }
+    return params;
   }
 
-  getFilesByUser(userId: number, page: number, size: number): Observable<PageResponse<FileResponse>> {
-  const params = new HttpParams().set('page', page).set('size', size);
-  return this.http.get<PageResponse<FileResponse>>(`${this.baseUrl}/user/${userId}`, { params });
-}
-  getAllFilesByDepartment(deptId: number, page:number , size: number): Observable<PageResponse<FileResponse>> {
-    return this.http.get<PageResponse<FileResponse>>(`${this.baseUrl}/dept/${deptId}?page=${page}&size=${size}`);
+  getAllFiles(page: number, size: number, sortBy?: string, sortDir?: 'asc' | 'desc'): Observable<PageResponse<FileResponse>> {
+    const params = this.buildPageParams(page, size, sortBy, sortDir);
+    return this.http.get<PageResponse<FileResponse>>(`${this.baseUrl}/all`, { params });
   }
-   
-  getMyFiles(page: number, size: number): Observable<PageResponse<FileResponse>> {
-  const params = new HttpParams().set('page', page).set('size', size);
-  return this.http.get<PageResponse<FileResponse>>(`${this.baseUrl}/my`, { params });
-}
+
+  getFilesByUser(userId: number, page: number, size: number, sortBy?: string, sortDir?: 'asc' | 'desc'): Observable<PageResponse<FileResponse>> {
+    const params = this.buildPageParams(page, size, sortBy, sortDir);
+    return this.http.get<PageResponse<FileResponse>>(`${this.baseUrl}/user/${userId}`, { params });
+  }
+
+  getAllFilesByDepartment(deptId: number, page: number, size: number, sortBy?: string, sortDir?: 'asc' | 'desc'): Observable<PageResponse<FileResponse>> {
+    const params = this.buildPageParams(page, size, sortBy, sortDir);
+    return this.http.get<PageResponse<FileResponse>>(`${this.baseUrl}/dept/${deptId}`, { params });
+  }
+
+  getMyFiles(page: number, size: number, sortBy?: string, sortDir?: 'asc' | 'desc'): Observable<PageResponse<FileResponse>> {
+    const params = this.buildPageParams(page, size, sortBy, sortDir);
+    return this.http.get<PageResponse<FileResponse>>(`${this.baseUrl}/my`, { params });
+  }
+
   getFileData(fileId: number): Observable<FileResponse> {
     return this.http.get<FileResponse>(`${this.baseUrl}/${fileId}`);
   }

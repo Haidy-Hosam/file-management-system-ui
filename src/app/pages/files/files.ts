@@ -13,6 +13,17 @@ import { TrashService } from '../../core/services/trash.service';
 import { ForwardFileDialog } from '../../shared/forward-file-dialog/forward-file-dialog'; // adjust path
 import { TranslatePipe } from '@ngx-translate/core';
 
+interface AdvancedFilters {
+  departments: Set<string>;
+  owners: Set<string>;
+  statuses: Set<string>;
+  fileTypeNames: Set<string>;
+  createdFrom: string;
+  createdTo: string;
+  modifiedFrom: string;
+  modifiedTo: string;
+}
+
 @Component({
   selector: 'app-files',
   standalone: true,
@@ -55,10 +66,32 @@ export class Files implements OnInit {
 
   searchTerm = '';
   activeTab: 'ALL' | 'PENDING' | 'APPROVED' | 'REJECTED' = 'ALL';
-  sortBy: 'NAME' | 'OWNER' | 'SIZE' | 'CREATED' | 'MODIFIED' | null = null;  
+  sortBy: 'NAME' | 'OWNER' | 'SIZE' | 'CREATED' | 'MODIFIED' | null = null;
   sortDirection: 'asc' | 'desc' = 'asc';
-  // showSortMenu = false;
-  showFilterMenu = false;
+
+  // Maps the UI's sort field to the backend/entity property name used by
+  // Spring Data's Pageable `sort` param. Adjust the right-hand values if
+  // your entity's field names differ from the DTO's.
+  private readonly sortFieldMap: Record<'NAME' | 'OWNER' | 'SIZE' | 'CREATED' | 'MODIFIED', string> = {
+    NAME: 'name',
+    OWNER: 'ownerName',
+    SIZE: 'size',
+    CREATED: 'createdDate',
+    MODIFIED: 'modifiedDate'
+  };
+
+  // ---- Advanced Search ----
+  showAdvancedSearch = false;
+  advancedFilters: AdvancedFilters = {
+    departments: new Set<string>(),
+    owners: new Set<string>(),
+    statuses: new Set<string>(),
+    fileTypeNames: new Set<string>(),
+    createdFrom: '',
+    createdTo: '',
+    modifiedFrom: '',
+    modifiedTo: ''
+  };
 
   selectedFileIds = new Set<number>();
   openMenuFileId: number | null = null;
@@ -105,11 +138,13 @@ export class Files implements OnInit {
     this.isLoading = true;
     const role = this.authService.getRole();
 
+    const backendSortField = this.sortBy ? this.sortFieldMap[this.sortBy] : undefined;
+
     // ADMIN sees everything; MANAGER/EMPLOYEE are restricted to their own
     // department, per the controller's @PreAuthorize check on /dept/{deptId}.
     let request$;
     if (role === 'ADMIN') {
-      request$ = this.fileService.getAllFiles(this.page, this.size);
+      request$ = this.fileService.getAllFiles(this.page, this.size, backendSortField, this.sortDirection);
     } else {
       const deptId = this.authService.getDeptId();
       if (deptId == null) {
@@ -117,7 +152,7 @@ export class Files implements OnInit {
         this.isLoading = false;
         return;
       }
-      request$ = this.fileService.getAllFilesByDepartment(deptId, this.page, this.size);
+      request$ = this.fileService.getAllFilesByDepartment(deptId, this.page, this.size, backendSortField, this.sortDirection);
     }
 
     request$.subscribe({
@@ -152,20 +187,130 @@ export class Files implements OnInit {
       );
     }
 
-    if (this.sortBy) {
-      result = this.sortFiles(result);
+    if (this.advancedFilters.departments.size > 0) {
+      result = result.filter(f =>
+        f.departmentNames.some(d => this.advancedFilters.departments.has(d))
+      );
     }
+
+    if (this.advancedFilters.owners.size > 0) {
+      result = result.filter(f => this.advancedFilters.owners.has(f.ownerName));
+    }
+
+    if (this.advancedFilters.statuses.size > 0) {
+      result = result.filter(f => this.advancedFilters.statuses.has(f.status.toUpperCase()));
+    }
+
+    if (this.advancedFilters.fileTypeNames.size > 0) {
+      result = result.filter(f => {
+        const ext = (f.extension || f.fileType || '').toUpperCase();
+        return this.advancedFilters.fileTypeNames.has(ext);
+      });
+    }
+
+    if (this.advancedFilters.createdFrom) {
+      const from = new Date(this.advancedFilters.createdFrom).getTime();
+      result = result.filter(f => new Date(f.createdDate).getTime() >= from);
+    }
+    if (this.advancedFilters.createdTo) {
+      const to = new Date(this.advancedFilters.createdTo).getTime();
+      result = result.filter(f => new Date(f.createdDate).getTime() <= to);
+    }
+    if (this.advancedFilters.modifiedFrom) {
+      const from = new Date(this.advancedFilters.modifiedFrom).getTime();
+      result = result.filter(f => new Date(f.modifiedDate).getTime() >= from);
+    }
+    if (this.advancedFilters.modifiedTo) {
+      const to = new Date(this.advancedFilters.modifiedTo).getTime();
+      result = result.filter(f => new Date(f.modifiedDate).getTime() <= to);
+    }
+
+    // Sorting is now done server-side (see loadFiles/setSort) so it applies
+    // across the whole dataset, not just the current page. `result` here
+    // arrives already sorted from the backend; filtering with .filter()
+    // preserves that order.
 
     this.filteredFiles = result;
   }
 
   setTab(tab: 'ALL' | 'PENDING' | 'APPROVED' | 'REJECTED'): void {
     this.activeTab = tab;
-    this.showFilterMenu = false;
     this.applyFilters();
   }
 
   onSearchChange(): void {
+    this.applyFilters();
+  }
+
+  // ---- Advanced Search interactions ----
+  toggleAdvancedSearch(event: Event): void {
+    event.stopPropagation();
+    this.showAdvancedSearch = !this.showAdvancedSearch;
+  }
+
+  get uniqueOwners(): string[] {
+    const owners = new Set(this.allFiles.map(f => f.ownerName));
+    return [...owners].sort();
+  }
+
+  isDeptFilterSelected(deptName: string): boolean {
+    return this.advancedFilters.departments.has(deptName);
+  }
+  toggleDeptFilter(deptName: string): void {
+    this.toggleSetValue(this.advancedFilters.departments, deptName);
+  }
+
+  isOwnerFilterSelected(owner: string): boolean {
+    return this.advancedFilters.owners.has(owner);
+  }
+  toggleOwnerFilter(owner: string): void {
+    this.toggleSetValue(this.advancedFilters.owners, owner);
+  }
+
+  isStatusFilterSelected(status: string): boolean {
+    return this.advancedFilters.statuses.has(status);
+  }
+  toggleStatusFilter(status: string): void {
+    this.toggleSetValue(this.advancedFilters.statuses, status);
+  }
+
+  isFileTypeFilterSelected(typeName: string): boolean {
+    return this.advancedFilters.fileTypeNames.has(typeName.toUpperCase());
+  }
+  toggleFileTypeFilter(typeName: string): void {
+    this.toggleSetValue(this.advancedFilters.fileTypeNames, typeName.toUpperCase());
+  }
+
+  private toggleSetValue(set: Set<string>, value: string): void {
+    if (set.has(value)) {
+      set.delete(value);
+    } else {
+      set.add(value);
+    }
+    this.applyFilters();
+  }
+
+  get activeAdvancedFilterCount(): number {
+    const f = this.advancedFilters;
+    let count = f.departments.size + f.owners.size + f.statuses.size + f.fileTypeNames.size;
+    if (f.createdFrom) count++;
+    if (f.createdTo) count++;
+    if (f.modifiedFrom) count++;
+    if (f.modifiedTo) count++;
+    return count;
+  }
+
+  clearAdvancedFilters(): void {
+    this.advancedFilters = {
+      departments: new Set<string>(),
+      owners: new Set<string>(),
+      statuses: new Set<string>(),
+      fileTypeNames: new Set<string>(),
+      createdFrom: '',
+      createdTo: '',
+      modifiedFrom: '',
+      modifiedTo: ''
+    };
     this.applyFilters();
   }
 
@@ -212,66 +357,30 @@ export class Files implements OnInit {
     this.openMenuFileId = this.openMenuFileId === fileId ? null : fileId;
   }
 
- closeMenu(): void {
-  this.openMenuFileId = null;
-  this.showFilterMenu = false;
-}
-
-  // toggleSortMenu(event: Event): void {
-  //   event.stopPropagation();
-  //   this.showSortMenu = !this.showSortMenu;
-  //   this.showFilterMenu = false;
-  // }
-
-toggleFilterMenu(event: Event): void {
-  event.stopPropagation();
-  this.showFilterMenu = !this.showFilterMenu;
-}
-
-setSort(field: 'NAME' | 'OWNER' | 'SIZE' | 'CREATED' | 'MODIFIED'): void {
-  if (this.sortBy === field) {
-    this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
-  } else {
-    this.sortBy = field;
-    this.sortDirection = 'asc';
+  closeMenu(): void {
+    this.openMenuFileId = null;
+    this.showAdvancedSearch = false;
   }
-  this.applyFilters();
-}
 
-  private sortFiles(files: FileResponse[]): FileResponse[] {
-  const dir = this.sortDirection === 'asc' ? 1 : -1;
-  return [...files].sort((a, b) => {
-    switch (this.sortBy) {
-      case 'NAME':
-        return a.name.localeCompare(b.name) * dir;
-      case 'OWNER':
-        return a.ownerName.localeCompare(b.ownerName) * dir;
-      case 'SIZE':
-        return (this.parseSize(a.size) - this.parseSize(b.size)) * dir;
-      case 'CREATED':
-        return (new Date(a.createdDate).getTime() - new Date(b.createdDate).getTime()) * dir;
-      case 'MODIFIED':
-        return (new Date(a.modifiedDate).getTime() - new Date(b.modifiedDate).getTime()) * dir;
-      default:
-        return 0;
+  setSort(field: 'NAME' | 'OWNER' | 'SIZE' | 'CREATED' | 'MODIFIED'): void {
+    if (this.sortBy === field) {
+      this.sortDirection = this.sortDirection === 'asc' ? 'desc' : 'asc';
+    } else {
+      this.sortBy = field;
+      this.sortDirection = 'asc';
     }
-  });
-}
-  private parseSize(size: string | number): number {
-    if (typeof size === 'number') return size;
-    const match = size.match(/([\d.]+)\s*(KB|MB|GB)?/i);
-    if (!match) return 0;
-    const value = parseFloat(match[1]);
-    const unit = (match[2] || '').toUpperCase();
-    const multipliers: Record<string, number> = { KB: 1024, MB: 1024 ** 2, GB: 1024 ** 3 };
-    return value * (multipliers[unit] || 1);
+    // Sorting spans the whole dataset, so go back to page 0 and re-fetch
+    // from the backend with the new sort applied, rather than re-sorting
+    // just the rows already on screen.
+    this.page = 0;
+    this.loadFiles();
   }
 
-@HostListener('document:click', ['$event'])
-onDocumentClick(event: MouseEvent): void {
-  if (this.elementRef.nativeElement.contains(event.target)) return;
-  this.closeMenu();
-}
+  @HostListener('document:click', ['$event'])
+  onDocumentClick(event: MouseEvent): void {
+    if (this.elementRef.nativeElement.contains(event.target)) return;
+    this.closeMenu();
+  }
   showUploadModal = false;
   isDragging = false;
   isUploading = false;
