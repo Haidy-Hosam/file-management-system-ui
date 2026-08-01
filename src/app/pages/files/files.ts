@@ -32,7 +32,7 @@ interface AdvancedFilters {
 @Component({
   selector: 'app-files',
   standalone: true,
-  imports: [CommonModule, FormsModule, ForwardFileDialog, TranslatePipe,HasPermissionDirective],
+  imports: [CommonModule, FormsModule,RouterLink, ForwardFileDialog, TranslatePipe,HasPermissionDirective],
   templateUrl: './files.html',
   styleUrl: './files.css'
 })
