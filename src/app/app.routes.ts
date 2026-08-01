@@ -43,16 +43,16 @@ export const routes: Routes = [
       {
         path: 'departments',
         component: Departments,
-        canActivate: [permissionGuard('Departments', 'READ')],
+        canActivate: [permissionGuard('Departments', ['READ_ALL', 'READ_SCOPED'])]
       },
       { path: 'departments/:id',
        component: DepartmentDetailsComponent,
-        canActivate: [permissionGuard('Departments', 'READ')],
+        canActivate: [permissionGuard('Departments', ['READ_ALL', 'READ_SCOPED'])],
       },
       {
         path: 'users',
         component: Users,
-        canActivate: [permissionGuard('Users', 'READ')],
+        canActivate: [permissionGuard('Users', ['READ_ALL', 'READ_SCOPED'])],
       },
       {
         path: 'roles',

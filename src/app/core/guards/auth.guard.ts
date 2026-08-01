@@ -68,7 +68,7 @@ export const roleGuard = (allowedRoles: string[]): CanActivateFn => {
   };
 };
 
-export const permissionGuard = (page: string, permission: string): CanActivateFn => {
+export const permissionGuard = (page: string, permission: string | string[]): CanActivateFn => {
   return () => {
     const authService = inject(AuthService);
     const permissions = inject(PermissionsService);
@@ -79,9 +79,11 @@ export const permissionGuard = (page: string, permission: string): CanActivateFn
       return false;
     }
 
+    const required = Array.isArray(permission) ? permission : [permission];
+
     return ensurePermissionsLoaded(permissions).pipe(
       map(() => {
-        if (permissions.has(page, permission)) return true;
+        if (required.some(p => permissions.has(page, p))) return true;
         router.navigate(['/unauthorized']);
         return false;
       })

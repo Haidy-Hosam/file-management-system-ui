@@ -95,29 +95,28 @@ export class Dashboard implements OnInit {
   }
 
   loadDashboardData(): void {
-    this.isLoading = true;
-    this.trashCount = this.trashService.trashCount;
+  this.isLoading = true;
+  this.trashCount = this.trashService.trashCount;
 
-    // Load files
-    this.fileService.getAllFiles(0, 50).subscribe({
-      next: (res) => {
-        const files = res.content || [];
-        this.recentFiles = files.slice(0, 6);
-        this.isLoading = false;
-      },
-      error: () => {
-        this.isLoading = false;
-      },
-    });
+  // CHANGED: getAllFiles(0, 50) → listFiles(0, 50)
+  this.fileService.listFiles(0, 50).subscribe({
+    next: (res) => {
+      const files = res.content || [];
+      this.recentFiles = files.slice(0, 6);
+      this.isLoading = false;
+    },
+    error: () => {
+      this.isLoading = false;
+    },
+  });
 
-    // Load departments
-    this.departmentService.getAllDepartments().subscribe({
-      next: (depts) => {
-        this.departmentsList = depts;
-      },
-      error: () => {},
-    });
-  }
+  this.departmentService.getAllDepartments().subscribe({
+    next: (depts) => {
+      this.departmentsList = depts;
+    },
+    error: () => {},
+  });
+}
 
   setPeriod(period: 'TODAY' | 'WEEK' | 'MONTH' | 'ALL'): void {
     this.selectedPeriod = period;
