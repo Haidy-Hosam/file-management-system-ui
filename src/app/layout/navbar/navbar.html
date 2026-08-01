@@ -16,6 +16,15 @@
     </div>
 
     <div class="topbar-actions">
+    <button
+  type="button"
+  class="lang-toggle-btn"
+  (click)="toggleLanguage()"
+  [title]="otherLangLabel()"
+>
+  <span class="span-mother"><span>{{ otherLangLabel() }}</span></span>
+  <span class="span-mother2"><span>{{ otherLangLabel() }}</span></span>
+</button>
       <button class="icon-btn" [title]="'NAVBAR.NOTIFICATIONS' | translate">
         <!-- <svg viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
           <path

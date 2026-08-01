@@ -271,3 +271,58 @@
 .dropdown-item.danger:hover {
   background: rgba(239, 68, 68, 0.15);
 }
+
+.lang-toggle-btn {
+  font-weight: bold;
+  color: white;
+  border-radius: 2rem;
+  cursor: pointer;
+  min-width: 90px;
+  padding: 0 1.1rem;
+  height: 38px;
+  border: none;
+  background-color: #3653f8;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+}
+
+.lang-toggle-btn .span-mother {
+  display: flex;
+  overflow: hidden;
+}
+
+.lang-toggle-btn:hover .span-mother {
+  position: absolute;
+}
+
+.lang-toggle-btn .span-mother span {
+  transition-property: transform;
+  transition-duration: 0.3s;
+  overflow: hidden;
+  transition-timing-function: ease;
+  
+}
+
+.lang-toggle-btn:hover .span-mother span {
+  transform: translateY(100%);
+}
+
+.lang-toggle-btn .span-mother2 {
+  display: flex;
+  position: absolute;
+  overflow: hidden;
+}
+
+.lang-toggle-btn .span-mother2 span {
+  transform: translateY(-100%);
+  transition-property: transform;
+  transition-duration: 0.3s;
+  transition-timing-function: ease;
+}
+
+.lang-toggle-btn:hover .span-mother2 span {
+  transform: translateY(0);
+}
