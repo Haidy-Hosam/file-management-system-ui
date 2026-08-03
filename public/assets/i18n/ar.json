@@ -165,6 +165,7 @@
     "COL_NAME": "الاسم",
     "COL_DEPARTMENT": "القسم",
     "COL_OWNER": "المالك",
+    "COL_CATEGORY" : "النوع",
     "COL_SIZE": "الحجم",
     "COL_CREATED": "تاريخ الإنشاء",
     "COL_MODIFIED": "تاريخ التعديل",
@@ -193,7 +194,16 @@
     "PREVIEW_TITLE": "معاينة الملف",
     "PREVIEW_LOADING": "جاري تحميل المعاينة...",
     "PREVIEW_UNSUPPORTED": "المعاينة غير متاحة لهذا النوع من الملفات.",
-    "DOWNLOAD_INSTEAD": "تنزيل بدلاً من ذلك"
+    "DOWNLOAD_INSTEAD": "تنزيل بدلاً من ذلك",
+    "EXPIRED": "منتهي الصلاحية",
+    "TRASH":"سلة المهملات",
+    "ADVANCED_SEARCH" : "بحث متقدم",
+    "FILE_STATUS": "حالة الملف",
+    "CATEGORES":"النوع",
+    "MODEFICATION_DATE" : "تاريخ التعديل",
+    "CREATION_DATE" : "تاريخ الانشاء",
+    "FROM" : "من",
+    "TO":"الي"
   },
   "FILE_DETAILS": {
     "BACK_TO_FILES": "العودة للملفات",

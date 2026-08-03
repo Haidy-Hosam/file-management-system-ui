@@ -166,6 +166,7 @@
     "COL_DEPARTMENT": "DEPARTMENT",
     "COL_OWNER": "OWNER",
     "COL_SIZE": "SIZE",
+    "COL_CATEGORY" : "File Category",
     "COL_CREATED": "CREATED AT",
     "COL_MODIFIED": "MODIFIED AT",
     "COL_STATUS": "STATUS",
@@ -193,7 +194,16 @@
     "PREVIEW_TITLE": "File Preview",
     "PREVIEW_LOADING": "Loading preview...",
     "PREVIEW_UNSUPPORTED": "Preview isn't available for this file type.",
-    "DOWNLOAD_INSTEAD": "Download instead"
+    "DOWNLOAD_INSTEAD": "Download instead",
+    "EXPIRED": "Expired",
+    "TRASH":"Trash",
+    "ADVANCED_SEARCH" : "Advanced Search",
+    "FILE_STATUS" :"File Status",
+    "FILES.CATEGORES":"File Categore",
+    "MODEFICATION_DATE" : "Modification Date",
+    "CREATION_DATE" : "Creation Date",
+    "FROM" : "من",
+    "TO":"الي"
   },
   "FILE_DETAILS": {
     "BACK_TO_FILES": "Back to Files",
