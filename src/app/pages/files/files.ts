@@ -122,8 +122,9 @@ export class Files implements OnInit {
       this.totalDisplayedPages = response.totalPages;
       this.isLoading = false;
     },
-    error: () => {
-      this.errorMessage = 'Failed to load files.';
+    error: (err) => {
+      console.error('Failed to load files:', err);
+      this.errorMessage = err?.error?.message || 'Failed to load files.';
       this.isLoading = false;
     }
   }); 
@@ -135,8 +136,8 @@ export class Files implements OnInit {
     this.loadFiles();
     this.loadFilterOptions();
   },
-    error: () => {
-      this.errorMessage = 'Failed to load departments.';
+    error: (err) => {
+      console.error('Failed to load departments:', err);
       this.loadFiles();      
     }
   });
@@ -503,8 +504,9 @@ toggleFileTypeFilter(typeName: string): void {
           this.loadFiles();
         },
         error: (err: HttpErrorResponse) => {
+          console.error('Upload failed:', err);
           this.isUploading = false;
-          this.errorMessage = 'Upload failed. Please try again.';
+          this.errorMessage = err?.error?.message || 'Upload failed. Please try again.';
         }
       });
   }

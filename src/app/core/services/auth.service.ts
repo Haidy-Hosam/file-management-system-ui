@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { Observable, tap } from 'rxjs';
+import { Observable, tap, throwError } from 'rxjs';
 import { jwtDecode } from 'jwt-decode';
 import { authResponse, LoginRequest ,DecodedToken} from '../models/auth.model';
 import { PermissionsService } from './permissions.service';
@@ -91,15 +91,15 @@ export class AuthService {
   }
 
   refreshToken(): Observable<authResponse> {
-
-  return this.http.post<authResponse>(
+    const refreshToken = this.getRefreshToken();
+    if (!refreshToken || refreshToken === 'null' || refreshToken === 'undefined') {
+      return throwError(() => new Error('No refresh token available'));
+    }
+    return this.http.post<authResponse>(
       'http://localhost:8080/api/auth/refresh',
-      {
-          refreshToken: this.getRefreshToken()
-      }
-  );
-
-}
+      { refreshToken }
+    );
+  }
 
 saveAccessToken(token: string): void {
 

@@ -4,6 +4,7 @@ import { HttpClient, HttpDownloadProgressEvent, HttpEventType } from '@angular/c
 import { Observable, Subscription } from 'rxjs';
 import { FileForwardResponse } from '../models/FileForward.model';
 import { ToastService } from './toast.service';
+import { AuthService } from './auth.service';
 
 @Injectable({ providedIn: 'root' })
 export class NotificationService implements OnDestroy {
@@ -18,13 +19,21 @@ export class NotificationService implements OnDestroy {
   private processedLength = 0;
   private reconnectTimer: ReturnType<typeof setTimeout> | null = null;
 
-  constructor(private http: HttpClient, private toastService: ToastService) {}
+  constructor(
+    private http: HttpClient,
+    private toastService: ToastService,
+    private authService: AuthService
+  ) {}
 
   loadInitial(): void {
+    if (!this.authService.isLoggedIn()) return;
     this.http.get<FileForwardResponse[]>(`${this.filesUrl}/forwarded/notifications`)
-      .subscribe(list => {
-        this.notifications.set(list);
-        this.unreadCount.set(list.filter(n => !n.isRead).length);
+      .subscribe({
+        next: list => {
+          this.notifications.set(list);
+          this.unreadCount.set(list.filter(n => !n.isRead).length);
+        },
+        error: () => {}
       });
   }
 
@@ -45,6 +54,7 @@ export class NotificationService implements OnDestroy {
   }
 
   connect(): void {
+    if (!this.authService.isLoggedIn()) return;
     if (this.streamSub) return;
     this.processedLength = 0;
     this.streamSub = this.http.get(`${this.notificationsUrl}/subscribe`, {
@@ -56,8 +66,20 @@ export class NotificationService implements OnDestroy {
           this.handleChunk((event as HttpDownloadProgressEvent).partialText ?? '');
         }
       },
-      error: () => this.scheduleReconnect(),
-      complete: () => this.scheduleReconnect()
+      error: (err) => {
+        if (err?.status === 401 || err?.status === 403 || !this.authService.isLoggedIn()) {
+          this.disconnect();
+        } else {
+          this.scheduleReconnect();
+        }
+      },
+      complete: () => {
+        if (!this.authService.isLoggedIn()) {
+          this.disconnect();
+        } else {
+          this.scheduleReconnect();
+        }
+      }
     });
   }
 

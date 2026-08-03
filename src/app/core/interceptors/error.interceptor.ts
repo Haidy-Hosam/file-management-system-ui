@@ -18,8 +18,7 @@ export const errorInterceptor: HttpInterceptorFn = (req, next) => {
         authService.logout();
         router.navigate(['/login']);
       } else if (err.status === 403) {
-    
-        router.navigate(['/unauthorized']);
+        router.navigate(['/dashboard']);
       }
       return throwError(() => err);
     })

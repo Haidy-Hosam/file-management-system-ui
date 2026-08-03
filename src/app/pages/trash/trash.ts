@@ -27,8 +27,9 @@ export class Trash implements OnInit {
   ) {}
 
   ngOnInit(): void {
-    if (this.authService.getRole() !== 'ADMIN') {
-      this.router.navigate(['/files']);
+    const role = this.authService.getRole()?.replace('ROLE_', '').toUpperCase();
+    if (role !== 'ADMIN') {
+      this.router.navigate(['/dashboard']);
       return;
     }
 

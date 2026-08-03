@@ -42,21 +42,30 @@ export const roleGuard = (allowedRoles: string[]): CanActivateFn => {
   return () => {
     const authService = inject(AuthService);
     const router = inject(Router);
+
+    const hasRole = (userRole: string | null) => {
+      if (!userRole) return false;
+      const normalizedUserRole = userRole.replace('ROLE_', '').toUpperCase();
+      return allowedRoles.some(r => r.replace('ROLE_', '').toUpperCase() === normalizedUserRole);
+    };
+
     if (authService.isLoggedIn()) {
       const role = authService.getRole();
-      if (role && allowedRoles.includes(role)) return true;
-      router.navigate(['/unauthorized']);
+      if (hasRole(role)) return true;
+      router.navigate(['/dashboard']);
       return false;
     }
+
     const refreshToken = authService.getRefreshToken();
     if (!refreshToken) { router.navigate(['/login']); return false; }
+
     return authService.refreshToken().pipe(
       map(res => {
         authService.saveAccessToken(res.accessToken);
         if (res.refreshToken) authService.saveRefreshToken(res.refreshToken);
         const role = authService.getRole();
-        if (role && allowedRoles.includes(role)) return true;
-        router.navigate(['/unauthorized']);
+        if (hasRole(role)) return true;
+        router.navigate(['/dashboard']);
         return false;
       }),
       catchError(() => {
