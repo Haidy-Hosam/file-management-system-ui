@@ -31,10 +31,10 @@ export class NotificationBell implements OnInit {
   @HostListener('document:click')
   closeDropdown(): void { this.showDropdown = false; }
 
- onNotificationClick(n: FileForwardResponse): void {
+onNotificationClick(n: FileForwardResponse): void {
   this.notificationService.markAsRead(n.id);
   this.showDropdown = false;
-  this.router.navigate(['/files'], { queryParams: { previewFileId: n.fileId } });
+  this.router.navigate(['/profile'], { queryParams: { tab: 'received', forwardId: n.id } });
 }
 
   viewAll(): void {

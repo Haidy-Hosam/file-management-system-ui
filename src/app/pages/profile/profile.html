@@ -1,16 +1,31 @@
 <div class="profile-page">
 
-  <!-- Profile header -->
   <section class="profile-header" *ngIf="!profileLoading && profile; else profileState">
-    <div class="avatar">{{ initials }}</div>
-    <div class="header-info">
-      <h1 class="name">{{ profile.name }}</h1>
-      <span class="role-badge">{{ profile.role }}</span>
-      <div class="meta-row">
-        <span>{{ profile.email }}</span>
-        <span class="dot">&middot;</span>
-        <span>{{ profile.departmentName || ('PROFILE.NO_DEPARTMENT' | translate) }}</span>
-        
+    <div class="header-main">
+      <div class="avatar">{{ initials }}</div>
+      <div class="header-info">
+        <h1 class="name">{{ profile.name }}</h1>
+        <span class="role-badge" [ngClass]="profile.role.toLowerCase()">{{ profile.role }}</span>
+        <div class="meta-row">
+          <span>{{ profile.email }}</span>
+          <span class="dot">&middot;</span>
+          <span>{{ profile.departmentName || ('PROFILE.NO_DEPARTMENT' | translate) }}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="stat-cards">
+      <div class="stat-card">
+        <span class="stat-value">{{ totalElements }}</span>
+        <span class="stat-label">{{ 'PROFILE.MY_FILES' | translate }}</span>
+      </div>
+      <div class="stat-card" *ngIf="isOwnProfile">
+        <span class="stat-value">{{ sentLoaded ? sentForwards.length : '—' }}</span>
+        <span class="stat-label">{{ 'PROFILE.SENT' | translate }}</span>
+      </div>
+      <div class="stat-card" *ngIf="isOwnProfile">
+        <span class="stat-value">{{ receivedLoaded ? receivedForwards.length : '—' }}</span>
+        <span class="stat-label">{{ 'PROFILE.RECEIVED' | translate }}</span>
       </div>
     </div>
   </section>
@@ -23,19 +38,25 @@
     </div>
   </ng-template>
 
-  <!-- My files -->
-  <section class="files-section">
-    <div class="section-header">
-      <h2>{{ 'PROFILE.MY_FILES' | translate }}</h2>
-      <span class="file-count" *ngIf="!filesLoading">{{ totalElements }} {{ 'PROFILE.FILE_COUNT' | translate }}</span>
-    </div>
+  <nav class="profile-tabs" *ngIf="!profileLoading && profile">
+    <button [class.active]="activeTab === 'FILES'" (click)="setTab('FILES')">
+      {{ 'PROFILE.MY_FILES' | translate }}
+    </button>
+    <button *ngIf="isOwnProfile" [class.active]="activeTab === 'SENT'" (click)="setTab('SENT')">
+      {{ 'PROFILE.SENT' | translate }}
+    </button>
+    <button *ngIf="isOwnProfile" [class.active]="activeTab === 'RECEIVED'" (click)="setTab('RECEIVED')">
+      {{ 'PROFILE.RECEIVED' | translate }}
+    </button>
+  </nav>
 
+  <!-- My Files -->
+  <section class="files-section" *ngIf="activeTab === 'FILES'">
     <div class="state-message" *ngIf="filesLoading">{{ 'FILES.LOADING_FILES' | translate }}</div>
     <div class="state-message error" *ngIf="!filesLoading && filesError">
       {{ filesError }}
-     <button (click)="loadFiles()">{{ 'COMMON.RETRY' | translate }}</button>
+      <button (click)="loadFiles()">{{ 'COMMON.RETRY' | translate }}</button>
     </div>
-
     <div class="empty-state" *ngIf="!filesLoading && !filesError && files.length === 0">
       {{ 'PROFILE.NO_FILES_YET' | translate }}
     </div>
@@ -57,14 +78,10 @@
           <td class="file-name">{{ file.name }}.{{ file.extension }}</td>
           <td>{{ file.fileType }}</td>
           <td>{{ file.departmentNames.join(', ') || '—' }}</td>
-          <td>
-            <span class="status-badge" [ngClass]="file.status.toLowerCase()">{{ ('STATUS.' + (file.status | uppercase) | translate) || file.status }}</span>
-          </td>
+          <td><span class="status-badge" [ngClass]="file.status.toLowerCase()">{{ ('STATUS.' + (file.status | uppercase) | translate) || file.status }}</span></td>
           <td>{{ file.size }}</td>
           <td>{{ file.modifiedDate }}</td>
-          <td class="actions">
-            <button class="download-btn" (click)="download(file)">{{ 'COMMON.DOWNLOAD' | translate }}</button>
-          </td>
+          <td class="actions"><button class="download-btn" (click)="download(file)">{{ 'COMMON.DOWNLOAD' | translate }}</button></td>
         </tr>
       </tbody>
     </table>
@@ -74,6 +91,69 @@
       <span>{{ 'PROFILE.PAGE' | translate }} {{ page + 1 }} {{ 'PROFILE.OF' | translate }} {{ totalPages }}</span>
       <button (click)="nextPage()" [disabled]="page + 1 >= totalPages">{{ 'COMMON.NEXT' | translate }}</button>
     </div>
+  </section>
+
+  <!-- Sent -->
+  <section class="files-section" *ngIf="activeTab === 'SENT'">
+    <div class="state-message" *ngIf="sentLoading">{{ 'PROFILE.LOADING' | translate }}</div>
+    <div class="state-message error" *ngIf="!sentLoading && sentError">
+      {{ sentError }}
+      <button (click)="loadSentForwards()">{{ 'COMMON.RETRY' | translate }}</button>
+    </div>
+    <div class="empty-state" *ngIf="!sentLoading && !sentError && sentForwards.length === 0">
+      {{ 'PROFILE.NO_SENT_YET' | translate }}
+    </div>
+
+    <table class="files-table" *ngIf="!sentLoading && !sentError && sentForwards.length > 0">
+      <thead>
+        <tr>
+          <th>{{ 'PROFILE.FILE' | translate }}</th>
+          <th>{{ 'PROFILE.TO' | translate }}</th>
+          <th>{{ 'PROFILE.MESSAGE' | translate }}</th>
+          <th>{{ 'PROFILE.FORWARDED_AT' | translate }}</th>
+        </tr>
+      </thead>
+      <tbody>
+<tr *ngFor="let fwd of receivedForwards" (click)="openReceivedForward(fwd)" class="clickable-row">          <td class="file-name">{{ fwd.fileName }}</td>
+          <td>{{ fwd.recipientName }}</td>
+          <td class="message-cell">{{ fwd.message || '—' }}</td>
+          <td>{{ fwd.forwardedAt | date:'short' }}</td>
+        </tr>
+      </tbody>
+    </table>
+  </section>
+
+  <!-- Received -->
+  <section class="files-section" *ngIf="activeTab === 'RECEIVED'">
+    <div class="state-message" *ngIf="receivedLoading">{{ 'PROFILE.LOADING' | translate }}</div>
+    <div class="state-message error" *ngIf="!receivedLoading && receivedError">
+      {{ receivedError }}
+      <button (click)="loadReceivedForwards()">{{ 'COMMON.RETRY' | translate }}</button>
+    </div>
+    <div class="empty-state" *ngIf="!receivedLoading && !receivedError && receivedForwards.length === 0">
+      {{ 'PROFILE.NO_RECEIVED_YET' | translate }}
+    </div>
+
+    <table class="files-table" *ngIf="!receivedLoading && !receivedError && receivedForwards.length > 0">
+      <thead>
+        <tr>
+          <th>{{ 'PROFILE.FILE' | translate }}</th>
+          <th>{{ 'PROFILE.FROM' | translate }}</th>
+          <th>{{ 'PROFILE.MESSAGE' | translate }}</th>
+          <th>{{ 'PROFILE.ISREAD' | translate }}</th>
+          <th>{{ 'PROFILE.FORWARDED_AT' | translate }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let fwd of receivedForwards">
+          <td class="file-name">{{ fwd.fileName }}</td>
+          <td>{{ fwd.senderName }}</td>
+          <td class="message-cell">{{ fwd.message || '—' }}</td>
+          <td><span class="status-badge" [ngClass]="fwd.isRead ? 'approved' : 'pending'">{{ (fwd.isRead ? 'PROFILE.READ' : 'PROFILE.UNREAD') | translate }}</span></td>
+          <td>{{ fwd.forwardedAt | date:'short' }}</td>
+        </tr>
+      </tbody>
+    </table>
   </section>
 
 </div>

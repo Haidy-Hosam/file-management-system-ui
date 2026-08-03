@@ -167,6 +167,7 @@
       {{ 'FILES.COL_MODIFIED' | translate }}
       <span class="sort-arrow" *ngIf="sortBy === 'MODIFIED'">{{ sortDirection === 'asc' ? '▲' : '▼' }}</span>
     </th>
+    <th>{{ 'FILES.COL_CATEGORY' | translate }}</th>
     <th>{{ 'FILES.COL_STATUS' | translate }}</th>
     <th class="col-actions"></th>
   </tr>
@@ -192,6 +193,8 @@
           <td>{{ file.size }}</td>
           <td>{{ file.createdDate }}</td>
           <td>{{ file.modifiedDate }}</td>
+          <td>{{ file.fileType }}</td>
+
          <td>
   <div class="status-progress" [ngClass]="file.status.toLowerCase()">
     <div class="status-progress-track">
