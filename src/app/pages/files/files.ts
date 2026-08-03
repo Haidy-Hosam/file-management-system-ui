@@ -305,15 +305,21 @@ toggleFileTypeFilter(typeName: string): void {
   }
 
   toggleSelectAll(event: Event): void {
-    const checked = (event.target as HTMLInputElement).checked;
-    if (checked) {
-      this.filteredFiles.forEach(f => this.selectedFileIds.add(f.id));
-    } else {
-      this.filteredFiles.forEach(f => this.selectedFileIds.delete(f.id));
-    }
+     const checked = (event.target as HTMLInputElement).checked;
+  if (checked) {
+    this.filteredFiles
+      .filter(f => !f.expired)
+      .forEach(f => this.selectedFileIds.add(f.id));
+  } else {
+    this.filteredFiles.forEach(f => this.selectedFileIds.delete(f.id));
+  }
   }
 
   toggleSelectFile(fileId: number): void {
+    const file = this.filteredFiles.find(f => f.id === fileId);
+    
+    if (file?.expired) return; 
+
     if (this.selectedFileIds.has(fileId)) {
       this.selectedFileIds.delete(fileId);
     } else {
@@ -327,6 +333,11 @@ toggleFileTypeFilter(typeName: string): void {
 
   toggleMenu(fileId: number, event: Event): void {
     event.stopPropagation();
+    const file = this.filteredFiles.find(f => f.id === fileId);
+    if (file?.expired) {
+      this.errorMessage = `"${file.name}" has expired and can no longer be accessed.`;
+      return;
+    }
     this.openMenuFileId = this.openMenuFileId === fileId ? null : fileId;
   }
 
@@ -517,6 +528,7 @@ toggleFileTypeFilter(typeName: string): void {
   }
 
   downloadFile(file: FileResponse): void {
+      if (this.blockIfExpired(file)) return;
     this.fileService.downloadFile(file.id).subscribe({
       next: (blob: Blob) => {
         const url = window.URL.createObjectURL(blob);
@@ -534,6 +546,8 @@ toggleFileTypeFilter(typeName: string): void {
   }
 
   previewFile(file: FileResponse): void {
+    if (this.blockIfExpired(file)) return;
+
     this.closeMenu();
     this.previewModalFile = file;
     this.previewKind = this.getPreviewKind(file.extension);
@@ -592,6 +606,8 @@ toggleFileTypeFilter(typeName: string): void {
   }
 
   deleteFile(file: FileResponse): void {
+    if (this.blockIfExpired(file)) return;
+
     if (!confirm(`Delete "${file.name}"?`)) return;
 
     const rejectedFile: FileResponse = { ...file, status: 'REJECTED' };
@@ -623,6 +639,7 @@ toggleFileTypeFilter(typeName: string): void {
   readonly statusOptions: string[] = ['PENDING', 'APPROVED', 'REJECTED'];
 
   openStatusModal(file: FileResponse): void {
+    if (this.blockIfExpired(file)) return;
     this.statusModalFile = file;
     this.selectedStatus = file.status;
     this.showStatusModal = true;
@@ -785,6 +802,7 @@ getFileIconColor(extension: string): string {
   }
 
   onForward(file: FileResponse): void {
+    if (this.blockIfExpired(file)) return;
     this.forwardingFileId = file.id;
     this.closeMenu();
   }
@@ -835,5 +853,18 @@ private buildSearchRequest(): FileSearchRequest {
     page: this.page,
     size: this.size
   };
+}
+
+private blockIfExpired(file: FileResponse): boolean {
+  if (file.expired) {
+    this.errorMessage = `"${file.name}" has expired and can no longer be accessed.`;
+    this.closeMenu();
+    return true;
+  }
+  return false;
+}
+get allSelectableSelected(): boolean {
+  const selectable = this.filteredFiles.filter(f => !f.expired);
+  return selectable.length > 0 && selectable.every(f => this.selectedFileIds.has(f.id));
 }
 }

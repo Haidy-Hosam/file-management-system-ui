@@ -9,6 +9,7 @@ export interface FileResponse {
   status: string;
   fileType: string;
   ownerName: string;
+  expired: boolean;
 }
 
 export interface FileRequest {

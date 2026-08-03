@@ -1117,3 +1117,76 @@
   font-size: 18px;
   flex-shrink: 0;
 }
+
+.file-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.file-name {
+  font-weight: 500;
+}
+
+.expired-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #fee2e2;
+  color: #b91c1c;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.expired-row {
+  background: #fef7f7;
+  border-left: 3px solid #ef4444;
+  cursor: not-allowed;
+}
+
+.expired-row:hover {
+  background: #fdeeee;
+}
+
+/* dim every cell's text, not just the name */
+.expired-row td {
+  color: #9ca3af !important;
+}
+
+/* keep the badge itself vibrant even though surrounding text is dimmed */
+.expired-row .expired-badge {
+  color: #b91c1c;
+  background: #fee2e2;
+}
+
+/* dim the file type icon */
+.expired-row .bi[class*="bi-file-earmark"] {
+  color: #d1d5db !important;
+  opacity: 0.7;
+}
+
+/* status progress bar shouldn't look "active" on an expired row */
+.expired-row .status-progress-fill {
+  background: #d1d5db !important;
+}
+.expired-row .status-progress-label {
+  color: #9ca3af !important;
+}
+
+/* checkbox + menu button visually disabled */
+.expired-row input[type="checkbox"],
+.expired-row .menu-btn {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+/* whole row signals "not interactive" except where explicitly allowed */
+.expired-row .name-cell {
+  cursor: not-allowed;
+}
