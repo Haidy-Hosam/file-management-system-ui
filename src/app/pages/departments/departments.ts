@@ -5,11 +5,15 @@ import { Department, CreateDepartmentRequest } from '../../core/models/departmen
 import { DepartmentService } from '../../core/services/department.service';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
+import { PermissionsService } from '../../core/services/permissions.service';
+import {HasPermissionDirective} from '../../core/directives/has-permission.directive'
+
+
 
 @Component({
   selector: 'app-departments',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, TranslatePipe],
+  imports: [CommonModule, FormsModule, RouterLink, TranslatePipe, HasPermissionDirective],
   templateUrl: './departments.html',
   styleUrl: './departments.css',
 })
@@ -27,7 +31,8 @@ export class Departments implements OnInit {
   createError: string | null = null;
   newDepartment: CreateDepartmentRequest = { name: '', isActive: true };
 
-  constructor(private departmentService: DepartmentService) {}
+  constructor(private departmentService: DepartmentService, private perms: PermissionsService   
+) {}
 
   ngOnInit(): void {
     this.loadDepartments();
