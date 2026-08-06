@@ -202,8 +202,9 @@
     "FILES.CATEGORES":"File Categore",
     "MODEFICATION_DATE" : "Modification Date",
     "CREATION_DATE" : "Creation Date",
-    "FROM" : "من",
-    "TO":"الي"
+    "FROM" : "From",
+    "TO":"To",
+    "Securitylevel":"Security Level"
   },
   "FILE_DETAILS": {
     "BACK_TO_FILES": "Back to Files",

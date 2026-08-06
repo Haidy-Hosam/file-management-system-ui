@@ -203,7 +203,8 @@
     "MODEFICATION_DATE" : "تاريخ التعديل",
     "CREATION_DATE" : "تاريخ الانشاء",
     "FROM" : "من",
-    "TO":"الي"
+    "TO":"الي",
+    "Securitylevel":"مستوى الامان"
   },
   "FILE_DETAILS": {
     "BACK_TO_FILES": "العودة للملفات",

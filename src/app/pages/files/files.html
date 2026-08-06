@@ -266,9 +266,18 @@
         <span class="step-num">3</span>
         <span class="step-label">{{ 'FILES.STEP_FILE_TYPES' | translate }}</span>
       </div>
+
+
       <div class="step-line" [class.done]="currentStep > 3"></div>
       <div class="step" [class.active]="currentStep === 4" (click)="goToStep(4)">
         <span class="step-num">4</span>
+        <span class="step-label">{{ 'FILES.Securitylevel' | translate }}</span>
+      </div>
+
+      
+      <div class="step-line" [class.done]="currentStep > 4"></div>
+      <div class="step" [class.active]="currentStep === 5" (click)="goToStep(5)">
+        <span class="step-num">5</span>
         <span class="step-label">{{ 'FILES.STEP_PREVIEW' | translate }}</span>
       </div>
     </div>
@@ -327,8 +336,25 @@
       </ul>
     </div>
 
-    <!-- Step 4: Preview -->
+    <!-- Step 4: Security Level -->
     <div class="step-content" *ngIf="currentStep === 4">
+      <label>{{ 'FILES.Securitylevel' | translate }}</label>
+      <ul class="Securitylevel_List" *ngIf="securitylevels.length > 0">
+        <li *ngFor="let item of uploadItems">
+          <span class="filetype-list-name">{{ item.file.name }}</span>
+          <select [(ngModel)]="item.securityLevelId">
+            <option [ngValue]="null" disabled>{{ 'FILES.SELECT_SECURITY_LEVEL' | translate }}</option>
+            <option *ngFor="let level of securitylevels" [ngValue]="level.id">{{ level.name }}</option>
+          </select>
+        </li>
+      </ul>
+      <p *ngIf="securitylevels.length === 0" class="empty-state">
+        {{ 'FILES.NO_SECURITY_LEVELS' | translate }}
+      </p>
+    </div>
+
+    <!-- Step 5: Preview -->
+    <div class="step-content" *ngIf="currentStep === 5">
       <label>{{ 'FILES.STEP_DEPARTMENTS' | translate }}</label>
       <div class="preview-tags">
         <span class="tag" *ngFor="let deptId of selectedDepartmentIds">{{ getDepartmentName(deptId) }}</span>
@@ -339,13 +365,14 @@
         <li *ngFor="let item of uploadItems">
           <span class="preview-file-name">{{ item.file.name }}</span>
           <span class="preview-file-type">{{ getFileTypeName(item.fileTypeId) }}</span>
+          <span class="preview-file-type" *ngIf="item.securityLevelId != null"> ({{ getSecurityLevelName(item.securityLevelId) }})</span>
         </li>
       </ul>
 
-      <p class="preview-summary">
+      <!-- <p class="preview-summary">
         {{ uploadItems.length }} file(s) × {{ selectedDepartmentIds.length }} department(s)
         = {{ totalRecordsToCreate }} {{ 'FILES.PREVIEW_SUMMARY_RECORD' | translate }}
-      </p>
+      </p> -->
     </div>
 
     <div class="modal-actions">
