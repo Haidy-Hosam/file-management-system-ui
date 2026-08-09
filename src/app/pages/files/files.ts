@@ -17,6 +17,8 @@ import { FileSearchRequest } from '../../core/models/file-search-request.model';
 import { PermissionsService } from '../../core/services/permissions.service';
 import { Subject } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
+import { SecuritylevelService } from '../../core/services/securitylevel.service';
+import { SecurityLevel } from '../../core/models/SecurityLevel.model';
 
 interface AdvancedFilters {
   departments: Set<string>;
@@ -52,7 +54,8 @@ export class Files implements OnInit {
     private route: ActivatedRoute,
     private sanitizer: DomSanitizer,
     private elementRef: ElementRef,
-    private perms: PermissionsService   
+    private perms: PermissionsService,
+    private SecLevelService : SecuritylevelService   
 
   ) { }
 
@@ -106,6 +109,7 @@ export class Files implements OnInit {
 
   private searchTrigger$ = new Subject<void>();
 
+  securitylevels:SecurityLevel[] = []
 
   ngOnInit(): void {
       this.searchTrigger$.pipe(
@@ -368,11 +372,11 @@ toggleFileTypeFilter(typeName: string): void {
   showUploadModal = false;
   isDragging = false;
   isUploading = false;
-  uploadItems: { file: File; fileTypeId: number | null }[] = [];
+  uploadItems: { file: File; fileTypeId: number | null; securityLevelId: number | null }[] = [];
   selectedDepartmentIds: number[] = [];
 
   currentStep = 1;
-  readonly totalSteps = 4;
+  readonly totalSteps = 5;
 
   get canSubmitUpload(): boolean {
     return this.uploadItems.length > 0 &&
@@ -381,9 +385,9 @@ toggleFileTypeFilter(typeName: string): void {
       !this.isUploading;
   }
 
-  get totalRecordsToCreate(): number {
-    return this.uploadItems.length * this.selectedDepartmentIds.length;
-  }
+  // get totalRecordsToCreate(): number {
+  //   return this.uploadItems.length * this.selectedDepartmentIds.length;
+  // }
   openUploadModal(): void {
     this.showUploadModal = true;
     this.uploadItems = [];
@@ -403,6 +407,9 @@ toggleFileTypeFilter(typeName: string): void {
   nextStep(): void {
     if (this.canGoNext()) {
       this.currentStep++;
+      if (this.currentStep === 4) {
+        this.setSecurityLevelsArr();
+      }
     }
   }
 
@@ -416,6 +423,9 @@ toggleFileTypeFilter(typeName: string): void {
     // only allow jumping to a step already reached
     if (step <= this.currentStep) {
       this.currentStep = step;
+      if (this.currentStep === 4) {
+        this.setSecurityLevelsArr();
+      }
     }
   }
 
@@ -424,6 +434,7 @@ toggleFileTypeFilter(typeName: string): void {
       case 1: return this.uploadItems.length > 0;
       case 2: return this.selectedDepartmentIds.length > 0;
       case 3: return this.uploadItems.every(item => item.fileTypeId != null);
+      case 4: return this.securitylevels.length === 0 || this.uploadItems.every(item => item.securityLevelId != null);
       default: return false;
     }
   }
@@ -435,7 +446,7 @@ toggleFileTypeFilter(typeName: string): void {
         item => item.file.name === file.name && item.file.size === file.size
       );
       if (!alreadyAdded) {
-        this.uploadItems.push({ file, fileTypeId: null });
+        this.uploadItems.push({ file, fileTypeId: null, securityLevelId: null });
       }
     });
   }
@@ -501,6 +512,26 @@ toggleFileTypeFilter(typeName: string): void {
   getFileTypeName(fileTypeId: number | null): string {
     if (fileTypeId == null) return '—';
     return this.fileTypes.find(t => t.id === fileTypeId)?.name ?? 'Unknown';
+  }
+
+  getSecurityLevelName(securityLevelId: number | null): string {
+    if (securityLevelId == null) return '—';
+    return this.securitylevels.find(s => s.id === securityLevelId)?.name ?? 'Unknown';
+  }
+
+  setSecurityLevelsArr(): void {
+    if (!this.selectedDepartmentIds || this.selectedDepartmentIds.length === 0) {
+      this.securitylevels = [];
+      return;
+    }
+    this.SecLevelService.getSecurityLevelsFromDepIDs(this.selectedDepartmentIds).subscribe({
+      next: (secLevels) => {
+        this.securitylevels = secLevels;
+      },
+      error: (err) => {
+        console.error('Error fetching security levels:', err);
+      },
+    });
   }
 
   submitUpload(): void {

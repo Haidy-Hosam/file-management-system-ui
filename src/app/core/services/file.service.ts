@@ -21,7 +21,7 @@ export class FileService {
   }
 
   uploadFilesBulk(
-    items: { file: File; fileTypeId: number }[],
+    items: { file: File; fileTypeId: number; securityLevelId?: number | null }[],
     departmentIds: number[]
   ): Observable<FileResponse[]> {
     const formData = new FormData();
@@ -29,6 +29,9 @@ export class FileService {
     items.forEach(item => {
       formData.append('files', item.file);
       formData.append('fileTypeIds', item.fileTypeId.toString());
+      if (item.securityLevelId != null) {
+        formData.append('securityLevelIds', item.securityLevelId.toString());
+      }
     });
 
     departmentIds.forEach(id => {
