@@ -68,7 +68,8 @@
       "USERS": "المستخدمين",
       "ROLES": "الأدوار",
       "DEPARTMENTS": "الأقسام",
-      "TRASH": "سلة المهملات"
+      "TRASH": "سلة المهملات",
+      "SECURITY_LEVELS": "مستويات الأمان"
     }
   },
   "DASHBOARD": {
@@ -327,5 +328,25 @@
     "TITLE": "توجيه ملف",
     "OPTIONAL_MESSAGE": "رسالة اختيارية...",
     "SEND": "إرسال"
+  },
+  "SECURITY_LEVELS": {
+    "TITLE": "مستويات الأمان",
+    "SUBTITLE": "إدارة مستويات تصنيف أمان المستندات",
+    "NEW_LEVEL": "مستوى جديد",
+    "COL_ID": "المعرّف",
+    "COL_NAME": "الاسم",
+    "COL_ACTIONS": "الإجراءات",
+    "NO_LEVELS": "لا توجد مستويات أمان.",
+    "CREATE_TITLE": "إنشاء مستوى أمان",
+    "EDIT_TITLE": "تعديل مستوى الأمان",
+    "DELETE_TITLE": "حذف مستوى الأمان",
+    "DELETE_CONFIRM": "هل أنت متأكد من حذف",
+    "NAME_LABEL": "اسم المستوى",
+    "NAME_PLACEHOLDER": "مثال: سري",
+    "FAILED_LOAD": "فشل تحميل مستويات الأمان.",
+    "FAILED_CREATE": "فشل إنشاء مستوى الأمان.",
+    "FAILED_UPDATE": "فشل تحديث مستوى الأمان.",
+    "FAILED_DELETE": "فشل حذف مستوى الأمان.",
+    "SUCCESS": "تمت العملية بنجاح."
   }
 }
