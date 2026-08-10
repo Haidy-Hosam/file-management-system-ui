@@ -204,11 +204,11 @@
           </h3>
           <div class="approval-step-list">
             <div class="approval-step-row" *ngFor="let step of approvedSteps">
-              <div class="step-avatar approved-avatar" [style.background]="getAvatarColor(step.mangerName)">
-                {{ getInitials(step.mangerName) }}
+              <div class="step-avatar approved-avatar" [style.background]="getAvatarColor(step.managerName)">
+                {{ getInitials(step.managerName) }}
               </div>
               <div class="step-info">
-                <div class="step-name">{{ step.mangerName }}</div>
+                <div class="step-name">{{ step.managerName || ('FILE_DETAILS.APPROVAL_UNKNOWN_MANAGER' | translate) }}</div>
                 <div class="step-dept">{{ step.departmentName }}</div>
                 <div class="step-date" *ngIf="step.decidedAt">{{ step.decidedAt }}</div>
               </div>
@@ -229,22 +229,22 @@
           </h3>
           <div class="approval-step-list">
             <div class="approval-step-row" *ngFor="let step of pendingSteps">
-              <div class="step-avatar pending-avatar" [style.background]="getAvatarColor(step.mangerName)">
-                {{ getInitials(step.mangerName) }}
+              <div class="step-avatar pending-avatar" [style.background]="getAvatarColor(step.managerName)">
+                {{ getInitials(step.managerName) }}
               </div>
               <div class="step-info">
-                <div class="step-name">{{ step.mangerName }}</div>
+                <div class="step-name">{{ step.managerName || ('FILE_DETAILS.APPROVAL_UNKNOWN_MANAGER' | translate) }}</div>
                 <div class="step-dept">{{ step.departmentName }}</div>
               </div>
               <span class="step-badge badge-pending">{{ 'FILE_DETAILS.APPROVAL_PENDING' | translate }}</span>
             </div>
             <!-- Rejected steps shown here too as "not approved" -->
             <div class="approval-step-row" *ngFor="let step of rejectedSteps">
-              <div class="step-avatar rejected-avatar" [style.background]="getAvatarColor(step.mangerName)">
-                {{ getInitials(step.mangerName) }}
+              <div class="step-avatar rejected-avatar" [style.background]="getAvatarColor(step.managerName)">
+                {{ getInitials(step.managerName) }}
               </div>
               <div class="step-info">
-                <div class="step-name">{{ step.mangerName }}</div>
+                <div class="step-name">{{ step.managerName || ('FILE_DETAILS.APPROVAL_UNKNOWN_MANAGER' | translate) }}</div>
                 <div class="step-dept">{{ step.departmentName }}</div>
               </div>
               <span class="step-badge badge-rejected">{{ 'FILE_DETAILS.APPROVAL_REJECTED' | translate }}</span>

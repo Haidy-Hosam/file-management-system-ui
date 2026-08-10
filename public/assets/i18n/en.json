@@ -239,7 +239,8 @@
     "APPROVAL_NONE_YET": "No approvals yet.",
     "APPROVAL_ALL_DONE": "All approvals are complete.",
     "APPROVAL_APPROVED_LIST": "Approved Managers",
-    "APPROVAL_PENDING_LIST": "Awaiting Approval"
+    "APPROVAL_PENDING_LIST": "Awaiting Approval",
+    "APPROVAL_UNKNOWN_MANAGER": "Unknown Manager"
   },
   "NOTIFICATIONS": {
     "TITLE": "Notifications",
