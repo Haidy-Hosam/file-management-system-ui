@@ -269,7 +269,7 @@
 
 
       <div class="step-line" [class.done]="currentStep > 3"></div>
-      <div class="step" [class.active]="currentStep === 4" (click)="goToStep(4)">
+      <div class="step" [class.active]="currentStep === 4" [class.done] = "currentStep > 4"  (click)="goToStep(4)">
         <span class="step-num">4</span>
         <span class="step-label">{{ 'FILES.Securitylevel' | translate }}</span>
       </div>
@@ -343,7 +343,7 @@
         <li *ngFor="let item of uploadItems">
           <span class="filetype-list-name">{{ item.file.name }}</span>
           <select [(ngModel)]="item.securityLevelId">
-            <option [ngValue]="null" disabled>{{ 'FILES.SELECT_SECURITY_LEVEL' | translate }}</option>
+            <option [ngValue]="null" disabled>{{ 'FILES.SELECT_FILE_SECURITYLEVEL' | translate}}</option>
             <option *ngFor="let level of securitylevels" [ngValue]="level.id">{{ level.name }}</option>
           </select>
         </li>
@@ -358,6 +358,11 @@
       <label>{{ 'FILES.STEP_DEPARTMENTS' | translate }}</label>
       <div class="preview-tags">
         <span class="tag" *ngFor="let deptId of selectedDepartmentIds">{{ getDepartmentName(deptId) }}</span>
+      </div>
+
+      <label>{{ 'FILES.SELECT_FILE_SECURITYLEVEL' | translate }}</label>
+      <div class="preview-tags">
+         <span class="tag" *ngFor="let item of uploadItems">{{ getSecurityLevelName(item.securityLevelId) }}</span>
       </div>
 
       <label>{{ 'FILES.STEP_FILES' | translate }}</label>
