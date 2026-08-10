@@ -309,8 +309,8 @@
     <div class="step-content" *ngIf="currentStep === 2">
       <label>{{ 'FILES.SEND_TO_DEPTS' | translate }}</label>
       <ul class="checkbox-list">
-        <li *ngFor="let dept of departments">
-          <label>
+<li *ngFor="let dept of uploadDepartments">
+            <label>
             <input
               type="checkbox"
               [checked]="isDepartmentSelected(dept.id)"

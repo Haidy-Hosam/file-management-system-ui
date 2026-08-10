@@ -130,6 +130,7 @@ export class Files implements OnInit {
     });
   }
 
+/////////////////////////////
   ngOnInit(): void 
   {
     this.setSecurityLevelsArr();
@@ -152,19 +153,29 @@ export class Files implements OnInit {
       this.isLoading = false;
     }
   }); 
+
+  //////
   this.departmentService.getLookupDepartments().subscribe({
-   next: (depts) => {
-    this.departments = this.canFilterAllDepartments
-      ? depts
-      : depts.filter(d => Number(d.id) === this.authService.getDeptId());
-    this.loadFiles();
-    this.loadFilterOptions();
-  },
-    error: () => {
-      this.errorMessage = 'Failed to load departments.';
-      this.loadFiles();      
-    }
-  });
+ next: (depts) => {
+  // Scoped list — used ONLY for the "filter by department" search panel,
+  // which should respect what this user is allowed to read.
+  this.departments = this.canFilterAllDepartments
+    ? depts
+    : depts.filter(d => Number(d.id) === this.authService.getDeptId());
+
+  // Unscoped list — used for the Upload Wizard's department-selection step.
+  // Any user who can create files must be able to route a file to ANY
+  // department, regardless of which departments they're allowed to read.
+  this.uploadDepartments = depts;
+
+  this.loadFiles();
+  this.loadFilterOptions();
+},
+  error: () => {
+    this.errorMessage = 'Failed to load departments.';
+    this.loadFiles();      
+  }
+});
 
   this.loadFileTypes();
 
@@ -187,9 +198,12 @@ get canFilterAllDepartments(): boolean {
     });
   }
 
-  departments: Department[] = [];
-  fileTypes: FileType[] = [];
-  availableOwners: string[] = [];
+  /** All departments — used for the upload wizard so any user can send to any dept. */
+  uploadDepartments: Department[] = [];
+  /** Departments visible in the filter panel — scoped by permission. */
+departments: Department[] = [];
+fileTypes: FileType[] = [];
+availableOwners: string[] = [];
 
 private loadFilterOptions(): void {
    const req: FileSearchRequest = {
@@ -203,12 +217,6 @@ private loadFilterOptions(): void {
   });
 }
 
-  loadDepartments(): void {
-    this.departmentService.getLookupDepartments().subscribe({
-      next: (depts) => this.departments = depts,
-      error: () => this.errorMessage = 'Failed to load departments.'
-    });
-  }
 
   loadFileTypes(): void {
     this.fileTypeService.lookupAllFileTypes().subscribe({
@@ -524,10 +532,10 @@ toggleFileTypeFilter(typeName: string): void {
     return this.selectedDepartmentIds.includes(Number(deptId));
   }
 
-  getDepartmentName(deptId: number | string): string {
-    const numId = Number(deptId);
-    return this.departments.find(d => Number(d.id) === numId)?.name ?? 'Unknown';
-  }
+ getDepartmentName(deptId: number | string): string {
+  const numId = Number(deptId);
+  return this.uploadDepartments.find(d => Number(d.id) === numId)?.name ?? 'Unknown';
+}
 
   getFileTypeName(fileTypeId: number | null): string {
     if (fileTypeId == null) return '—';
