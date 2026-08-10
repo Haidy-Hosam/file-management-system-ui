@@ -32,6 +32,15 @@ export interface AddPermissionRequest {
   access: string;
 }
 
+/** Represents one department manager's approval step in the workflow */
+export interface ApprovalStep {
+  departmentId: number;
+  departmentName: string;
+  mangerName: string;
+  status: 'PENDING' | 'APPROVED' | 'REJECTED';
+  decidedAt: string | null;
+}
+
 @Injectable({ providedIn: 'root' })
 export class FileDetailsService {
   private baseUrl = 'http://localhost:8080/api/files';
@@ -68,5 +77,10 @@ export class FileDetailsService {
   // DELETE /api/files/{fileId}/permissions/{permissionId}
   removePermission(fileId: number, permissionId: number): Observable<void> {
     return this.http.delete<void>(`${this.baseUrl}/${fileId}/permissions/${permissionId}`);
+  }
+
+  // GET /api/files/{fileId}/approval-steps
+  getApprovalSteps(fileId: number): Observable<ApprovalStep[]> {
+    return this.http.get<ApprovalStep[]>(`${this.baseUrl}/fileApprovalStatusSteps/${fileId}`);
   }
 }

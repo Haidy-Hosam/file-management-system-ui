@@ -1,19 +1,21 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { HttpErrorResponse } from '@angular/common/http';
 import { FileService, FileResponse } from '../../core/services/file.service';
+import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
+import { TrashService } from '../../core/services/trash.service';
+import { TranslatePipe } from '@ngx-translate/core';
+import {HttpErrorResponse} from '@angular/common/http';
 import {
   FileDetailsService,
   FileVersion,
   FileActivity,
   FilePermission,
+  ApprovalStep,
 } from '../../core/services/file-details.service';
-import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { TrashService } from '../../core/services/trash.service';
-import { TranslatePipe } from '@ngx-translate/core';
 
-type TabId = 'overview' | 'activity' | 'permissions';
+
+type TabId = 'overview' | 'activity' | 'permissions' | 'approval';
 
 @Component({
   selector: 'app-file-details',
@@ -29,6 +31,8 @@ export class FileDetails implements OnInit {
   versions: FileVersion[] = [];
   activity: FileActivity[] = [];
   permissions: FilePermission[] = [];
+  approvalSteps: ApprovalStep[] = [];
+  isLoadingApprovals = false;
 
   isLoading = true;
   errorMessage = '';
@@ -37,7 +41,7 @@ export class FileDetails implements OnInit {
   tabs: { id: TabId; label: string }[] = [
     { id: 'overview', label: 'Overview' },
     { id: 'activity', label: 'Activity' },
-    { id: 'permissions', label: 'Permissions' },
+    { id: 'approval', label: 'Approval' },
   ];
 
   constructor(
@@ -86,6 +90,9 @@ export class FileDetails implements OnInit {
       case 'permissions':
         if (this.permissions.length === 0) this.loadPermissions();
         break;
+      case 'approval':
+        if (this.approvalSteps.length === 0) this.loadApprovalSteps();
+        break;
     }
   }
 
@@ -108,6 +115,43 @@ export class FileDetails implements OnInit {
       next: (permissions) => (this.permissions = permissions),
       error: () => (this.errorMessage = 'Failed to load permissions.'),
     });
+  }
+
+  loadApprovalSteps(): void {
+    this.isLoadingApprovals = true;
+    this.fileDetailsService.getApprovalSteps(this.fileId).subscribe({
+      next: (steps) => {
+        this.approvalSteps = steps;
+        this.isLoadingApprovals = false;
+      },
+      error: () => {
+        this.isLoadingApprovals = false;
+        this.errorMessage = 'Failed to load approval steps.';
+      },
+    });
+  }
+
+  get approvedSteps(): ApprovalStep[] {
+    return this.approvalSteps.filter(s => s.status === 'APPROVED');
+  }
+
+  get pendingSteps(): ApprovalStep[] {
+    return this.approvalSteps.filter(s => s.status === 'PENDING');
+  }
+
+  get rejectedSteps(): ApprovalStep[] {
+    return this.approvalSteps.filter(s => s.status === 'REJECTED');
+  }
+
+  get approvalPercentage(): number {
+    if (this.approvalSteps.length === 0) return 0;
+    return Math.round((this.approvedSteps.length / this.approvalSteps.length) * 100);
+  }
+
+  /** SVG stroke-dashoffset for the progress ring (radius = 54, circumference ≈ 339.3) */
+  get ringOffset(): number {
+    const circumference = 2 * Math.PI * 54;
+    return circumference - (this.approvalPercentage / 100) * circumference;
   }
 
   getInitials(name: string): string {

@@ -7,11 +7,11 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class SecuritylevelService {
-private baseUrl = 'http://localhost:8080/api/file/securityLevel';
+private baseUrl = 'http://localhost:8080/api/files/securityLevel';
   
  constructor(private http: HttpClient) {}
 
-   getSecurityLevelsFromDepIDs(depIds:number[]): Observable<SecurityLevel[]> {
-     return this.http.get<SecurityLevel[]>(`${this.baseUrl}/${depIds}`);
+   getSecurityLevels(): Observable<SecurityLevel[]> {
+     return this.http.get<SecurityLevel[]>(`${this.baseUrl}`);
    }
 }
