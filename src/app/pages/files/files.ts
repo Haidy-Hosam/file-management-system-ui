@@ -111,7 +111,28 @@ export class Files implements OnInit {
 
   securitylevels:SecurityLevel[] = []
 
-  ngOnInit(): void {
+ getSecurityLevelName(securityLevelId: number | null): string {
+    if (securityLevelId == null) return '—';
+    return this.securitylevels.find(s => s.id === securityLevelId)?.name ?? 'Unknown';
+  }
+
+  setSecurityLevelsArr(): void {
+    console.log('Fetching security levels...');
+    this.SecLevelService.getSecurityLevels().subscribe({
+      next: (secLevels) => {
+        console.log('Security levels received:', secLevels);
+        this.securitylevels = secLevels;
+      },
+      error: (err) => {
+        console.error('Error fetching security levels:', err);
+        console.error('Error details:', err.status, err.message);
+      },
+    });
+  }
+
+  ngOnInit(): void 
+  {
+    this.setSecurityLevelsArr();
       this.searchTrigger$.pipe(
     switchMap(() => {
       this.isLoading = true;
@@ -514,31 +535,12 @@ toggleFileTypeFilter(typeName: string): void {
     return this.fileTypes.find(t => t.id === fileTypeId)?.name ?? 'Unknown';
   }
 
-  getSecurityLevelName(securityLevelId: number | null): string {
-    if (securityLevelId == null) return '—';
-    return this.securitylevels.find(s => s.id === securityLevelId)?.name ?? 'Unknown';
-  }
-
-  setSecurityLevelsArr(): void {
-    if (!this.selectedDepartmentIds || this.selectedDepartmentIds.length === 0) {
-      this.securitylevels = [];
-      return;
-    }
-    this.SecLevelService.getSecurityLevelsFromDepIDs(this.selectedDepartmentIds).subscribe({
-      next: (secLevels) => {
-        this.securitylevels = secLevels;
-      },
-      error: (err) => {
-        console.error('Error fetching security levels:', err);
-      },
-    });
-  }
 
   submitUpload(): void {
     if (!this.canSubmitUpload) return;
 
     this.isUploading = true;
-    this.fileService.uploadFilesBulk(this.uploadItems as { file: File; fileTypeId: number }[], this.selectedDepartmentIds)
+    this.fileService.uploadFilesBulk(this.uploadItems as { file: File; fileTypeId: number ;securityLevelId: number}[], this.selectedDepartmentIds)
       .subscribe({
         next: (response: FileResponse[]) => {
           this.isUploading = false;
