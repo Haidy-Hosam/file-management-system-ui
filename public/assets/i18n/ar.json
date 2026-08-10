@@ -239,7 +239,8 @@
     "APPROVAL_NONE_YET": "لا توجد موافقات حتى الآن.",
     "APPROVAL_ALL_DONE": "تمت جميع الموافقات.",
     "APPROVAL_APPROVED_LIST": "المدراء الموافقون",
-    "APPROVAL_PENDING_LIST": "بانتظار الموافقة"
+    "APPROVAL_PENDING_LIST": "بانتظار الموافقة",
+    "APPROVAL_UNKNOWN_MANAGER": "مدير غير معروف"
   },
   "NOTIFICATIONS": {
     "TITLE": "الإشعارات",

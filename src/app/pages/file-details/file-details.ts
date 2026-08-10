@@ -154,7 +154,8 @@ export class FileDetails implements OnInit {
     return circumference - (this.approvalPercentage / 100) * circumference;
   }
 
-  getInitials(name: string): string {
+  getInitials(name: string | null | undefined): string {
+    if (!name) return '?';
     return name
       .split(' ')
       .map((part) => part.charAt(0))
@@ -163,8 +164,9 @@ export class FileDetails implements OnInit {
       .slice(0, 2);
   }
 
-  getAvatarColor(name: string): string {
+  getAvatarColor(name: string | null | undefined): string {
     const colors = ['#2563eb', '#0ea5b7', '#6b7280', '#1e293b', '#7c3aed', '#0d9488'];
+    if (!name) return colors[0];
     const index = name.charCodeAt(0) % colors.length;
     return colors[index];
   }

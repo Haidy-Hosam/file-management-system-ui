@@ -36,7 +36,7 @@ export interface AddPermissionRequest {
 export interface ApprovalStep {
   departmentId: number;
   departmentName: string;
-  mangerName: string;
+  managerName: string | null;
   status: 'PENDING' | 'APPROVED' | 'REJECTED';
   decidedAt: string | null;
 }
