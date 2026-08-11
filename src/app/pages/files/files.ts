@@ -6,7 +6,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { FileService, FileResponse, FileRequest } from '../../core/services/file.service';
 import { AuthService } from '../../core/services/auth.service';
 import { DepartmentService } from '../../core/services/department.service';
-import { Department } from '../../core/models/department.model';
+import { Department, DepartmentLookUp } from '../../core/models/department.model';
 import { FileTypeService, FileType } from '../../core/services/filetype.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { TrashService } from '../../core/services/trash.service';
@@ -19,6 +19,7 @@ import { Subject } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { SecuritylevelService } from '../../core/services/securitylevel.service';
 import { SecurityLevel } from '../../core/models/SecurityLevel.model';
+import { LookupService } from '../../core/services/Lookup.service';
 
 interface AdvancedFilters {
   departments: Set<string>;
@@ -55,7 +56,8 @@ export class Files implements OnInit {
     private sanitizer: DomSanitizer,
     private elementRef: ElementRef,
     private perms: PermissionsService,
-    private SecLevelService : SecuritylevelService   
+    private SecLevelService : SecuritylevelService,
+    private lookUpService : LookupService   
 
   ) { }
 
@@ -163,11 +165,6 @@ export class Files implements OnInit {
     ? depts
     : depts.filter(d => Number(d.id) === this.authService.getDeptId());
 
-  // Unscoped list — used for the Upload Wizard's department-selection step.
-  // Any user who can create files must be able to route a file to ANY
-  // department, regardless of which departments they're allowed to read.
-  this.uploadDepartments = depts;
-
   this.loadFiles();
   this.loadFilterOptions();
 },
@@ -176,6 +173,14 @@ export class Files implements OnInit {
     this.loadFiles();      
   }
 });
+
+  // Load ALL departments for the upload wizard — the backend's lookup endpoint
+  // filters by the user's department, so we hit the unfiltered /api/departments
+  // endpoint instead so any manager can send a file to any department.
+  this.lookUpService.getAllDepartmentsForUpload().subscribe({
+    next: (depts) => (this.uploadDepartments = depts),
+    error: () => (this.uploadDepartments = [])
+  });
 
   this.loadFileTypes();
 
@@ -199,7 +204,7 @@ get canFilterAllDepartments(): boolean {
   }
 
   /** All departments — used for the upload wizard so any user can send to any dept. */
-  uploadDepartments: Department[] = [];
+  uploadDepartments: DepartmentLookUp[] = [];
   /** Departments visible in the filter panel — scoped by permission. */
 departments: Department[] = [];
 fileTypes: FileType[] = [];

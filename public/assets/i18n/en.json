@@ -68,7 +68,8 @@
       "USERS": "Users",
       "ROLES": "Roles",
       "DEPARTMENTS": "Departments",
-      "TRASH": "Trash"
+      "TRASH": "Trash",
+      "SECURITY_LEVELS": "Security Levels"
     }
   },
   "DASHBOARD": {
@@ -295,7 +296,6 @@
     "COL_DEPTS": "Departments",
     "COL_SIZE": "Size",
     "COL_DATE_DELETED": "Date Deleted",
-    "COL_ACTIONS": "Actions",
     "RESTORE": "Restore",
     "DELETE": "Delete",
     "TRASH_EMPTY_TITLE": "Trash is Empty",
@@ -327,5 +327,25 @@
     "TITLE": "Forward file",
     "OPTIONAL_MESSAGE": "Optional message...",
     "SEND": "Send"
+  },
+  "SECURITY_LEVELS": {
+    "TITLE": "Security Levels",
+    "SUBTITLE": "Manage document security classification levels",
+    "NEW_LEVEL": "New Level",
+    "COL_ID": "ID",
+    "COL_NAME": "Name",
+    "COL_ACTIONS": "Actions",
+    "NO_LEVELS": "No security levels found.",
+    "CREATE_TITLE": "Create Security Level",
+    "EDIT_TITLE": "Edit Security Level",
+    "DELETE_TITLE": "Delete Security Level",
+    "DELETE_CONFIRM": "Are you sure you want to delete",
+    "NAME_LABEL": "Level Name",
+    "NAME_PLACEHOLDER": "e.g. Confidential",
+    "FAILED_LOAD": "Failed to load security levels.",
+    "FAILED_CREATE": "Failed to create security level.",
+    "FAILED_UPDATE": "Failed to update security level.",
+    "FAILED_DELETE": "Failed to delete security level.",
+    "SUCCESS": "Operation completed successfully."
   }
 }

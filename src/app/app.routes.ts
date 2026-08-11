@@ -12,6 +12,7 @@ import { MainLayout } from './layout/main-layout/main-layout';
 import { authGuard, roleGuard, permissionGuard } from './core/guards/auth.guard';
 import { Routes } from '@angular/router';
 import { NotificationsPage } from './pages/notifications-page/notifications-page';
+import { SecurityLevelsComponent } from './pages/security-levels/security-levels';
 
 export const routes: Routes = [
   {
@@ -70,6 +71,11 @@ export const routes: Routes = [
      {
      path: 'users/:id',
      component: ProfileComponent
+     },
+     {
+       path: 'security-levels',
+       component: SecurityLevelsComponent,
+       canActivate: [roleGuard(['ADMIN'])],
      }
     ],
   },
