@@ -206,7 +206,13 @@
     "CREATION_DATE" : "Creation Date",
     "FROM" : "From",
     "TO":"To",
-    "Securitylevel":"Security Level"
+    "Securitylevel":"Security Level",
+    "NO_SECURITY_LEVELS": "No security levels available.",
+    "UPLOAD_SIZE_LIMIT": "Max file size: {{mb}} MB",
+    "UPLOAD_COUNT_LIMIT": "Max {{count}} files per upload",
+    "REJECTION_SIZE": "Exceeds size limit (max {{mb}} MB)",
+    "REJECTION_COUNT": "Batch limit reached (max {{count}} files)",
+    "REJECTION_DUPLICATE": "Already added"
   },
   "FILE_DETAILS": {
     "BACK_TO_FILES": "Back to Files",

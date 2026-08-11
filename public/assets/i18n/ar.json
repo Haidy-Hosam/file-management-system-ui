@@ -206,7 +206,13 @@
     "CREATION_DATE" : "تاريخ الانشاء",
     "FROM" : "من",
     "TO":"الي",
-    "Securitylevel":"مستوى الامان"
+    "Securitylevel":"مستوى الامان",
+    "NO_SECURITY_LEVELS": "لا توجد مستويات أمان متاحة.",
+    "UPLOAD_SIZE_LIMIT": "الحد الأقصى لحجم الملف: {{mb}} ميغابايت",
+    "UPLOAD_COUNT_LIMIT": "الحد الأقصى {{count}} ملفات لكل رفع",
+    "REJECTION_SIZE": "يتجاوز الحد المسموح (أقصى {{mb}} ميغابايت)",
+    "REJECTION_COUNT": "تم بلوغ الحد الأقصى للدفعة (أقصى {{count}} ملفات)",
+    "REJECTION_DUPLICATE": "تم إضافته مسبقاً"
   },
   "FILE_DETAILS": {
     "BACK_TO_FILES": "العودة للملفات",
