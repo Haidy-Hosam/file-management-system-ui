@@ -1,4 +1,4 @@
-import { Component, OnInit, ElementRef, HostListener } from '@angular/core';
+import { Component, OnInit, ElementRef, HostListener, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -6,7 +6,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { FileService, FileResponse, FileRequest } from '../../core/services/file.service';
 import { AuthService } from '../../core/services/auth.service';
 import { DepartmentService } from '../../core/services/department.service';
-import { Department } from '../../core/models/department.model';
+import { Department, DepartmentLookUp } from '../../core/models/department.model';
 import { FileTypeService, FileType } from '../../core/services/filetype.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { TrashService } from '../../core/services/trash.service';
@@ -19,6 +19,7 @@ import { Subject } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
 import { SecuritylevelService } from '../../core/services/securitylevel.service';
 import { SecurityLevel } from '../../core/models/SecurityLevel.model';
+import { LookupService } from '../../core/services/Lookup.service';
 
 interface AdvancedFilters {
   departments: Set<string>;
@@ -55,7 +56,8 @@ export class Files implements OnInit {
     private sanitizer: DomSanitizer,
     private elementRef: ElementRef,
     private perms: PermissionsService,
-    private SecLevelService : SecuritylevelService   
+    private SecLevelService : SecuritylevelService,
+    @Inject(LookupService) private lookUpService: LookupService   
 
   ) { }
 
@@ -130,6 +132,7 @@ export class Files implements OnInit {
     });
   }
 
+/////////////////////////////
   ngOnInit(): void 
   {
     this.setSecurityLevelsArr();
@@ -152,18 +155,31 @@ export class Files implements OnInit {
       this.isLoading = false;
     }
   }); 
+
+  //////
   this.departmentService.getLookupDepartments().subscribe({
-   next: (depts) => {
-    this.departments = this.canFilterAllDepartments
-      ? depts
-      : depts.filter(d => Number(d.id) === this.authService.getDeptId());
-    this.loadFiles();
-    this.loadFilterOptions();
-  },
-    error: () => {
-      this.errorMessage = 'Failed to load departments.';
-      this.loadFiles();      
-    }
+ next: (depts) => {
+  // Scoped list — used ONLY for the "filter by department" search panel,
+  // which should respect what this user is allowed to read.
+  this.departments = this.canFilterAllDepartments
+    ? depts
+    : depts.filter(d => Number(d.id) === this.authService.getDeptId());
+
+  this.loadFiles();
+  this.loadFilterOptions();
+},
+  error: () => {
+    this.errorMessage = 'Failed to load departments.';
+    this.loadFiles();      
+  }
+});
+
+  // Load ALL departments for the upload wizard — the backend's lookup endpoint
+  // filters by the user's department, so we hit the unfiltered /api/departments
+  // endpoint instead so any manager can send a file to any department.
+  this.lookUpService.getAllDepartmentsForUpload().subscribe({
+    next: (depts) => (this.uploadDepartments = depts),
+    error: () => (this.uploadDepartments = [])
   });
 
   this.loadFileTypes();
@@ -187,9 +203,12 @@ get canFilterAllDepartments(): boolean {
     });
   }
 
-  departments: Department[] = [];
-  fileTypes: FileType[] = [];
-  availableOwners: string[] = [];
+  /** All departments — used for the upload wizard so any user can send to any dept. */
+  uploadDepartments: DepartmentLookUp[] = [];
+  /** Departments visible in the filter panel — scoped by permission. */
+departments: Department[] = [];
+fileTypes: FileType[] = [];
+availableOwners: string[] = [];
 
 private loadFilterOptions(): void {
    const req: FileSearchRequest = {
@@ -203,12 +222,6 @@ private loadFilterOptions(): void {
   });
 }
 
-  loadDepartments(): void {
-    this.departmentService.getLookupDepartments().subscribe({
-      next: (depts) => this.departments = depts,
-      error: () => this.errorMessage = 'Failed to load departments.'
-    });
-  }
 
   loadFileTypes(): void {
     this.fileTypeService.lookupAllFileTypes().subscribe({
@@ -524,10 +537,10 @@ toggleFileTypeFilter(typeName: string): void {
     return this.selectedDepartmentIds.includes(Number(deptId));
   }
 
-  getDepartmentName(deptId: number | string): string {
-    const numId = Number(deptId);
-    return this.departments.find(d => Number(d.id) === numId)?.name ?? 'Unknown';
-  }
+ getDepartmentName(deptId: number | string): string {
+  const numId = Number(deptId);
+  return this.uploadDepartments.find(d => Number(d.id) === numId)?.name ?? 'Unknown';
+}
 
   getFileTypeName(fileTypeId: number | null): string {
     if (fileTypeId == null) return '—';

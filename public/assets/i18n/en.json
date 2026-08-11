@@ -288,6 +288,7 @@
     "TITLE": "Trash Bin",
     "SUBTITLE": "View, restore, or permanently delete removed files",
     "EMPTY_TRASH": "Empty Trash",
+    "COL_ACTIONS": "Actions",
     "SEARCH_PLACEHOLDER": "Search in trash...",
     "SELECTED_COUNT": "selected",
     "RESTORE_SELECTED": "Restore Selected",

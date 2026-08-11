@@ -5,6 +5,7 @@ import { Router, RouterLink } from '@angular/router';
 import { TrashService, TrashItem } from '../../core/services/trash.service';
 import { AuthService } from '../../core/services/auth.service';
 import { TranslatePipe } from '@ngx-translate/core';
+import { PermissionsService } from '../../core/services/permissions.service';
 
 @Component({
   selector: 'app-trash',
@@ -22,15 +23,15 @@ export class Trash implements OnInit {
 
   constructor(
     private trashService: TrashService,
-    private authService: AuthService,
-    private router: Router
+    private permissionsService: PermissionsService,
+    private router:Router
   ) {}
 
   ngOnInit(): void {
-    if (this.authService.getRole() !== 'ADMIN') {
-      this.router.navigate(['/files']);
-      return;
-    }
+    //  if (this.permissionsService.has('files','DELETE')) {
+    //    this.router.navigate(['/files']);
+    //    return;
+    //  }
 
     this.trashService.trash$.subscribe((items) => {
       this.deletedFiles = items;

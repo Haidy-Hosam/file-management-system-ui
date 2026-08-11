@@ -308,18 +308,18 @@
     <!-- Step 2: Departments (multi-select) -->
     <div class="step-content" *ngIf="currentStep === 2">
       <label>{{ 'FILES.SEND_TO_DEPTS' | translate }}</label>
-      <ul class="checkbox-list">
-        <li *ngFor="let dept of departments">
-          <label>
-            <input
-              type="checkbox"
-              [checked]="isDepartmentSelected(dept.id)"
-              (change)="toggleDepartmentSelection(dept.id)"
-            />
-            {{ dept.name }}
-          </label>
-        </li>
-      </ul>
+      <div class="dept-chip-grid">
+        <button
+          *ngFor="let dept of uploadDepartments"
+          type="button"
+          class="dept-chip"
+          [class.dept-chip--selected]="isDepartmentSelected(dept.id)"
+          (click)="toggleDepartmentSelection(dept.id)"
+        >
+          <span class="dept-chip__check">✓</span>
+          {{ dept.name }}
+        </button>
+      </div>
     </div>
 
     <!-- Step 3: File Type per file -->
