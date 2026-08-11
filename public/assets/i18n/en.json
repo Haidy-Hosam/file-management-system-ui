@@ -296,7 +296,6 @@
     "COL_DEPTS": "Departments",
     "COL_SIZE": "Size",
     "COL_DATE_DELETED": "Date Deleted",
-    "COL_ACTIONS": "Actions",
     "RESTORE": "Restore",
     "DELETE": "Delete",
     "TRASH_EMPTY_TITLE": "Trash is Empty",

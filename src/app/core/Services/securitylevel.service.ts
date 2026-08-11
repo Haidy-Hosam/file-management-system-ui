@@ -7,23 +7,27 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class SecuritylevelService {
-  private baseUrl = 'http://localhost:8080/api/files/securityLevel';
+  private baseUrl = 'http://localhost:8080/api/securitylevel/securityLevel';
 
   constructor(private http: HttpClient) {}
 
+  // GET /api/securitylevel/securityLevel
   getSecurityLevels(): Observable<SecurityLevel[]> {
     return this.http.get<SecurityLevel[]>(`${this.baseUrl}`);
   }
 
+  // POST /api/securitylevel/securityLevel/{name}
   createSecurityLevel(name: string): Observable<SecurityLevel> {
-    return this.http.post<SecurityLevel>(`${this.baseUrl}`, { name });
+    return this.http.post<SecurityLevel>(`${this.baseUrl}/${encodeURIComponent(name)}`, null);
   }
 
-  updateSecurityLevel(id: number, name: string): Observable<SecurityLevel> {
-    return this.http.put<SecurityLevel>(`${this.baseUrl}/${id}`, { name });
+  // PUT /api/securitylevel/securityLevel  — body: { Id, name }
+  updateSecurityLevel(Id: number, name: string): Observable<SecurityLevel> {
+    return this.http.put<SecurityLevel>(`${this.baseUrl}`, { Id, name });
   }
 
-  deleteSecurityLevel(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  // DELETE /api/securitylevel/securityLevel/{id}
+  deleteSecurityLevel(id: number): Observable<SecurityLevel> {
+    return this.http.delete<SecurityLevel>(`${this.baseUrl}/${id}`);
   }
 }
