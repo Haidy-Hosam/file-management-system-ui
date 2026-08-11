@@ -35,8 +35,9 @@
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let level of levels()">
-          <td class="cell-id">{{ level.id }}</td>
+        <tr *ngFor="let level of levels(),let i = index">
+          <td hidden class="cell-id">{{ level.id }}</td>
+          <td class="cell-id">{{ i + 1 }}</td>
           <td>
             <span class="level-badge">{{ level.name }}</span>
           </td>
