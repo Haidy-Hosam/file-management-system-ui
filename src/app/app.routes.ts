@@ -37,8 +37,7 @@ export const routes: Routes = [
       },
       {
         path: 'trash',
-        component: Trash,
-        canActivate: [roleGuard(['ADMIN'])],
+        component: Trash
       },
       {
         path: 'departments',

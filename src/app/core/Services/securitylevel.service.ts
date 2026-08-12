@@ -7,7 +7,7 @@ import { Observable } from 'rxjs';
   providedIn: 'root',
 })
 export class SecuritylevelService {
-private baseUrl = 'http://localhost:8080/api/files/securityLevel';
+private baseUrl = 'http://localhost:8080/api/securitylevel';
   
  constructor(private http: HttpClient) {}
 
