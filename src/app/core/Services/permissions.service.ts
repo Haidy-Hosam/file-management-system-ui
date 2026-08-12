@@ -1,11 +1,12 @@
 import { Injectable, signal } from '@angular/core';
 import { HttpClient } from '@angular/common/http';
-import { tap } from 'rxjs';
-import { PagePermission } from '../models/permission.model';
+import { Observable, tap } from 'rxjs';
+import { PagePermission, Permission } from '../models/permission.model';
 
 @Injectable({ providedIn: 'root' })
 export class PermissionsService {
-  private baseUrl = 'http://localhost:8080/api/user/permissions';
+  private baseUrl = 'http://localhost:8080/api/permissions/Userpermissions';
+  private baseUrl2 = `http://localhost:8080/api/permissions`;
   private map = signal<Map<string, Set<string>>>(new Map());
   loaded = signal(false);
 
@@ -32,5 +33,9 @@ export class PermissionsService {
   clear(): void {
     this.map.set(new Map());
     this.loaded.set(false);
+  }
+
+  getAllPermissions(): Observable<Permission[]> {
+    return this.http.get<Permission[]>(this.baseUrl2);
   }
 }

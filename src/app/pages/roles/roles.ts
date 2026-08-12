@@ -3,13 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RoleService } from '../../core/services/roles.service';
 import { PageService } from '../../core/services/page.service';
-import { PermissionService } from '../../core/services/permission.service';
 import { Role, RoleRequest, PagePermissionRequest } from '../../core/models/role.model';
 import { Page } from '../../core/models/page.model';
 import { Permission } from '../../core/models/permission.model';
 import { UserService, UserResponse } from '../../core/services/user.service';
 import { forkJoin } from 'rxjs';
 import { TranslatePipe } from '@ngx-translate/core';
+import { PermissionsService } from '../../core/services/permissions.service';
 
 
 @Component({
@@ -44,7 +44,7 @@ assignedUsers = signal<UserResponse[]>([]);
   constructor(
     private roleService: RoleService,
     private pageService: PageService,
-    private permissionService: PermissionService,
+    private permissionService: PermissionsService,
     private userService: UserService,
   ) {}
 

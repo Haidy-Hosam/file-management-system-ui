@@ -12,7 +12,7 @@ export interface ReassignmentItem {
   targetDepartmentId: number;
 }
 
-import type { FileResponse } from '../services/file.service';
+import type { FileResponse } from '../services/FileServices/file.service';
 export type { FileResponse };
 
 

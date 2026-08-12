@@ -1,8 +1,8 @@
 import { Injectable } from '@angular/core';
 import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable } from 'rxjs';
-import { FileResponse, FileRequest, PageResponse } from '../models/file.model';
-import { FileSearchRequest } from '../models/file-search-request.model';
+import { FileResponse, FileRequest, PageResponse } from '../../models/file.model';
+import { FileSearchRequest } from '../../models/file-search-request.model';
 
 export type { FileResponse, FileRequest, PageResponse };
 

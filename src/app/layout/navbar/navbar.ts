@@ -14,10 +14,10 @@ import { LanguageService } from '../../core/services/language.service';
   templateUrl: './navbar.html',
   styleUrl: './navbar.css',
 })
+
 export class Navbar {
   searchTerm = '';
   showUserMenu = false;
-
   otherLang = computed<'en' | 'ar'>(() =>
   this.languageService.currentLang() === 'en' ? 'ar' : 'en'
 );

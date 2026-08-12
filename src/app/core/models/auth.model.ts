@@ -1,5 +1,5 @@
 export interface LoginRequest{
- email: string;
+  email: string;
   password: string;
   rememberMe: boolean;
 }

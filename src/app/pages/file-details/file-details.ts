@@ -1,7 +1,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { ActivatedRoute, Router, RouterModule } from '@angular/router';
-import { FileService, FileResponse } from '../../core/services/file.service';
+import { FileService, FileResponse } from '../../core/services/FileServices/file.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { TrashService } from '../../core/services/trash.service';
 import { TranslatePipe } from '@ngx-translate/core';
@@ -12,7 +12,7 @@ import {
   FileActivity,
   FilePermission,
   ApprovalStep,
-} from '../../core/services/file-details.service';
+} from '../../core/services/FileServices/file-details.service';
 
 
 type TabId = 'overview' | 'activity' | 'permissions' | 'approval';

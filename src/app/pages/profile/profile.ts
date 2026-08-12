@@ -3,8 +3,8 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { UserService, UserResponse } from '../../core/services/user.service';
-import { FileService, FileResponse, PageResponse } from '../../core/services/file.service';
-import { FileForwardService } from '../../core/services/file-forward.service';
+import { FileService, FileResponse, PageResponse } from '../../core/services/FileServices/file.service';
+import { FileForwardService } from '../../core/services/FileServices/file-forward.service';
 import { FileForwardResponse } from '../../core/models/FileForward.model';
 import { TranslatePipe } from '@ngx-translate/core';
 
