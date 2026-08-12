@@ -6,7 +6,9 @@ import { TranslateService } from '@ngx-translate/core';
 })
 export class LanguageService {
 
+
   currentLang = signal<string>(localStorage.getItem('language') || 'en');
+
   constructor(private translate: TranslateService) {
     this.translate.addLangs(['en', 'ar']);
     this.translate.setFallbackLang('en');

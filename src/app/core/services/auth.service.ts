@@ -5,9 +5,6 @@ import { jwtDecode } from 'jwt-decode';
 import { authResponse, LoginRequest ,DecodedToken} from '../models/auth.model';
 import { PermissionsService } from './permissions.service';
 
-
-
-
 @Injectable({ providedIn: 'root' })
 export class AuthService {
   private baseUrl = 'http://localhost:8080/api/auth';

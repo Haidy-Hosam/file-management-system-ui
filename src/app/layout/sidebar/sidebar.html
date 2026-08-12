@@ -22,6 +22,12 @@
       <span>{{ 'SIDEBAR.PAGES.' + (page.route?.replace('/', '') | uppercase) | translate }}</span>
     </a>
   }
+  @if (userRole === 'ADMIN') {
+    <a class="nav-link" routerLink="/security-levels" routerLinkActive="active">
+      <i class="bi bi-shield-fill-check nav-icon"></i>
+      <span>{{ 'SIDEBAR.PAGES.SECURITY_LEVELS' | translate }}</span>
+    </a>
+  }
 } @else {
   <span class="text-secondary small px-2">{{ 'SIDEBAR.LOADING_MENU' | translate }}</span>
 }

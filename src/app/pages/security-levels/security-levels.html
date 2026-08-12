@@ -1,0 +1,155 @@
+<div class="sl-page">
+
+  <!-- Page header -->
+  <div class="sl-header">
+    <div>
+      <h1 class="sl-title">{{ 'SECURITY_LEVELS.TITLE' | translate }}</h1>
+      <p class="sl-subtitle">{{ 'SECURITY_LEVELS.SUBTITLE' | translate }}</p>
+    </div>
+    <button class="btn btn-primary" (click)="openCreateModal()">
+      <span>＋</span> {{ 'SECURITY_LEVELS.NEW_LEVEL' | translate }}
+    </button>
+  </div>
+
+  <!-- Success banner -->
+  <div class="alert alert-success" *ngIf="successMessage()">
+    {{ successMessage() | translate }}
+  </div>
+
+  <!-- Error banner -->
+  <div class="alert alert-error" *ngIf="errorMessage()">
+    {{ errorMessage() | translate }}
+    <button class="alert-dismiss" (click)="dismissError()">✕</button>
+  </div>
+
+  <!-- Loading -->
+  <div class="sl-state-msg" *ngIf="isLoading()">{{ 'COMMON.LOADING' | translate }}</div>
+
+  <!-- Table card -->
+  <div class="sl-card" *ngIf="!isLoading()">
+    <table class="sl-table" *ngIf="levels().length > 0; else emptyState">
+      <thead>
+        <tr>
+          <th>{{ 'SECURITY_LEVELS.COL_ID' | translate }}</th>
+          <th>{{ 'SECURITY_LEVELS.COL_NAME' | translate }}</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr *ngFor="let level of levels(),let i = index">
+          <td hidden class="cell-id">{{ level.id }}</td>
+          <td class="cell-id">{{ i + 1 }}</td>
+          <td>
+            <span class="level-badge">{{ level.name }}</span>
+          </td>
+          <td class="cell-actions">
+            <button class="action-btn edit-btn" (click)="openEditModal(level)" title="{{ 'COMMON.EDIT' | translate }}">
+              <i class="bi bi-pencil-fill"></i>
+            </button>
+            <button class="action-btn delete-btn" (click)="openDeleteModal(level)" title="{{ 'COMMON.DELETE' | translate }}">
+              <i class="bi bi-trash3-fill"></i>
+            </button>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+
+    <ng-template #emptyState>
+      <div class="sl-state-msg">{{ 'SECURITY_LEVELS.NO_LEVELS' | translate }}</div>
+    </ng-template>
+  </div>
+
+</div>
+
+<!-- ══════════════════════════════════
+     CREATE MODAL
+════════════════════════════════════ -->
+<div class="modal-overlay" *ngIf="showCreateModal" (click)="closeCreateModal()">
+  <div class="modal-box" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2 class="modal-title">{{ 'SECURITY_LEVELS.CREATE_TITLE' | translate }}</h2>
+      <button class="modal-close" (click)="closeCreateModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <label class="field-label">{{ 'SECURITY_LEVELS.NAME_LABEL' | translate }}</label>
+      <input
+        class="field-input"
+        type="text"
+        [(ngModel)]="createName"
+        [placeholder]="'SECURITY_LEVELS.NAME_PLACEHOLDER' | translate"
+        (keydown.enter)="submitCreate()"
+        autofocus
+      />
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" (click)="closeCreateModal()">{{ 'COMMON.CANCEL' | translate }}</button>
+      <button
+        class="btn btn-primary"
+        (click)="submitCreate()"
+        [disabled]="!createName.trim() || isSaving"
+      >
+        {{ isSaving ? ('COMMON.SAVING' | translate) : ('COMMON.CREATE' | translate) }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     EDIT MODAL
+════════════════════════════════════ -->
+<div class="modal-overlay" *ngIf="showEditModal" (click)="closeEditModal()">
+  <div class="modal-box" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2 class="modal-title">{{ 'SECURITY_LEVELS.EDIT_TITLE' | translate }}</h2>
+      <button class="modal-close" (click)="closeEditModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <label class="field-label">{{ 'SECURITY_LEVELS.NAME_LABEL' | translate }}</label>
+      <input
+        class="field-input"
+        type="text"
+        [(ngModel)]="editName"
+        [placeholder]="'SECURITY_LEVELS.NAME_PLACEHOLDER' | translate"
+        (keydown.enter)="submitEdit()"
+        autofocus
+      />
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" (click)="closeEditModal()">{{ 'COMMON.CANCEL' | translate }}</button>
+      <button
+        class="btn btn-primary"
+        (click)="submitEdit()"
+        [disabled]="!editName.trim() || isUpdating"
+      >
+        {{ isUpdating ? ('COMMON.SAVING' | translate) : ('COMMON.SAVE' | translate) }}
+      </button>
+    </div>
+  </div>
+</div>
+
+<!-- ══════════════════════════════════
+     DELETE CONFIRM MODAL
+════════════════════════════════════ -->
+<div class="modal-overlay" *ngIf="showDeleteModal" (click)="closeDeleteModal()">
+  <div class="modal-box modal-box-sm" (click)="$event.stopPropagation()">
+    <div class="modal-header">
+      <h2 class="modal-title danger-title">{{ 'SECURITY_LEVELS.DELETE_TITLE' | translate }}</h2>
+      <button class="modal-close" (click)="closeDeleteModal()">✕</button>
+    </div>
+    <div class="modal-body">
+      <p class="delete-confirm-text">
+        {{ 'SECURITY_LEVELS.DELETE_CONFIRM' | translate }}
+        <strong>{{ deleteTarget?.name }}</strong>?
+      </p>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-outline" (click)="closeDeleteModal()">{{ 'COMMON.CANCEL' | translate }}</button>
+      <button
+        class="btn btn-danger"
+        (click)="confirmDelete()"
+        [disabled]="isDeleting"
+      >
+        {{ isDeleting ? ('COMMON.DELETING' | translate) : ('COMMON.DELETE' | translate) }}
+      </button>
+    </div>
+  </div>
+</div>

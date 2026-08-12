@@ -303,23 +303,48 @@
           <button type="button" (click)="removeUploadItem(i); $event.stopPropagation()">✕</button>
         </li>
       </ul>
+
+      <!-- Size / count / duplicate rejection warnings -->
+      <div class="upload-limit-hint">
+        {{ 'FILES.UPLOAD_SIZE_LIMIT' | translate: { mb: maxFileSizeMB } }} ·
+        {{ 'FILES.UPLOAD_COUNT_LIMIT' | translate: { count: maxFilesPerUpload } }}
+      </div>
+      <ul class="upload-rejections" *ngIf="uploadRejections.length > 0">
+        <li *ngFor="let r of uploadRejections" class="rejection-row">
+          <span class="rejection-icon">⚠</span>
+          <span class="rejection-name">{{ r.name }}</span>
+          <span class="rejection-reason">
+            <ng-container [ngSwitch]="r.reason">
+              <ng-container *ngSwitchCase="'size'">
+                {{ 'FILES.REJECTION_SIZE' | translate: { mb: maxFileSizeMB } }}
+              </ng-container>
+              <ng-container *ngSwitchCase="'count'">
+                {{ 'FILES.REJECTION_COUNT' | translate: { count: maxFilesPerUpload } }}
+              </ng-container>
+              <ng-container *ngSwitchCase="'duplicate'">
+                {{ 'FILES.REJECTION_DUPLICATE' | translate }}
+              </ng-container>
+            </ng-container>
+          </span>
+        </li>
+      </ul>
     </div>
 
     <!-- Step 2: Departments (multi-select) -->
     <div class="step-content" *ngIf="currentStep === 2">
       <label>{{ 'FILES.SEND_TO_DEPTS' | translate }}</label>
-      <ul class="checkbox-list">
-        <li *ngFor="let dept of departments">
-          <label>
-            <input
-              type="checkbox"
-              [checked]="isDepartmentSelected(dept.id)"
-              (change)="toggleDepartmentSelection(dept.id)"
-            />
-            {{ dept.name }}
-          </label>
-        </li>
-      </ul>
+      <div class="dept-chip-grid">
+        <button
+          *ngFor="let dept of uploadDepartments"
+          type="button"
+          class="dept-chip"
+          [class.dept-chip--selected]="isDepartmentSelected(dept.id)"
+          (click)="toggleDepartmentSelection(dept.id)"
+        >
+          <span class="dept-chip__check">✓</span>
+          {{ dept.name }}
+        </button>
+      </div>
     </div>
 
     <!-- Step 3: File Type per file -->
