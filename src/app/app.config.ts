@@ -11,21 +11,28 @@ import {
   provideAppInitializer,
   provideBrowserGlobalErrorListeners,
   provideZoneChangeDetection,
-
 } from '@angular/core';
 import { LanguageService } from './core/services/language.service';
+import { AppConfigService } from './core/services/app-config.service';
 
 export const appConfig: ApplicationConfig = {
-  providers: [
-    provideBrowserGlobalErrorListeners(),
-    provideZoneChangeDetection({ eventCoalescing: true }),
-    provideRouter(routes),
-    provideHttpClient(withInterceptors([errorInterceptor,authInterceptor])),
-    provideAppTranslate(),
+  providers: [
+    provideBrowserGlobalErrorListeners(),
+    provideZoneChangeDetection({ eventCoalescing: true }),
+    provideRouter(routes),
+    provideHttpClient(withInterceptors([errorInterceptor, authInterceptor])),
+    provideAppTranslate(),
 
-    provideAppInitializer(() => {
-      const languageService = inject(LanguageService);
-      return languageService.initialLanguage();
-    }),
-  ],
+    // Loads public/assets/app.config.json before the app renders.
+    // Change maxFileSizeMB / maxFilesPerUpload there — no rebuild needed.
+    provideAppInitializer(() => {
+      const configService = inject(AppConfigService);
+      return configService.load();
+    }),
+
+    provideAppInitializer(() => {
+      const languageService = inject(LanguageService);
+      return languageService.initialLanguage();
+    }),
+  ],
 };

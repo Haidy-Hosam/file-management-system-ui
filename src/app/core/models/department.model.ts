@@ -39,6 +39,10 @@ export interface Department {
   themeColor: string;
 }
 
+export interface DepartmentLookUp{
+  id:number;
+  name:string
+}
 
 export interface CreateDepartmentRequest {
   name: string;

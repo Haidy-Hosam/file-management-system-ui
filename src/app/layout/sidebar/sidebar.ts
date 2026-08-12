@@ -88,6 +88,7 @@ getIconClass(route: string): string {
     'roles': 'bi-shield-lock-fill',
     'departments': 'bi-building',
     'trash': 'bi-trash3-fill',
+    'security-levels': 'bi-shield-fill-check',
   };
   const normalized = route?.replace(/^\/+|\/+$/g, '').toLowerCase() ?? '';
   return icons[normalized] ?? 'bi-list';

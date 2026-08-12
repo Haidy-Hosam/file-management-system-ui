@@ -68,7 +68,8 @@
       "USERS": "المستخدمين",
       "ROLES": "الأدوار",
       "DEPARTMENTS": "الأقسام",
-      "TRASH": "سلة المهملات"
+      "TRASH": "سلة المهملات",
+      "SECURITY_LEVELS": "مستويات الأمان"
     }
   },
   "DASHBOARD": {
@@ -205,7 +206,13 @@
     "CREATION_DATE" : "تاريخ الانشاء",
     "FROM" : "من",
     "TO":"الي",
-    "Securitylevel":"مستوى الامان"
+    "Securitylevel":"مستوى الامان",
+    "NO_SECURITY_LEVELS": "لا توجد مستويات أمان متاحة.",
+    "UPLOAD_SIZE_LIMIT": "الحد الأقصى لحجم الملف: {{mb}} ميغابايت",
+    "UPLOAD_COUNT_LIMIT": "الحد الأقصى {{count}} ملفات لكل رفع",
+    "REJECTION_SIZE": "يتجاوز الحد المسموح (أقصى {{mb}} ميغابايت)",
+    "REJECTION_COUNT": "تم بلوغ الحد الأقصى للدفعة (أقصى {{count}} ملفات)",
+    "REJECTION_DUPLICATE": "تم إضافته مسبقاً"
   },
   "FILE_DETAILS": {
     "BACK_TO_FILES": "العودة للملفات",
@@ -327,5 +334,24 @@
     "TITLE": "توجيه ملف",
     "OPTIONAL_MESSAGE": "رسالة اختيارية...",
     "SEND": "إرسال"
+  },
+  "SECURITY_LEVELS": {
+    "TITLE": "مستويات الأمان",
+    "SUBTITLE": "إدارة مستويات تصنيف أمان المستندات",
+    "NEW_LEVEL": "مستوى جديد",
+    "COL_ID": "المعرّف",
+    "COL_NAME": "الاسم",
+    "NO_LEVELS": "لا توجد مستويات أمان.",
+    "CREATE_TITLE": "إنشاء مستوى أمان",
+    "EDIT_TITLE": "تعديل مستوى الأمان",
+    "DELETE_TITLE": "حذف مستوى الأمان",
+    "DELETE_CONFIRM": "هل أنت متأكد من حذف",
+    "NAME_LABEL": "اسم المستوى",
+    "NAME_PLACEHOLDER": "مثال: سري",
+    "FAILED_LOAD": "فشل تحميل مستويات الأمان.",
+    "FAILED_CREATE": "فشل إنشاء مستوى الأمان.",
+    "FAILED_UPDATE": "فشل تحديث مستوى الأمان.",
+    "FAILED_DELETE": "فشل حذف مستوى الأمان.",
+    "SUCCESS": "تمت العملية بنجاح."
   }
 }

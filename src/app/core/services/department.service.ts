@@ -54,8 +54,28 @@ export class DepartmentService {
     };
   }
 
-  getLookupDepartments():Observable<Department[]> {
+  getLookupDepartments(): Observable<Department[]> {
     return this.http.get<Department[]>(this.lookupBaseUrl);
+  }
+
+  /**
+   * Returns ALL departments regardless of the caller's role.
+   * Used by the upload wizard so any user can route a file to any department.
+   * Hits /api/departments which is not filtered by the backend.
+   */
+  getAllDepartmentsForUpload(): Observable<Department[]> {
+    return this.http.get<DepartmentDetails[]>(this.baseUrl).pipe(
+      map(list => list.map((dept, index) => ({
+        id: dept.id,
+        name: dept.name,
+        head: dept.managerName ?? 'Unassigned',
+        members: dept.employeeCount,
+        files: dept.fileCount,
+        storage: formatBytes(dept.storageUsed),
+        status: dept.isActive ? 'Active' : 'Inactive',
+        themeColor: THEME_COLORS[index % THEME_COLORS.length],
+      })))
+    );
   }
 
 }

@@ -210,7 +210,7 @@
               <div class="step-info">
                 <div class="step-name">{{ step.managerName || ('FILE_DETAILS.APPROVAL_UNKNOWN_MANAGER' | translate) }}</div>
                 <div class="step-dept">{{ step.departmentName }}</div>
-                <div class="step-date" *ngIf="step.decidedAt">{{ step.decidedAt }}</div>
+                <div class="step-date" *ngIf="step.decidedAt">{{ step.decidedAt | date:'short' }}</div>
               </div>
               <span class="step-badge badge-approved">{{ 'FILE_DETAILS.APPROVAL_APPROVED' | translate }}</span>
             </div>
