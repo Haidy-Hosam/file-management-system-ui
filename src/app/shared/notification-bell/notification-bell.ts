@@ -3,7 +3,7 @@ import { Component, HostListener, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { Router } from '@angular/router';
 import { NotificationService } from '../../core/services/Notification.service';
-import {FileForwardResponse} from "../../core/models/FileForward.model"
+import {FileForwardResponse} from "../../pages/file/models/FileForward.model"
 import { TranslatePipe } from '@ngx-translate/core';
 
 @Component({

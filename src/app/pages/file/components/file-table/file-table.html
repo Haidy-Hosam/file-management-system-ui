@@ -1,0 +1,293 @@
+<table class="files-table">
+
+  <thead>
+    <tr>
+
+      <th class="col-checkbox">
+        <input
+          type="checkbox"
+          (change)="onSelectAll($event)"
+        />
+      </th>
+
+      <th
+        class="sortable"
+        (click)="onSort('NAME')">
+
+        {{ 'FILES.COL_NAME' | translate }}
+
+        <span
+          class="sort-arrow"
+          *ngIf="sortBy === 'NAME'">
+
+          {{ sortDirection === 'asc' ? '▲' : '▼' }}
+
+        </span>
+
+      </th>
+
+      <th>
+        {{ 'FILES.COL_DEPARTMENT' | translate }}
+      </th>
+
+      <th
+        class="sortable"
+        (click)="onSort('OWNER')">
+
+        {{ 'FILES.COL_OWNER' | translate }}
+
+        <span
+          class="sort-arrow"
+          *ngIf="sortBy === 'OWNER'">
+
+          {{ sortDirection === 'asc' ? '▲' : '▼' }}
+
+        </span>
+
+      </th>
+
+      <th
+        class="sortable"
+        (click)="onSort('SIZE')">
+
+        {{ 'FILES.COL_SIZE' | translate }}
+
+        <span
+          class="sort-arrow"
+          *ngIf="sortBy === 'SIZE'">
+
+          {{ sortDirection === 'asc' ? '▲' : '▼' }}
+
+        </span>
+
+      </th>
+
+      <th
+        class="sortable"
+        (click)="onSort('CREATED')">
+
+        {{ 'FILES.COL_CREATED' | translate }}
+
+        <span
+          class="sort-arrow"
+          *ngIf="sortBy === 'CREATED'">
+
+          {{ sortDirection === 'asc' ? '▲' : '▼' }}
+
+        </span>
+
+      </th>
+
+      <th
+        class="sortable"
+        (click)="onSort('MODIFIED')">
+
+        {{ 'FILES.COL_MODIFIED' | translate }}
+
+        <span
+          class="sort-arrow"
+          *ngIf="sortBy === 'MODIFIED'">
+
+          {{ sortDirection === 'asc' ? '▲' : '▼' }}
+
+        </span>
+
+      </th>
+
+      <th>
+        {{ 'FILES.COL_CATEGORY' | translate }}
+      </th>
+
+      <th>
+        {{ 'FILES.COL_STATUS' | translate }}
+      </th>
+
+      <th class="col-actions"></th>
+
+    </tr>
+  </thead>
+
+
+  <tbody>
+
+    <tr
+      *ngFor="let file of filteredFiles"
+      [class.expired-row]="file.expired">
+
+      <td class="col-checkbox">
+
+        <input
+          type="checkbox"
+          [checked]="isSelected(file.id)"
+          [disabled]="file.expired"
+          (change)="onSelectFile(file.id)"
+        />
+
+      </td>
+
+
+      <td
+        class="name-cell"
+        (click)="onViewDetails(file.id)">
+
+        <i
+          class="bi"
+          [ngClass]="getFileIcon(file.extension)"
+          [style.color]="getFileIconColor(file.extension)">
+        </i>
+
+        <div>
+
+          <div class="file-name">
+            {{ file.name }}
+          </div>
+
+          <div class="tags">
+
+            <span
+              class="expired-badge"
+              *ngIf="file.expired">
+
+              {{ 'FILES.EXPIRED' | translate }}
+
+            </span>
+
+          </div>
+
+        </div>
+
+      </td>
+
+
+      <td>
+        {{ file.departmentNames.join(', ') }}
+      </td>
+
+      <td>
+        {{ file.ownerName }}
+      </td>
+
+      <td>
+        {{ file.size }}
+      </td>
+
+      <td>
+        {{ file.createdDate }}
+      </td>
+
+      <td>
+        {{ file.modifiedDate }}
+      </td>
+
+      <td>
+        {{ file.fileType }}
+      </td>
+
+
+      <td>
+
+        <div
+          class="status-progress"
+          [ngClass]="file.status.toLowerCase()">
+
+          <div class="status-progress-track">
+            <div class="status-progress-fill"></div>
+          </div>
+
+          <span class="status-progress-label">
+            {{ ('STATUS.' + (file.status | uppercase) | translate) || file.status }}
+          </span>
+
+        </div>
+
+      </td>
+
+
+      <td class="col-actions">
+
+        <button
+          class="menu-btn"
+          (click)="onToggleMenu(file.id, $event)">
+
+          ⋮
+
+        </button>
+
+
+        <div
+          class="action-menu"
+          *ngIf="openMenuFileId === file.id"
+          (click)="$event.stopPropagation()">
+
+          <button
+            (click)="onViewDetails(file.id)">
+
+            {{ 'FILES.VIEW_DETAILS' | translate }}
+
+          </button>
+
+
+          <button
+            (click)="onPreviewFile(file)">
+
+            {{ 'COMMON.PREVIEW' | translate }}
+
+          </button>
+
+
+          <button
+            (click)="onDownloadFile(file)">
+
+            {{ 'COMMON.DOWNLOAD' | translate }}
+
+          </button>
+
+
+          <button
+            (click)="onForwardFile(file)">
+
+            {{ 'COMMON.FORWARD' | translate }}
+
+          </button>
+
+
+          <button
+            *appHasPermission="['Files','UPDATE']"
+            (click)="onOpenStatus(file)">
+
+            {{ 'FILES.EDIT_STATUS' | translate }}
+
+          </button>
+
+
+          <button
+            class="danger"
+            *appHasPermission="['Files','DELETE']"
+            (click)="onDeleteFile(file)">
+
+            {{ 'COMMON.DELETE' | translate }}
+
+          </button>
+
+        </div>
+
+      </td>
+
+    </tr>
+
+
+    <tr *ngIf="filteredFiles.length === 0">
+
+      <td
+        colspan="7"
+        class="empty-state">
+
+        {{ 'FILES.NO_FILES_FOUND' | translate }}
+
+      </td>
+
+    </tr>
+
+  </tbody>
+
+</table>

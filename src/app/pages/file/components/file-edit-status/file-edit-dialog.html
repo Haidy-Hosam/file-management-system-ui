@@ -1,0 +1,81 @@
+<div
+  class="status-overlay"
+  *ngIf="showStatusModal"
+  (click)="closeDialog()"
+>
+  <div
+    class="status-modal"
+    (click)="$event.stopPropagation()"
+  >
+
+    <h3>
+      {{ 'FILES.EDIT_STATUS_TITLE' | translate }}
+    </h3>
+
+    <p
+      class="status-modal-file"
+      *ngIf="statusModalFile"
+    >
+      {{ statusModalFile.name }}
+    </p>
+
+
+    <label>
+      {{ 'FILES.CURRENT_STATUS' | translate }}
+    </label>
+
+    <span
+      class="status-badge"
+      [ngClass]="statusModalFile?.status?.toLowerCase()"
+      *ngIf="statusModalFile"
+    >
+      {{
+        ('STATUS.' + (statusModalFile.status | uppercase) | translate)
+        || statusModalFile.status
+      }}
+    </span>
+
+
+    <label>
+      {{ 'FILES.NEW_STATUS' | translate }}
+    </label>
+
+    <select
+      [ngModel]="selectedStatus"
+      (ngModelChange)="onStatusChange($event)"
+    >
+      <option
+        *ngFor="let option of statusOptions"
+        [ngValue]="option"
+      >
+        {{ ('STATUS.' + option | translate) || option }}
+      </option>
+    </select>
+
+
+    <div class="modal-actions">
+
+      <button
+        class="cancel-btn"
+        (click)="closeDialog()"
+        [disabled]="isUpdatingStatus"
+      >
+        {{ 'COMMON.CANCEL' | translate }}
+      </button>
+
+      <button
+        class="confirm-btn"
+        (click)="confirmUpdate()"
+        [disabled]="!canConfirmStatus"
+      >
+        {{
+          (isUpdatingStatus
+            ? 'COMMON.SAVING'
+            : 'FILES.SAVE_STATUS') | translate
+        }}
+      </button>
+
+    </div>
+
+  </div>
+</div>

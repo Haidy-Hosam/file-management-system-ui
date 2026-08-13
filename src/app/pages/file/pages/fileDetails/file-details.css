@@ -700,10 +700,6 @@
   }
 }
 
-.approval-list-card {
-  /* inherits .card */
-}
-
 .approval-list-title {
   display: flex;
   align-items: center;

@@ -1,0 +1,262 @@
+.files-table {
+  width: 100%;
+  border-collapse: collapse;
+}
+
+.files-table th {
+  text-align: left;
+  font-size: 0.72rem;
+  color: #9ca3af;
+  font-weight: 600;
+  padding: 0.9rem 1rem;
+  border-bottom: 1px solid #e5e7eb;
+  position: sticky;
+  top: 0;
+  background: #fff;
+  z-index: 5;
+}
+
+.files-table td {
+  padding: 0.9rem 1rem;
+  font-size: 0.85rem;
+  border-bottom: 1px solid #f3f4f6;
+  color: #374151;
+  position: relative;
+}
+
+.col-checkbox {
+  width: 40px;
+}
+
+.name-cell {
+  display: flex;
+  align-items: center;
+  gap: 0.6rem;
+  cursor: pointer;
+}
+
+.file-icon {
+  font-size: 1.2rem;
+}
+
+.file-name {
+  font-weight: 600;
+  color: #1a1a2e;
+}
+
+.tags {
+  display: flex;
+  gap: 0.3rem;
+  margin-top: 0.2rem;
+}
+
+.tag {
+  font-size: 0.7rem;
+  background: #eef2ff;
+  color: #4338ca;
+  padding: 0.1rem 0.5rem;
+  border-radius: 4px;
+}
+
+.status-progress {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  min-width: 110px;
+}
+
+.status-progress-track {
+  position: relative;
+  flex: 1;
+  height: 6px;
+  border-radius: 999px;
+  background: #f3f4f6;
+  overflow: hidden;
+}
+
+.status-progress-fill {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  border-radius: 999px;
+  transition: width 0.3s ease;
+}
+
+.status-progress-label {
+  font-size: 0.72rem;
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.status-progress.pending .status-progress-fill {
+  width: 40%;
+  background: #ca8a04;
+}
+
+.status-progress.pending .status-progress-label {
+  color: #ca8a04;
+}
+
+.status-progress.approved .status-progress-fill {
+  width: 100%;
+  background: #16a34a;
+}
+
+.status-progress.approved .status-progress-label {
+  color: #16a34a;
+}
+
+.status-progress.rejected .status-progress-fill {
+  width: 100%;
+  background: #dc2626;
+}
+
+.status-progress.rejected .status-progress-label {
+  color: #dc2626;
+}
+
+.col-actions {
+  width: 40px;
+  text-align: right;
+}
+
+.menu-btn {
+  background: none;
+  border: none;
+  font-size: 1.1rem;
+  cursor: pointer;
+  color: #6b7280;
+}
+
+.action-menu {
+  position: absolute;
+  right: 1rem;
+  top: 2.2rem;
+  background: white;
+  border: 1px solid #e5e7eb;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  z-index: 20;
+  display: flex;
+  flex-direction: column;
+  min-width: 150px;
+}
+
+.action-menu button {
+  background: none;
+  border: none;
+  text-align: left;
+  padding: 0.6rem 1rem;
+  font-size: 0.85rem;
+  cursor: pointer;
+  color: #374151;
+}
+
+.action-menu button:hover {
+  background: #f3f4f6;
+}
+
+.action-menu button.danger {
+  color: #dc2626;
+}
+
+.empty-state,
+.loading-state {
+  text-align: center;
+  padding: 2rem;
+  color: #9ca3af;
+}
+
+.files-table th.sortable {
+  cursor: pointer;
+  user-select: none;
+}
+
+.files-table th.sortable:hover {
+  color: #2563eb;
+}
+
+.sort-arrow {
+  font-size: 0.65rem;
+  margin-left: 3px;
+  display: inline-block;
+}
+
+.file-name {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.file-name i {
+  font-size: 18px;
+  flex-shrink: 0;
+}
+
+.file-name-row {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: nowrap;
+}
+
+.file-name {
+  font-weight: 500;
+}
+
+.expired-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+  background: #fee2e2;
+  color: #b91c1c;
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
+  padding: 2px 8px;
+  border-radius: 999px;
+  white-space: nowrap;
+}
+
+.expired-row {
+  background: #fef7f7;
+  border-left: 3px solid #ef4444;
+  cursor: not-allowed;
+}
+
+.expired-row:hover {
+  background: #fdeeee;
+}
+
+.expired-row td {
+  color: #9ca3af !important;
+}
+
+.expired-row .expired-badge {
+  color: #b91c1c;
+  background: #fee2e2;
+}
+
+.expired-row .bi[class*="bi-file-earmark"] {
+  color: #d1d5db !important;
+  opacity: 0.7;
+}
+
+.expired-row .status-progress-fill {
+  background: #d1d5db !important;
+}
+.expired-row .status-progress-label {
+  color: #9ca3af !important;
+}
+
+.expired-row input[type="checkbox"],
+.expired-row .menu-btn {
+  opacity: 0.4;
+  cursor: not-allowed;
+}
+
+.expired-row .name-cell {
+  cursor: not-allowed;
+}

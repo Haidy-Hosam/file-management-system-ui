@@ -1,26 +1,32 @@
 import { Component, OnInit, ElementRef, HostListener, Inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
-import { FileService, FileResponse, FileRequest } from '../../core/services/file.service';
-import { AuthService } from '../../core/services/auth.service';
-import { DepartmentService } from '../../core/services/department.service';
-import { Department, DepartmentLookUp } from '../../core/models/department.model';
-import { FileTypeService, FileType } from '../../core/services/filetype.service';
+import { FileService, FileResponse, FileRequest } from '../../services/file.service';
+import { AuthService } from '../../../../core/services/auth.service';
+import { DepartmentService } from '../../../../core/services/department.service';
+import { Department, DepartmentLookUp } from '../../../../core/models/department.model';
+import { FileTypeService, FileType } from '../../services/filetype.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
-import { TrashService } from '../../core/services/trash.service';
-import { ForwardFileDialog } from '../../shared/forward-file-dialog/forward-file-dialog'; 
+import { TrashService } from '../../../../core/services/trash.service';
+import { ForwardFileDialog } from '../../../../shared/forward-file-dialog/forward-file-dialog';
 import { TranslatePipe } from '@ngx-translate/core';
-import {HasPermissionDirective} from '../../core/directives/has-permission.directive'
-import { FileSearchRequest } from '../../core/models/file-search-request.model';
-import { PermissionsService } from '../../core/services/permissions.service';
+import { HasPermissionDirective } from '../../../../core/directives/has-permission.directive';
+import { FileSearchRequest } from '../../models/file-search-request.model';
+import { PermissionsService } from '../../../../core/services/permissions.service';
 import { Subject } from 'rxjs';
 import { switchMap } from 'rxjs/operators';
-import { SecuritylevelService } from '../../core/services/securitylevel.service';
-import { SecurityLevel } from '../../core/models/SecurityLevel.model';
-import { LookupService } from '../../core/services/Lookup.service';
-import { AppConfigService } from '../../core/services/app-config.service';
+import { SecuritylevelService } from '../../../../core/services/securitylevel.service';
+import { SecurityLevel } from '../../../../core/models/SecurityLevel.model';
+import { LookupService } from '../../../../core/services/Lookup.service';
+import { AppConfigService } from '../../../../core/services/app-config.service';
+import { FileToolbar } from '../../components/file-toolbar/file-toolbar';
+import { FileFilters } from '../../components/file-filters/file-filters';
+import { FileTable } from '../../components/file-table/file-table';
+import { FileUpload } from '../../components/file-upload/file-upload';
+import { FileEditDialog } from '../../components/file-edit-status/file-edit-dialog';
+import { FilePreview } from '../../components/file-preview/file-preview';
 
 interface AdvancedFilters {
   departments: Set<string>;
@@ -36,9 +42,21 @@ interface AdvancedFilters {
 @Component({
   selector: 'app-files',
   standalone: true,
-  imports: [CommonModule, FormsModule,RouterLink, ForwardFileDialog, TranslatePipe,HasPermissionDirective],
+  imports: [
+    CommonModule,
+    FormsModule,
+    ForwardFileDialog,
+    TranslatePipe,
+    HasPermissionDirective,
+    FileToolbar,
+    FileFilters,
+    FileTable,
+    FileUpload,
+    FileEditDialog,
+    FilePreview
+  ],
   templateUrl: './files.html',
-  styleUrl: './files.css'
+  styleUrl: './files.css',
 })
 export class Files implements OnInit {
   allFiles: FileResponse[] = [];
@@ -57,10 +75,10 @@ export class Files implements OnInit {
     private sanitizer: DomSanitizer,
     private elementRef: ElementRef,
     private perms: PermissionsService,
-    private SecLevelService : SecuritylevelService,
+    private SecLevelService: SecuritylevelService,
     @Inject(LookupService) private lookUpService: LookupService,
     private appConfig: AppConfigService,
-  ) { }
+  ) {}
 
   get isAdmin(): boolean {
     return this.authService.getRole() === 'ADMIN';
@@ -85,13 +103,21 @@ export class Files implements OnInit {
   // Maps the UI's sort field to the backend/entity property name used by
   // Spring Data's Pageable `sort` param. Adjust the right-hand values if
   // your entity's field names differ from the DTO's.
-  private readonly sortFieldMap: Record<'NAME' | 'OWNER' | 'SIZE' | 'CREATED' | 'MODIFIED', string> = {
+  private readonly sortFieldMap: Record<
+    'NAME' | 'OWNER' | 'SIZE' | 'CREATED' | 'MODIFIED',
+    string
+  > = {
     NAME: 'name',
     OWNER: 'ownerName',
     SIZE: 'size',
     CREATED: 'createdDate',
-    MODIFIED: 'modifiedDate'
+    MODIFIED: 'modifiedDate',
   };
+
+  onToolbarSearchChange(searchTerm: string): void {
+    this.searchTerm = searchTerm;
+    this.onSearchChange();
+  }
 
   // ---- Advanced Search ----
   showAdvancedSearch = false;
@@ -103,7 +129,7 @@ export class Files implements OnInit {
     createdFrom: '',
     createdTo: '',
     modifiedFrom: '',
-    modifiedTo: ''
+    modifiedTo: '',
   };
 
   selectedFileIds = new Set<number>();
@@ -112,11 +138,11 @@ export class Files implements OnInit {
 
   private searchTrigger$ = new Subject<void>();
 
-  securitylevels:SecurityLevel[] = []
+  securitylevels: SecurityLevel[] = [];
 
- getSecurityLevelName(securityLevelId: number | null): string {
+  getSecurityLevelName(securityLevelId: number | null): string {
     if (securityLevelId == null) return '—';
-    return this.securitylevels.find(s => s.id === securityLevelId)?.name ?? 'Unknown';
+    return this.securitylevels.find((s) => s.id === securityLevelId)?.name ?? 'Unknown';
   }
 
   setSecurityLevelsArr(): void {
@@ -133,121 +159,125 @@ export class Files implements OnInit {
     });
   }
 
-/////////////////////////////
-  ngOnInit(): void 
-  {
+  /////////////////////////////
+  ngOnInit(): void {
     this.setSecurityLevelsArr();
-      this.searchTrigger$.pipe(
-    switchMap(() => {
-      this.isLoading = true;
-      this.errorMessage = '';
-      return this.fileService.searchFiles(this.buildSearchRequest());
-    })
-  ).subscribe({
-    next: (response) => {
-      this.allFiles = response.content;
-      this.filteredFiles = response.content;
-      this.totalElements = response.totalElements;
-      this.totalDisplayedPages = response.totalPages;
-      this.isLoading = false;
-    },
-    error: (err) => {
-      console.error('Failed to load files:', err);
-      this.errorMessage = err?.error?.message || 'Failed to load files.';
-      this.isLoading = false;
-    }
-  }); 
+    this.searchTrigger$
+      .pipe(
+        switchMap(() => {
+          this.isLoading = true;
+          this.errorMessage = '';
+          return this.fileService.searchFiles(this.buildSearchRequest());
+        }),
+      )
+      .subscribe({
+        next: (response) => {
+          this.allFiles = response.content || [];
+          this.filteredFiles = response.content || [];
+          this.totalElements = response.totalElements || 0;
+          this.totalDisplayedPages = response.totalPages || 0;
+          this.isLoading = false;
+        },
+        error: (err) => {
+          console.error('Failed to load files:', err);
+          this.errorMessage = err?.error?.message || 'Failed to load files.';
+          this.isLoading = false;
+          // Set empty arrays to prevent stuck loading state
+          this.allFiles = [];
+          this.filteredFiles = [];
+        },
+      });
 
-  //////
-  this.departmentService.getLookupDepartments().subscribe({
- next: (depts) => {
-  // Scoped list — used ONLY for the "filter by department" search panel,
-  // which should respect what this user is allowed to read.
-  this.departments = this.canFilterAllDepartments
-    ? depts
-    : depts.filter(d => Number(d.id) === this.authService.getDeptId());
+    //////
+    this.departmentService.getLookupDepartments().subscribe({
+      next: (depts) => {
+        // Scoped list — used ONLY for the "filter by department" search panel,
+        // which should respect what this user is allowed to read.
+        this.departments = this.canFilterAllDepartments
+          ? depts
+          : depts.filter((d) => Number(d.id) === this.authService.getDeptId());
 
-  this.loadFiles();
-  this.loadFilterOptions();
-},
-  error: () => {
-    this.errorMessage = 'Failed to load departments.';
-    this.loadFiles();      
+        this.loadFiles();
+        this.loadFilterOptions();
+      },
+      error: () => {
+        this.errorMessage = 'Failed to load departments.';
+        this.loadFiles();
+      },
+    });
+
+    // Load ALL departments for the upload wizard — the backend's lookup endpoint
+    // filters by the user's department, so we hit the unfiltered /api/departments
+    // endpoint instead so any manager can send a file to any department.
+    this.lookUpService.getAllDepartmentsForUpload().subscribe({
+      next: (depts) => (this.uploadDepartments = depts),
+      error: () => (this.uploadDepartments = []),
+    });
+
+    this.loadFileTypes();
+
+    this.route.queryParams.subscribe((params) => {
+      const previewId = params['previewFileId'];
+      if (previewId) {
+        this.previewFileById(Number(previewId));
+      }
+    });
   }
-});
 
-  // Load ALL departments for the upload wizard — the backend's lookup endpoint
-  // filters by the user's department, so we hit the unfiltered /api/departments
-  // endpoint instead so any manager can send a file to any department.
-  this.lookUpService.getAllDepartmentsForUpload().subscribe({
-    next: (depts) => (this.uploadDepartments = depts),
-    error: () => (this.uploadDepartments = [])
-  });
-
-  this.loadFileTypes();
-
-  this.route.queryParams.subscribe(params => {
-    const previewId = params['previewFileId'];
-    if (previewId) {
-      this.previewFileById(Number(previewId));
-    }
-  });
-}
-
-get canFilterAllDepartments(): boolean {
-  return this.perms.has('Files', 'READ_ALL');
-}
+  get canFilterAllDepartments(): boolean {
+    return this.perms.has('Files', 'READ_ALL');
+  }
 
   previewFileById(fileId: number): void {
     this.fileService.getFileData(fileId).subscribe({
       next: (file: FileResponse) => this.previewFile(file),
-      error: () => this.errorMessage = 'Could not load that file — it may have been removed.'
+      error: () => (this.errorMessage = 'Could not load that file — it may have been removed.'),
     });
   }
 
   /** All departments — used for the upload wizard so any user can send to any dept. */
   uploadDepartments: DepartmentLookUp[] = [];
   /** Departments visible in the filter panel — scoped by permission. */
-departments: Department[] = [];
-fileTypes: FileType[] = [];
-availableOwners: string[] = [];
+  departments: Department[] = [];
+  fileTypes: FileType[] = [];
+  availableOwners: string[] = [];
 
-private loadFilterOptions(): void {
-   const req: FileSearchRequest = {
-    page: 0,
-    size: 1000
-  };
-  this.fileService.searchFiles(req).subscribe({
-    next: (res) => {
-      this.availableOwners = [...new Set(res.content.map(f => f.ownerName).filter(Boolean))].sort();
-    }
-  });
-}
-
+  private loadFilterOptions(): void {
+    const req: FileSearchRequest = {
+      page: 0,
+      size: 1000,
+    };
+    this.fileService.searchFiles(req).subscribe({
+      next: (res) => {
+        this.availableOwners = [
+          ...new Set(res.content.map((f) => f.ownerName).filter(Boolean)),
+        ].sort();
+      },
+    });
+  }
 
   loadFileTypes(): void {
     this.fileTypeService.lookupAllFileTypes().subscribe({
-      next: (types) => this.fileTypes = types,
-      error: () => this.errorMessage = 'Failed to load file types.'
+      next: (types) => (this.fileTypes = types),
+      error: () => (this.errorMessage = 'Failed to load file types.'),
     });
   }
 
   loadFiles(): void {
-  this.searchTrigger$.next();
-}
+    this.searchTrigger$.next();
+  }
 
-applyFilters(): void {
-  this.page = 0;
-  this.loadFiles();
-}
+  applyFilters(): void {
+    this.page = 0;
+    this.loadFiles();
+  }
 
-private searchDebounceTimer: any;
+  private searchDebounceTimer: any;
 
-onSearchChange(): void {
-  clearTimeout(this.searchDebounceTimer);
-  this.searchDebounceTimer = setTimeout(() => this.applyFilters(), 300);
-}
-
+  onSearchChange(): void {
+    clearTimeout(this.searchDebounceTimer);
+    this.searchDebounceTimer = setTimeout(() => this.applyFilters(), 300);
+  }
 
   setTab(tab: 'ALL' | 'PENDING' | 'APPROVED' | 'REJECTED'): void {
     this.activeTab = tab;
@@ -260,9 +290,9 @@ onSearchChange(): void {
     this.showAdvancedSearch = !this.showAdvancedSearch;
   }
 
- get uniqueOwners(): string[] {
-  return this.availableOwners;
-}
+  get uniqueOwners(): string[] {
+    return this.availableOwners;
+  }
 
   isDeptFilterSelected(deptName: string): boolean {
     return this.advancedFilters.departments.has(deptName);
@@ -285,13 +315,13 @@ onSearchChange(): void {
     this.toggleSetValue(this.advancedFilters.statuses, status);
   }
 
- isFileTypeFilterSelected(typeName: string): boolean {
-  return this.advancedFilters.fileTypeNames.has(typeName);
-}
+  isFileTypeFilterSelected(typeName: string): boolean {
+    return this.advancedFilters.fileTypeNames.has(typeName);
+  }
 
-toggleFileTypeFilter(typeName: string): void {
-  this.toggleSetValue(this.advancedFilters.fileTypeNames, typeName);
-}
+  toggleFileTypeFilter(typeName: string): void {
+    this.toggleSetValue(this.advancedFilters.fileTypeNames, typeName);
+  }
 
   private toggleSetValue(set: Set<string>, value: string): void {
     if (set.has(value)) {
@@ -321,7 +351,7 @@ toggleFileTypeFilter(typeName: string): void {
       createdFrom: '',
       createdTo: '',
       modifiedFrom: '',
-      modifiedTo: ''
+      modifiedTo: '',
     };
     this.applyFilters();
   }
@@ -344,20 +374,18 @@ toggleFileTypeFilter(typeName: string): void {
   }
 
   toggleSelectAll(event: Event): void {
-     const checked = (event.target as HTMLInputElement).checked;
-  if (checked) {
-    this.filteredFiles
-      .filter(f => !f.expired)
-      .forEach(f => this.selectedFileIds.add(f.id));
-  } else {
-    this.filteredFiles.forEach(f => this.selectedFileIds.delete(f.id));
-  }
+    const checked = (event.target as HTMLInputElement).checked;
+    if (checked) {
+      this.filteredFiles.filter((f) => !f.expired).forEach((f) => this.selectedFileIds.add(f.id));
+    } else {
+      this.filteredFiles.forEach((f) => this.selectedFileIds.delete(f.id));
+    }
   }
 
   toggleSelectFile(fileId: number): void {
-    const file = this.filteredFiles.find(f => f.id === fileId);
-    
-    if (file?.expired) return; 
+    const file = this.filteredFiles.find((f) => f.id === fileId);
+
+    if (file?.expired) return;
 
     if (this.selectedFileIds.has(fileId)) {
       this.selectedFileIds.delete(fileId);
@@ -372,7 +400,7 @@ toggleFileTypeFilter(typeName: string): void {
 
   toggleMenu(fileId: number, event: Event): void {
     event.stopPropagation();
-    const file = this.filteredFiles.find(f => f.id === fileId);
+    const file = this.filteredFiles.find((f) => f.id === fileId);
     if (file?.expired) {
       this.errorMessage = `"${file.name}" has expired and can no longer be accessed.`;
       return;
@@ -416,10 +444,12 @@ toggleFileTypeFilter(typeName: string): void {
   readonly totalSteps = 5;
 
   get canSubmitUpload(): boolean {
-    return this.uploadItems.length > 0 &&
+    return (
+      this.uploadItems.length > 0 &&
       this.selectedDepartmentIds.length > 0 &&
-      this.uploadItems.every(item => item.fileTypeId != null) &&
-      !this.isUploading;
+      this.uploadItems.every((item) => item.fileTypeId != null) &&
+      !this.isUploading
+    );
   }
 
   // get totalRecordsToCreate(): number {
@@ -470,26 +500,34 @@ toggleFileTypeFilter(typeName: string): void {
 
   canGoNext(): boolean {
     switch (this.currentStep) {
-      case 1: return this.uploadItems.length > 0;
-      case 2: return this.selectedDepartmentIds.length > 0;
-      case 3: return this.uploadItems.every(item => item.fileTypeId != null);
-      case 4: return this.securitylevels.length === 0 || this.uploadItems.every(item => item.securityLevelId != null);
-      default: return false;
+      case 1:
+        return this.uploadItems.length > 0;
+      case 2:
+        return this.selectedDepartmentIds.length > 0;
+      case 3:
+        return this.uploadItems.every((item) => item.fileTypeId != null);
+      case 4:
+        return (
+          this.securitylevels.length === 0 ||
+          this.uploadItems.every((item) => item.securityLevelId != null)
+        );
+      default:
+        return false;
     }
   }
 
   private addFiles(files: FileList): void {
-    const maxBytes  = this.appConfig.maxFileSizeBytes;
-    const maxCount  = this.appConfig.maxFilesPerUpload;
-    const maxMB     = this.appConfig.maxFileSizeMB;
+    const maxBytes = this.appConfig.maxFileSizeBytes;
+    const maxCount = this.appConfig.maxFilesPerUpload;
+    const maxMB = this.appConfig.maxFileSizeMB;
 
     // Clear previous rejection messages each time new files are picked
     this.uploadRejections = [];
 
-    Array.from(files).forEach(file => {
+    Array.from(files).forEach((file) => {
       // 1. Duplicate check
       const alreadyAdded = this.uploadItems.some(
-        item => item.file.name === file.name && item.file.size === file.size
+        (item) => item.file.name === file.name && item.file.size === file.size,
       );
       if (alreadyAdded) {
         this.uploadRejections.push({ name: file.name, reason: 'duplicate' });
@@ -513,8 +551,12 @@ toggleFileTypeFilter(typeName: string): void {
   }
 
   /** Expose limit values to the template without exposing the whole service. */
-  get maxFileSizeMB(): number  { return this.appConfig.maxFileSizeMB; }
-  get maxFilesPerUpload(): number { return this.appConfig.maxFilesPerUpload; }
+  get maxFileSizeMB(): number {
+    return this.appConfig.maxFileSizeMB;
+  }
+  get maxFilesPerUpload(): number {
+    return this.appConfig.maxFilesPerUpload;
+  }
 
   onFileSelected(event: Event): void {
     const input = event.target as HTMLInputElement;
@@ -569,22 +611,25 @@ toggleFileTypeFilter(typeName: string): void {
     return this.selectedDepartmentIds.includes(Number(deptId));
   }
 
- getDepartmentName(deptId: number | string): string {
-  const numId = Number(deptId);
-  return this.uploadDepartments.find(d => Number(d.id) === numId)?.name ?? 'Unknown';
-}
+  getDepartmentName(deptId: number | string): string {
+    const numId = Number(deptId);
+    return this.uploadDepartments.find((d) => Number(d.id) === numId)?.name ?? 'Unknown';
+  }
 
   getFileTypeName(fileTypeId: number | null): string {
     if (fileTypeId == null) return '—';
-    return this.fileTypes.find(t => t.id === fileTypeId)?.name ?? 'Unknown';
+    return this.fileTypes.find((t) => t.id === fileTypeId)?.name ?? 'Unknown';
   }
-
 
   submitUpload(): void {
     if (!this.canSubmitUpload) return;
 
     this.isUploading = true;
-    this.fileService.uploadFilesBulk(this.uploadItems as { file: File; fileTypeId: number ;securityLevelId: number}[], this.selectedDepartmentIds)
+    this.fileService
+      .uploadFilesBulk(
+        this.uploadItems as { file: File; fileTypeId: number; securityLevelId: number }[],
+        this.selectedDepartmentIds,
+      )
       .subscribe({
         next: (response: FileResponse[]) => {
           this.isUploading = false;
@@ -595,7 +640,7 @@ toggleFileTypeFilter(typeName: string): void {
           console.error('Upload failed:', err);
           this.isUploading = false;
           this.errorMessage = err?.error?.message || 'Upload failed. Please try again.';
-        }
+        },
       });
   }
 
@@ -605,7 +650,7 @@ toggleFileTypeFilter(typeName: string): void {
   }
 
   downloadFile(file: FileResponse): void {
-      if (this.blockIfExpired(file)) return;
+    if (this.blockIfExpired(file)) return;
     this.fileService.downloadFile(file.id).subscribe({
       next: (blob: Blob) => {
         const url = window.URL.createObjectURL(blob);
@@ -617,7 +662,7 @@ toggleFileTypeFilter(typeName: string): void {
       },
       error: (err: HttpErrorResponse) => {
         this.errorMessage = 'Download failed.';
-      }
+      },
     });
     this.closeMenu();
   }
@@ -659,7 +704,7 @@ toggleFileTypeFilter(typeName: string): void {
         this.isLoadingPreview = false;
         this.errorMessage = 'Preview failed.';
         this.showPreviewModal = false;
-      }
+      },
     });
   }
 
@@ -731,10 +776,12 @@ toggleFileTypeFilter(typeName: string): void {
   }
 
   get canConfirmStatus(): boolean {
-    return !!this.statusModalFile &&
+    return (
+      !!this.statusModalFile &&
       !!this.selectedStatus &&
       this.selectedStatus !== this.statusModalFile.status &&
-      !this.isUpdatingStatus;
+      !this.isUpdatingStatus
+    );
   }
 
   confirmStatusUpdate(): void {
@@ -752,7 +799,7 @@ toggleFileTypeFilter(typeName: string): void {
       error: (err: HttpErrorResponse) => {
         this.isUpdatingStatus = false;
         this.errorMessage = 'Status update failed.';
-      }
+      },
     });
   }
 
@@ -760,40 +807,40 @@ toggleFileTypeFilter(typeName: string): void {
     return this.authService.getRole();
   }
 
-getFileIcon(extension: string): string {
-  const map: Record<string, string> = {
-     pdf: 'bi-file-earmark-pdf',
-    docx: 'bi-file-earmark-word',
-    doc: 'bi-file-earmark-word',
-    xlsx: 'bi-file-earmark-excel',
-    xls: 'bi-file-earmark-excel',
-    zip: 'bi-file-earmark-zip',
-    gz: 'bi-file-earmark-zip',
-    png: 'bi-file-earmark-image',
-    jpg: 'bi-file-earmark-image',
-    jpeg: 'bi-file-earmark-image',
-    txt: 'bi-file-earmark-text'
-  };
+  getFileIcon(extension: string): string {
+    const map: Record<string, string> = {
+      pdf: 'bi-file-earmark-pdf',
+      docx: 'bi-file-earmark-word',
+      doc: 'bi-file-earmark-word',
+      xlsx: 'bi-file-earmark-excel',
+      xls: 'bi-file-earmark-excel',
+      zip: 'bi-file-earmark-zip',
+      gz: 'bi-file-earmark-zip',
+      png: 'bi-file-earmark-image',
+      jpg: 'bi-file-earmark-image',
+      jpeg: 'bi-file-earmark-image',
+      txt: 'bi-file-earmark-text',
+    };
 
-  return map[extension.toLowerCase()] ?? 'bi-file-earmark';
-}
-getFileIconColor(extension: string): string {
-  const map: Record<string, string> = {
-    pdf: '#ef4444',
-    docx: '#2563eb',
-    doc: '#2563eb',
-    xlsx: '#16a34a',
-    xls: '#16a34a',
-    zip: '#f59e0b',
-    gz: '#f59e0b',
-    png: '#10b981',
-    jpg: '#10b981',
-    jpeg: '#10b981',
-    txt: '#64748b'
-  };
+    return map[extension.toLowerCase()] ?? 'bi-file-earmark';
+  }
+  getFileIconColor(extension: string): string {
+    const map: Record<string, string> = {
+      pdf: '#ef4444',
+      docx: '#2563eb',
+      doc: '#2563eb',
+      xlsx: '#16a34a',
+      xls: '#16a34a',
+      zip: '#f59e0b',
+      gz: '#f59e0b',
+      png: '#10b981',
+      jpg: '#10b981',
+      jpeg: '#10b981',
+      txt: '#64748b',
+    };
 
-  return map[extension?.toLowerCase()] ?? '#64748b';
-}
+    return map[extension?.toLowerCase()] ?? '#64748b';
+  }
   get selectedCount(): number {
     return this.selectedFileIds.size;
   }
@@ -803,7 +850,6 @@ getFileIconColor(extension: string): string {
   }
 
   deleteSelectedFiles(): void {
-
     if (this.selectedFileIds.size === 0) {
       return;
     }
@@ -813,12 +859,12 @@ getFileIconColor(extension: string): string {
     }
 
     const ids = [...this.selectedFileIds];
-    const filesToTrash = this.allFiles.filter(f => ids.includes(f.id));
+    const filesToTrash = this.allFiles.filter((f) => ids.includes(f.id));
     if (filesToTrash.length > 0) {
       this.trashService.moveToTrashBulk(filesToTrash);
     }
 
-    ids.forEach(id => {
+    ids.forEach((id) => {
       this.fileService.deleteFile(id).subscribe({
         next: () => {
           this.selectedFileIds.delete(id);
@@ -832,7 +878,7 @@ getFileIconColor(extension: string): string {
           if (this.selectedFileIds.size === 0) {
             this.loadFiles();
           }
-        }
+        },
       });
     });
   }
@@ -854,7 +900,7 @@ getFileIconColor(extension: string): string {
       error: (err: HttpErrorResponse) => {
         console.error('Bulk download failed:', err.status, err.error);
         this.errorMessage = 'Download failed. Please try again.';
-      }
+      },
     });
   }
 
@@ -895,53 +941,56 @@ getFileIconColor(extension: string): string {
   }
 
   private getScopedDepartments(selected: Set<string>): string[] | undefined {
-  const canViewAllDepartments = this.perms.has('Files', 'DELETE');
+    const canViewAllDepartments = this.perms.has('Files', 'DELETE');
 
-  if (!canViewAllDepartments) {
-    const deptId = this.authService.getDeptId();
-    const deptName = deptId != null ? this.getDepartmentName(deptId) : null;
-    return deptName ? [deptName] : undefined;
+    if (!canViewAllDepartments) {
+      const deptId = this.authService.getDeptId();
+      const deptName = deptId != null ? this.getDepartmentName(deptId) : null;
+      return deptName ? [deptName] : undefined;
+    }
+
+    return selected.size > 0 ? [...selected] : undefined;
   }
 
-  return selected.size > 0 ? [...selected] : undefined;
-}
+  private buildSearchRequest(): FileSearchRequest {
+    const f = this.advancedFilters;
 
-private buildSearchRequest(): FileSearchRequest {
-  const f = this.advancedFilters;
+    const statuses =
+      this.activeTab !== 'ALL'
+        ? [this.activeTab]
+        : f.statuses.size > 0
+          ? [...f.statuses]
+          : undefined;
 
-  const statuses = this.activeTab !== 'ALL'
-    ? [this.activeTab]
-    : (f.statuses.size > 0 ? [...f.statuses] : undefined);
+    const backendSortField = this.sortBy ? this.sortFieldMap[this.sortBy] : undefined;
 
-  const backendSortField = this.sortBy ? this.sortFieldMap[this.sortBy] : undefined;
-
-  return {
-    name: this.searchTerm.trim() || undefined,
-    owners: f.owners.size > 0 ? [...f.owners] : undefined,
-    departments: f.departments.size > 0 ? [...f.departments] : undefined,
-    categories: f.fileTypeNames.size > 0 ? [...f.fileTypeNames] : undefined,
-    statuses,
-    fromDate: f.createdFrom || undefined,
-    toDate: f.createdTo || undefined,
-    modifiedFrom: f.modifiedFrom || undefined,
-    modifiedTo: f.modifiedTo || undefined,
-    sortBy: backendSortField,
-    sortDir: this.sortDirection,
-    page: this.page,
-    size: this.size
-  };
-}
-
-private blockIfExpired(file: FileResponse): boolean {
-  if (file.expired) {
-    this.errorMessage = `"${file.name}" has expired and can no longer be accessed.`;
-    this.closeMenu();
-    return true;
+    return {
+      name: this.searchTerm.trim() || undefined,
+      owners: f.owners.size > 0 ? [...f.owners] : undefined,
+      departments: f.departments.size > 0 ? [...f.departments] : undefined,
+      categories: f.fileTypeNames.size > 0 ? [...f.fileTypeNames] : undefined,
+      statuses,
+      fromDate: f.createdFrom || undefined,
+      toDate: f.createdTo || undefined,
+      modifiedFrom: f.modifiedFrom || undefined,
+      modifiedTo: f.modifiedTo || undefined,
+      sortBy: backendSortField,
+      sortDir: this.sortDirection,
+      page: this.page,
+      size: this.size,
+    };
   }
-  return false;
-}
-get allSelectableSelected(): boolean {
-  const selectable = this.filteredFiles.filter(f => !f.expired);
-  return selectable.length > 0 && selectable.every(f => this.selectedFileIds.has(f.id));
-}
+
+  private blockIfExpired(file: FileResponse): boolean {
+    if (file.expired) {
+      this.errorMessage = `"${file.name}" has expired and can no longer be accessed.`;
+      this.closeMenu();
+      return true;
+    }
+    return false;
+  }
+  get allSelectableSelected(): boolean {
+    const selectable = this.filteredFiles.filter((f) => !f.expired);
+    return selectable.length > 0 && selectable.every((f) => this.selectedFileIds.has(f.id));
+  }
 }

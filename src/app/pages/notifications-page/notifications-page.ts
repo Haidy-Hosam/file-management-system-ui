@@ -2,7 +2,7 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { NotificationService } from '../../core/services/Notification.service';
-import { FileForwardResponse } from '../../core/models/FileForward.model';
+import { FileForwardResponse } from '../file/models/FileForward.model';
 import { Router } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
 

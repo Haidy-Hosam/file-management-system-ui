@@ -1,0 +1,145 @@
+<div class="advanced-search-panel">
+  <div class="advanced-search-header">
+    <h4>
+      {{ 'FILES.ADVANCED_SEARCH' | translate }}
+    </h4>
+
+    <button class="clear-filters-btn" (click)="clearAllFilters()" *ngIf="activeFilterCount > 0">
+      {{ 'Clear' | translate }}
+    </button>
+  </div>
+
+  <div class="advanced-search-grid">
+    <!-- Department -->
+
+    <div class="filter-column">
+      <span class="filter-column-title">
+        {{ 'FILES.COL_DEPARTMENT' | translate }}
+      </span>
+
+      <label class="filter-checkbox" *ngFor="let dept of departments">
+        <input
+          type="checkbox"
+          [checked]="isDeptFilterSelected(dept.name)"
+          (change)="toggleDeptFilter(dept.name)"
+        />
+
+        {{ dept.name }}
+      </label>
+    </div>
+
+    <!-- Owner -->
+
+    <div class="filter-column">
+      <span class="filter-column-title">
+        {{ 'FILES.COL_OWNER' | translate }}
+      </span>
+
+      <label class="filter-checkbox" *ngFor="let owner of uniqueOwners">
+        <input
+          type="checkbox"
+          [checked]="isOwnerFilterSelected(owner)"
+          (change)="toggleOwnerFilter(owner)"
+        />
+
+        {{ owner }}
+      </label>
+    </div>
+
+    <!-- Status -->
+
+    <div class="filter-column">
+      <span class="filter-column-title">
+        {{ 'FILES.FILE_STATUS' | translate }}
+      </span>
+
+      <label class="filter-checkbox" *ngFor="let status of statusOptions">
+        <input
+          type="checkbox"
+          [checked]="isStatusFilterSelected(status)"
+          (change)="toggleStatusFilter(status)"
+        />
+
+        {{ 'STATUS.' + status | translate }}
+      </label>
+    </div>
+
+    <!-- File Type -->
+
+    <div class="filter-column">
+      <span class="filter-column-title">
+        {{ 'FILES.CATEGORES' | translate }}
+      </span>
+
+      <label class="filter-checkbox" *ngFor="let type of fileTypes">
+        <input
+          type="checkbox"
+          [checked]="isFileTypeFilterSelected(type.name)"
+          (change)="toggleFileTypeFilter(type.name)"
+        />
+
+        {{ type.name }}
+      </label>
+    </div>
+
+    <!-- Creation Date -->
+
+    <div class="filter-column">
+      <span class="filter-column-title">
+        {{ 'FILES.CREATION_DATE' | translate }}
+      </span>
+
+      <span class="date-label">
+        {{ 'FILES.FROM' | translate }}
+      </span>
+
+      <input
+        type="date"
+        class="date-input"
+        [(ngModel)]="createdFrom"
+        (ngModelChange)="onDateChange()"
+      />
+
+      <span class="date-label">
+        {{ 'FILES.TO' | translate }}
+      </span>
+
+      <input
+        type="date"
+        class="date-input"
+        [(ngModel)]="createdTo"
+        (ngModelChange)="onDateChange()"
+      />
+    </div>
+
+    <!-- Modification Date -->
+
+    <div class="filter-column">
+      <span class="filter-column-title">
+        {{ 'FILES.MODEFICATION_DATE' | translate }}
+      </span>
+
+      <span class="date-label">
+        {{ 'FILES.FROM' | translate }}
+      </span>
+
+      <input
+        type="date"
+        class="date-input"
+        [(ngModel)]="modifiedFrom"
+        (ngModelChange)="onDateChange()"
+      />
+
+      <span class="date-label">
+        {{ 'FILES.TO' | translate }}
+      </span>
+
+      <input
+        type="date"
+        class="date-input"
+        [(ngModel)]="modifiedTo"
+        (ngModelChange)="onDateChange()"
+      />
+    </div>
+  </div>
+</div>

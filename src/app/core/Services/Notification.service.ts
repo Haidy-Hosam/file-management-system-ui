@@ -2,7 +2,7 @@
 import { Injectable, OnDestroy, signal } from '@angular/core';
 import { HttpClient, HttpDownloadProgressEvent, HttpEventType } from '@angular/common/http';
 import { Observable, Subscription } from 'rxjs';
-import { FileForwardResponse } from '../models/FileForward.model';
+import { FileForwardResponse } from '../../pages/file/models/FileForward.model';
 import { ToastService } from './toast.service';
 import { AuthService } from './auth.service';
 
