@@ -1,0 +1,127 @@
+<div class="top-row">
+
+  <button
+    class="link-btn"
+    (click)="goBack()"
+  >
+    <span class="icon">←</span>
+    {{ 'FILE_DETAILS.BACK_TO_FILES' | translate }}
+  </button>
+
+
+  <div class="actions">
+
+    <button
+      class="btn btn-outline"
+      (click)="previewFile()"
+    >
+      <span class="icon">👁</span>
+      {{ 'COMMON.PREVIEW' | translate }}
+    </button>
+
+
+    <button
+      class="btn btn-outline"
+      (click)="downloadFile()"
+    >
+      <span class="icon">⬇</span>
+      {{ 'COMMON.DOWNLOAD' | translate }}
+    </button>
+
+
+    <button
+      class="btn btn-primary"
+      (click)="editFile()"
+    >
+      <span class="icon">✎</span>
+      {{ 'COMMON.EDIT' | translate }}
+    </button>
+
+  </div>
+
+</div>
+
+
+<!-- File header card -->
+
+<div class="card header-card" *ngIf="file">
+
+  <div class="header-row">
+
+    <div class="file-meta">
+
+      <div class="file-icon">
+        📄
+      </div>
+
+      <div>
+
+        <h2>
+          {{ file.name }}
+        </h2>
+
+        <div class="meta-line">
+
+          <span>
+            🏢 {{ file.departmentNames }}
+          </span>
+
+          <span class="mono">
+            .{{ file.extension }}
+          </span>
+
+          <span class="mono">
+            {{ file.size }}
+          </span>
+
+          <span>
+            🕒 {{ file.modifiedDate }}
+          </span>
+
+        </div>
+
+      </div>
+
+    </div>
+
+
+    <div class="header-right">
+
+      <span class="status">
+
+        <span
+          class="dot"
+          [class.dot-active]="file.status === 'Active'"
+        ></span>
+
+        {{
+          ('STATUS.' + (file.status | uppercase) | translate)
+          || file.status
+        }}
+
+      </span>
+
+    </div>
+
+  </div>
+
+
+  <!-- Tabs -->
+
+  <div class="tabs">
+
+    <button
+      *ngFor="let tab of tabs"
+      class="tab"
+      [class.tab-active]="activeTab === tab.id"
+      (click)="setTab(tab.id)"
+    >
+      {{
+        ('FILE_DETAILS.TAB_' + (tab.id | uppercase) | translate)
+        || tab.label
+      }}
+    </button>
+
+  </div>
+
+</div>

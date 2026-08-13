@@ -1,0 +1,20 @@
+<div class="card">
+  <h3>{{ 'FILE_DETAILS.ACTIVITY_LOG' | translate }}</h3>
+  <div class="activity-list">
+    <div class="activity-row" *ngFor="let a of activity; let last = last">
+      <div class="timeline">
+        <span class="timeline-dot"></span>
+        <span class="timeline-line" *ngIf="!last"></span>
+      </div>
+      <div class="activity-content">
+        <div class="activity-text">
+          <strong>{{ a.action }}</strong> by {{ a.by }}
+        </div>
+        <div class="activity-date">{{ a.date }}</div>
+      </div>
+    </div>
+    <div class="state-msg" *ngIf="activity.length === 0">
+      {{ 'FILE_DETAILS.NO_ACTIVITY' | translate }}
+    </div>
+  </div>
+</div>

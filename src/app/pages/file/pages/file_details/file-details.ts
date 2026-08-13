@@ -5,7 +5,11 @@ import { FileService, FileResponse } from '../../services/file.service';
 import { DomSanitizer, SafeResourceUrl } from '@angular/platform-browser';
 import { TrashService } from '../../../../core/services/trash.service';
 import { TranslatePipe } from '@ngx-translate/core';
-import {HttpErrorResponse} from '@angular/common/http';
+import { HttpErrorResponse } from '@angular/common/http';
+import { FileDetailsHeader } from '../../components/file-details/file-details-header/file-details-header';
+import { FileDetailsOverview } from '../../components/file-details/file-details-overview/file-details-overview';
+import { FileDetailsActivity } from '../../components/file-details/file-details-activity/file-details-activity';
+import { FileDetailsApproval } from '../../components/file-details/file-details-approval/file-details-approval';
 import {
   FileDetailsService,
   FileVersion,
@@ -14,13 +18,20 @@ import {
   ApprovalStep,
 } from '../../services/file-details.service';
 
-
 type TabId = 'overview' | 'activity' | 'permissions' | 'approval';
 
 @Component({
   selector: 'app-file-details',
   standalone: true,
-  imports: [CommonModule, RouterModule, TranslatePipe],
+  imports: [
+    CommonModule,
+    RouterModule,
+    TranslatePipe,
+    FileDetailsHeader,
+    FileDetailsOverview,
+    FileDetailsActivity,
+    FileDetailsApproval,
+  ],
   templateUrl: './file-details.html',
   styleUrl: './file-details.css',
 })
@@ -51,7 +62,6 @@ export class FileDetails implements OnInit {
     private fileDetailsService: FileDetailsService,
     private trashService: TrashService,
     private sanitizer: DomSanitizer
-
   ) {}
 
   ngOnInit(): void {
@@ -122,7 +132,6 @@ export class FileDetails implements OnInit {
     this.fileDetailsService.getApprovalSteps(this.fileId).subscribe({
       next: (steps) => {
         this.approvalSteps = steps;
-        // this.approvalSteps.sort( (s)=> s.stepNumber)
         this.approvalSteps.sort((a, b) => a.stepNumber - b.stepNumber);
         this.isLoadingApprovals = false;
       },
@@ -240,72 +249,72 @@ export class FileDetails implements OnInit {
   }
 
   // ---- Preview modal ----
-showPreviewModal = false;
-previewKind: 'image' | 'pdf' | 'text' | 'unsupported' | null = null;
-previewUrl: SafeResourceUrl | null = null;
-previewText = '';
-isLoadingPreview = false;
-private previewObjectUrl: string | null = null; // raw URL, kept to revoke later
+  showPreviewModal = false;
+  previewKind: 'image' | 'pdf' | 'text' | 'unsupported' | null = null;
+  previewUrl: SafeResourceUrl | null = null;
+  previewText = '';
+  isLoadingPreview = false;
+  private previewObjectUrl: string | null = null; // raw URL, kept to revoke later
 
-readonly imageExtensions = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'bmp'];
-readonly textExtensions = ['txt', 'csv', 'json', 'md', 'log', 'xml', 'yml', 'yaml'];
+  readonly imageExtensions = ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg', 'bmp'];
+  readonly textExtensions = ['txt', 'csv', 'json', 'md', 'log', 'xml', 'yml', 'yaml'];
 
-private getPreviewKind(extension: string): 'image' | 'pdf' | 'text' | 'unsupported' {
-  const ext = extension.toLowerCase();
-  if (this.imageExtensions.includes(ext)) return 'image';
-  if (ext === 'pdf') return 'pdf';
-  if (this.textExtensions.includes(ext)) return 'text';
-  return 'unsupported';
-}
-
-previewFile(): void {
-  if (!this.file) return;
-
-  this.previewKind = this.getPreviewKind(this.file.extension);
-  this.previewText = '';
-  this.previewUrl = null;
-  this.showPreviewModal = true;
-
-  if (this.previewKind === 'unsupported') {
-    return; // modal shows a "can't preview" message + download button
+  private getPreviewKind(extension: string): 'image' | 'pdf' | 'text' | 'unsupported' {
+    const ext = extension.toLowerCase();
+    if (this.imageExtensions.includes(ext)) return 'image';
+    if (ext === 'pdf') return 'pdf';
+    if (this.textExtensions.includes(ext)) return 'text';
+    return 'unsupported';
   }
 
-  this.isLoadingPreview = true;
-  this.fileService.downloadFile(this.fileId).subscribe({
-    next: (blob: Blob) => {
-      this.isLoadingPreview = false;
+  previewFile(): void {
+    if (!this.file) return;
 
-      if (this.previewKind === 'text') {
-        const reader = new FileReader();
-        reader.onload = () => {
-          this.previewText = reader.result as string;
-        };
-        reader.readAsText(blob);
-        return;
-      }
+    this.previewKind = this.getPreviewKind(this.file.extension);
+    this.previewText = '';
+    this.previewUrl = null;
+    this.showPreviewModal = true;
 
-      // image or pdf — render via object URL
-      const objectUrl = window.URL.createObjectURL(blob);
-      this.previewObjectUrl = objectUrl;
-      this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
-    },
-    error: (err: HttpErrorResponse) => {
-      this.isLoadingPreview = false;
-      this.errorMessage = 'Preview failed.';
-      this.showPreviewModal = false;
+    if (this.previewKind === 'unsupported') {
+      return; // modal shows a "can't preview" message + download button
     }
-  });
-}
 
-closePreviewModal(): void {
-  this.showPreviewModal = false;
-  this.previewKind = null;
-  this.previewText = '';
-  this.previewUrl = null;
+    this.isLoadingPreview = true;
+    this.fileService.downloadFile(this.fileId).subscribe({
+      next: (blob: Blob) => {
+        this.isLoadingPreview = false;
 
-  if (this.previewObjectUrl) {
-    window.URL.revokeObjectURL(this.previewObjectUrl);
-    this.previewObjectUrl = null;
+        if (this.previewKind === 'text') {
+          const reader = new FileReader();
+          reader.onload = () => {
+            this.previewText = reader.result as string;
+          };
+          reader.readAsText(blob);
+          return;
+        }
+
+        // image or pdf — render via object URL
+        const objectUrl = window.URL.createObjectURL(blob);
+        this.previewObjectUrl = objectUrl;
+        this.previewUrl = this.sanitizer.bypassSecurityTrustResourceUrl(objectUrl);
+      },
+      error: (err: HttpErrorResponse) => {
+        this.isLoadingPreview = false;
+        this.errorMessage = 'Preview failed.';
+        this.showPreviewModal = false;
+      }
+    });
   }
-}
+
+  closePreviewModal(): void {
+    this.showPreviewModal = false;
+    this.previewKind = null;
+    this.previewText = '';
+    this.previewUrl = null;
+
+    if (this.previewObjectUrl) {
+      window.URL.revokeObjectURL(this.previewObjectUrl);
+      this.previewObjectUrl = null;
+    }
+  }
 }

@@ -3,7 +3,7 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
 import { TranslatePipe } from '@ngx-translate/core';
-import { HasPermissionDirective } from '../../../../core/directives/has-permission.directive';
+import { HasPermissionDirective } from '../../../../../core/directives/has-permission.directive';
 
 type FileTab = 'ALL' | 'PENDING' | 'APPROVED' | 'REJECTED';
 

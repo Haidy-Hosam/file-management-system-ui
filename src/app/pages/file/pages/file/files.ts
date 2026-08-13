@@ -21,12 +21,12 @@ import { SecuritylevelService } from '../../../../core/services/securitylevel.se
 import { SecurityLevel } from '../../../../core/models/SecurityLevel.model';
 import { LookupService } from '../../../../core/services/Lookup.service';
 import { AppConfigService } from '../../../../core/services/app-config.service';
-import { FileToolbar } from '../../components/file-toolbar/file-toolbar';
-import { FileFilters } from '../../components/file-filters/file-filters';
-import { FileTable } from '../../components/file-table/file-table';
-import { FileUpload } from '../../components/file-upload/file-upload';
-import { FileEditDialog } from '../../components/file-edit-status/file-edit-dialog';
-import { FilePreview } from '../../components/file-preview/file-preview';
+import { FileToolbar } from '../../components/file/file-toolbar/file-toolbar';
+import { FileFilters } from '../../components/file/file-filters/file-filters';
+import { FileTable } from '../../components/file/file-table/file-table';
+import { FileUpload } from '../../components/file/file-upload/file-upload';
+import { FileEditDialog } from '../../components/file/file-edit-status/file-edit-dialog';
+import { FilePreview } from '../../components/file/file-preview/file-preview';
 
 interface AdvancedFilters {
   departments: Set<string>;
