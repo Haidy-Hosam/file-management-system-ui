@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { FileResponse } from './file.service';
+import { FileResponse } from '../../pages/file/services/file.service';
 
 export interface TrashItem extends FileResponse {
   deletedDate: string;

@@ -1,0 +1,202 @@
+<div>
+  <!-- Loading state -->
+  <div class="state-msg" *ngIf="isLoadingApprovals">{{ 'COMMON.LOADING' | translate }}</div>
+
+  <ng-container *ngIf="!isLoadingApprovals">
+    <!-- Summary card: ring + counters -->
+    <div class="card approval-summary-card">
+      <div class="approval-summary">
+        <!-- Circular progress ring -->
+        <div class="approval-ring-wrap">
+          <svg class="approval-ring" viewBox="0 0 120 120">
+            <!-- Track -->
+            <circle class="ring-track" cx="60" cy="60" r="54" />
+            <!-- Progress arc -->
+            <circle
+              class="ring-progress"
+              cx="60"
+              cy="60"
+              r="54"
+              [style.stroke-dashoffset]="ringOffset"
+            />
+          </svg>
+          <div class="ring-label">
+            <span class="ring-pct">{{ approvalPercentage }}%</span>
+            <span class="ring-sub">{{ 'FILE_DETAILS.APPROVAL_APPROVED' | translate }}</span>
+          </div>
+        </div>
+
+        <!-- Counter chips -->
+        <div class="approval-counters">
+          <div class="approval-counter approved">
+            <span class="counter-icon">✔</span>
+            <div>
+              <div class="counter-num">{{ approvedSteps.length }}</div>
+              <div class="counter-lbl">{{ 'FILE_DETAILS.APPROVAL_APPROVED' | translate }}</div>
+            </div>
+          </div>
+          <div class="approval-counter pending">
+            <span class="counter-icon">⏳</span>
+            <div>
+              <div class="counter-num">{{ pendingSteps.length }}</div>
+              <div class="counter-lbl">{{ 'FILE_DETAILS.APPROVAL_PENDING' | translate }}</div>
+            </div>
+          </div>
+          <div class="approval-counter rejected">
+            <span class="counter-icon">✕</span>
+            <div>
+              <div class="counter-num">{{ rejectedSteps.length }}</div>
+              <div class="counter-lbl">{{ 'FILE_DETAILS.APPROVAL_REJECTED' | translate }}</div>
+            </div>
+          </div>
+          <div class="approval-counter total">
+            <span class="counter-icon">≡</span>
+            <div>
+              <div class="counter-num">{{ approvalSteps.length }}</div>
+              <div class="counter-lbl">{{ 'FILE_DETAILS.APPROVAL_TOTAL' | translate }}</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Empty state -->
+    <div class="state-msg" *ngIf="approvalSteps.length === 0">
+      {{ 'FILE_DETAILS.APPROVAL_NO_STEPS' | translate }}
+    </div>
+
+    <!-- Two-column list: Approved | Pending -->
+    <div class="approval-lists" *ngIf="approvalSteps.length > 0">
+      <!-- Approved managers -->
+      <div class="card approval-list-card">
+        <h3 class="approval-list-title approved-title">
+          <span class="list-title-dot dot-approved"></span>
+          {{ 'FILE_DETAILS.APPROVAL_APPROVED_LIST' | translate }}
+          <span class="list-count approved-count">{{ approvedSteps.length }}</span>
+        </h3>
+        <div class="approval-step-list">
+          <div class="approval-step-row approved-step-row" *ngFor="let step of approvedSteps">
+            <div
+              class="step-avatar approved-avatar"
+              [style.background]="getAvatarColor(step.managerName)"
+            >
+              {{ getInitials(step.managerName) }}
+            </div>
+            <div class="step-info">
+              <div class="step-name">
+                {{ step.managerName || ('FILE_DETAILS.APPROVAL_UNKNOWN_MANAGER' | translate) }}
+              </div>
+              <div class="step-meta">
+                <span class="step-dept">{{ step.departmentName }}</span>
+                <span class="step-rank-tag approved-tag" *ngIf="step.stepNumber">Step {{ step.stepNumber }}</span>
+              </div>
+              <div class="step-date" *ngIf="step.decidedAt">
+                {{ step.decidedAt | date: 'short' }}
+              </div>
+            </div>
+            <span class="step-badge badge-approved">{{
+              'FILE_DETAILS.APPROVAL_APPROVED' | translate
+            }}</span>
+          </div>
+          <div class="state-msg" *ngIf="approvedSteps.length === 0">
+            {{ 'FILE_DETAILS.APPROVAL_NONE_YET' | translate }}
+          </div>
+        </div>
+      </div>
+
+      <!-- Pending managers (Grouped & Ranked by stepNumber) -->
+      <div class="card approval-list-card">
+        <h3 class="approval-list-title pending-title">
+          <span class="list-title-dot dot-pending"></span>
+          {{ 'FILE_DETAILS.APPROVAL_PENDING_LIST' | translate }}
+          <span class="list-count pending-count">{{ pendingSteps.length }}</span>
+        </h3>
+        <div class="approval-step-list">
+          <ng-container *ngFor="let step of pendingSteps; let i = index">
+            <!-- Step Group Stage Header: Displayed once for each unique stepNumber -->
+            <div
+              class="approval-step-group-header"
+              [class.step-group-subsequent]="i > 0 && step.stepNumber !== pendingSteps[i - 1].stepNumber"
+              *ngIf="i === 0 || step.stepNumber !== pendingSteps[i - 1].stepNumber"
+            >
+              <div class="step-group-top">
+                <div class="step-group-badge">
+                  <span class="step-group-num">{{ step.stepNumber }}</span>
+                  <span class="step-group-label">Step {{ step.stepNumber }}</span>
+                </div>
+                <span class="step-group-pill">
+                  <span class="pill-icon">⚡</span>
+                  <span>Parallel Priority</span>
+                </span>
+              </div>
+              <div class="step-group-hint">
+                All managers in Step {{ step.stepNumber }} must approve · Any order
+              </div>
+            </div>
+
+            <!-- Pending Manager Row -->
+            <div class="approval-step-row pending-step-row">
+              <div
+                class="step-avatar pending-avatar"
+                [style.background]="getAvatarColor(step.managerName)"
+              >
+                {{ getInitials(step.managerName) }}
+              </div>
+              <div class="step-info">
+                <div class="step-name">
+                  {{ step.managerName || ('FILE_DETAILS.APPROVAL_UNKNOWN_MANAGER' | translate) }}
+                </div>
+                <div class="step-meta">
+                  <span class="step-dept">{{ step.departmentName }}</span>
+                  <span class="step-rank-tag pending-tag">Step {{ step.stepNumber }}</span>
+                </div>
+              </div>
+              <span class="step-badge badge-pending">{{
+                'FILE_DETAILS.APPROVAL_PENDING' | translate
+              }}</span>
+            </div>
+          </ng-container>
+
+          <!-- Rejected steps shown as requiring action -->
+          <ng-container *ngIf="rejectedSteps.length > 0">
+            <div class="approval-step-group-header rejected-group-header">
+              <div class="step-group-top">
+                <div class="step-group-badge rejected-badge">
+                  <span class="step-group-num rejected-num">✕</span>
+                  <span class="step-group-label">Rejected</span>
+                </div>
+                <span class="step-group-pill rejected-pill">Action Required</span>
+              </div>
+            </div>
+
+            <div class="approval-step-row rejected-step-row" *ngFor="let step of rejectedSteps">
+              <div
+                class="step-avatar rejected-avatar"
+                [style.background]="getAvatarColor(step.managerName)"
+              >
+                {{ getInitials(step.managerName) }}
+              </div>
+              <div class="step-info">
+                <div class="step-name">
+                  {{ step.managerName || ('FILE_DETAILS.APPROVAL_UNKNOWN_MANAGER' | translate) }}
+                </div>
+                <div class="step-meta">
+                  <span class="step-dept">{{ step.departmentName }}</span>
+                  <span class="step-rank-tag rejected-tag" *ngIf="step.stepNumber">Step {{ step.stepNumber }}</span>
+                </div>
+              </div>
+              <span class="step-badge badge-rejected">{{
+                'FILE_DETAILS.APPROVAL_REJECTED' | translate
+              }}</span>
+            </div>
+          </ng-container>
+
+          <div class="state-msg" *ngIf="pendingSteps.length === 0 && rejectedSteps.length === 0">
+            {{ 'FILE_DETAILS.APPROVAL_ALL_DONE' | translate }}
+          </div>
+        </div>
+      </div>
+    </div>
+    <!-- /approval-lists -->
+  </ng-container>
+</div>

@@ -1,0 +1,52 @@
+<div class="grid-2" *ngIf="file">
+  <div class="card">
+    <h3>{{ 'FILE_DETAILS.FILE_INFO' | translate }}</h3>
+    <div class="info-grid">
+      <div>
+        <div class="label">{{ 'FILE_DETAILS.FILE_ID' | translate }}</div>
+        <div class="value">{{ file.id }}</div>
+      </div>
+      <div>
+        <div class="label">{{ 'FILE_DETAILS.FILE_TYPE' | translate }}</div>
+        <div class="value">{{ file.fileType }}</div>
+      </div>
+      <div>
+        <div class="label">{{ 'FILE_DETAILS.EXTENSION' | translate }}</div>
+        <div class="value">.{{ file.extension }}</div>
+      </div>
+      <div>
+        <div class="label">{{ 'FILE_DETAILS.FILE_SIZE' | translate }}</div>
+        <div class="value">{{ file.size }}</div>
+      </div>
+      <div>
+        <div class="label">{{ 'FILE_DETAILS.STATUS' | translate }}</div>
+        <div class="value">
+          {{ ('STATUS.' + (file.status | uppercase) | translate) || file.status }}
+        </div>
+      </div>
+      <div>
+        <div class="label">{{ 'FILE_DETAILS.DEPARTMENT' | translate }}</div>
+        <div class="value">{{ file.departmentNames }}</div>
+      </div>
+      <div>
+        <div class="label">{{ 'FILE_DETAILS.LAST_MODIFIED' | translate }}</div>
+        <div class="value">{{ file.modifiedDate }}</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="card">
+    <h3>{{ 'FILE_DETAILS.QUICK_ACTIONS' | translate }}</h3>
+    <div class="quick-actions">
+      <button class="btn btn-outline full" (click)="onDownload()">
+        <span class="icon">⬇</span> {{ 'FILE_DETAILS.DOWNLOAD_FILE' | translate }}
+      </button>
+      <button class="btn btn-outline full" (click)="onEdit()">
+        <span class="icon">✎</span> {{ 'FILE_DETAILS.EDIT_METADATA' | translate }}
+      </button>
+      <button class="btn btn-outline full danger" (click)="onDelete()">
+        <span class="icon">🗑</span> {{ 'FILE_DETAILS.DELETE_FILE' | translate }}
+      </button>
+    </div>
+  </div>
+</div>

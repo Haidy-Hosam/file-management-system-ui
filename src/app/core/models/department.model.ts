@@ -1,5 +1,5 @@
 export interface EmployeeResponse {
-   id: number;
+  id: number;
   name: string;
   email: string;
   role: string | null;
@@ -12,7 +12,7 @@ export interface ReassignmentItem {
   targetDepartmentId: number;
 }
 
-import type { FileResponse } from '../services/file.service';
+import type { FileResponse } from '../../pages/file/models/file.model';
 export type { FileResponse };
 
 

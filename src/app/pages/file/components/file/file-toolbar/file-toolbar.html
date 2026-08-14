@@ -1,0 +1,176 @@
+<div class="toolbar">
+
+  <!-- Search -->
+  <div class="search-box">
+
+    <svg
+      class="search-icon"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg">
+
+      <circle
+        cx="11"
+        cy="11"
+        r="7"
+        stroke="currentColor"
+        stroke-width="1.8"
+      />
+
+      <path
+        d="M21 21L16.65 16.65"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+      />
+
+    </svg>
+
+    <input
+      type="text"
+      [placeholder]="'FILES.SEARCH_PLACEHOLDER' | translate"
+      [(ngModel)]="searchTerm"
+      (ngModelChange)="onSearchChange()"
+    />
+
+  </div>
+
+
+  <!-- Status Tabs -->
+  <div class="tabs">
+
+    <button
+      [class.active]="activeTab === 'ALL'"
+      (click)="setTab('ALL')">
+      {{ 'COMMON.ALL' | translate }}
+    </button>
+
+    <button
+      [class.active]="activeTab === 'PENDING'"
+      (click)="setTab('PENDING')">
+      {{ 'STATUS.PENDING' | translate }}
+    </button>
+
+    <button
+      [class.active]="activeTab === 'APPROVED'"
+      (click)="setTab('APPROVED')">
+      {{ 'STATUS.APPROVED' | translate }}
+    </button>
+
+    <button
+      [class.active]="activeTab === 'REJECTED'"
+      (click)="setTab('REJECTED')">
+      {{ 'STATUS.REJECTED' | translate }}
+    </button>
+
+  </div>
+
+
+  <!-- Advanced Search -->
+  <button
+    class="advanced-search-btn"
+    [class.active]="showAdvancedSearch"
+    (click)="toggleAdvancedSearch($event)">
+
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg">
+
+      <circle
+        cx="11"
+        cy="11"
+        r="7"
+        stroke="currentColor"
+        stroke-width="1.8"
+      />
+
+      <path
+        d="M21 21L16.65 16.65"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+      />
+
+    </svg>
+
+    {{ 'FILES.ADVANCED_SEARCH' | translate }}
+
+    <span
+      class="advanced-search-count"
+      *ngIf="activeAdvancedFilterCount > 0">
+      {{ activeAdvancedFilterCount }}
+    </span>
+
+    <svg
+      class="chevron"
+      [class.open]="showAdvancedSearch"
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg">
+
+      <path
+        d="M6 9L12 15L18 9"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+
+    </svg>
+
+  </button>
+
+
+  <!-- Trash -->
+  <button
+    class="trash-btn"
+    *appHasPermission="['Files','DELETE']"
+    [routerLink]="['/trash']">
+
+    <i class="bi bi-trash"></i>
+
+    {{ 'FILES.TRASH' | translate }}
+
+    <span
+      class="trash-count"
+      *ngIf="trashCount > 0">
+      {{ trashCount }}
+    </span>
+
+  </button>
+
+
+  <!-- Upload -->
+  <button
+    class="upload-btn"
+    *appHasPermission="['Files','CREATE']"
+    (click)="openUpload($event)">
+
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg">
+
+      <path
+        d="M12 16V4M12 4L7 9M12 4L17 9"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+        stroke-linejoin="round"
+      />
+
+      <path
+        d="M4 16V18C4 19.1046 4.89543 20 6 20H18C19.1046 20 20 19.1046 20 18V16"
+        stroke="currentColor"
+        stroke-width="1.8"
+        stroke-linecap="round"
+      />
+
+    </svg>
+
+    {{ 'FILES.UPLOAD_FILE' | translate }}
+
+  </button>
+
+</div>

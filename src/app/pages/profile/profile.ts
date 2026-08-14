@@ -3,9 +3,9 @@ import { CommonModule } from '@angular/common';
 import { ActivatedRoute } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
 import { UserService, UserResponse } from '../../core/services/user.service';
-import { FileService, FileResponse, PageResponse } from '../../core/services/file.service';
-import { FileForwardService } from '../../core/services/file-forward.service';
-import { FileForwardResponse } from '../../core/models/FileForward.model';
+import { FileService, FileResponse, PageResponse } from '../file/services/file.service';
+import { FileForwardService } from '../file/services/file-forward.service';
+import { FileForwardResponse } from '../file/models/FileForward.model';
 import { TranslatePipe } from '@ngx-translate/core';
 
 type ProfileTab = 'FILES' | 'SENT' | 'RECEIVED';

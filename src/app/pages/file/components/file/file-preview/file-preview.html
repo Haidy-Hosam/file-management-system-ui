@@ -1,0 +1,86 @@
+<!-- Preview Modal -->
+<div
+  class="preview-overlay"
+  *ngIf="showPreviewModal"
+  (click)="closePreview()"
+>
+  <div
+    class="preview-modal"
+    (click)="$event.stopPropagation()"
+  >
+
+    <div class="preview-header">
+
+      <span class="preview-title">
+        {{ previewModalFile?.name }}
+      </span>
+
+      <button
+        class="preview-close-btn"
+        (click)="closePreview()"
+      >
+        ✕
+      </button>
+
+    </div>
+
+
+    <div class="preview-body">
+
+      <div
+        class="preview-loading"
+        *ngIf="isLoadingPreview"
+      >
+        {{ 'FILES.PREVIEW_LOADING' | translate }}
+      </div>
+
+
+      <ng-container *ngIf="!isLoadingPreview">
+
+        <!-- Image Preview -->
+        <img
+          *ngIf="previewKind === 'image' && previewUrl"
+          [src]="previewUrl"
+          class="preview-image"
+          alt="File preview"
+        />
+
+
+        <!-- PDF Preview -->
+        <iframe
+          *ngIf="previewKind === 'pdf' && previewUrl"
+          [src]="previewUrl"
+          class="preview-pdf"
+        ></iframe>
+
+
+        <!-- Text Preview -->
+        <pre
+          *ngIf="previewKind === 'text'"
+          class="preview-text"
+        >{{ previewText }}</pre>
+
+
+        <!-- Unsupported Preview -->
+        <div
+          class="preview-unsupported"
+          *ngIf="previewKind === 'unsupported'"
+        >
+          <p>
+            {{ 'FILES.PREVIEW_UNSUPPORTED' | translate }}
+          </p>
+
+          <button
+            class="confirm-btn"
+            (click)="downloadPreview()"
+          >
+            {{ 'FILES.DOWNLOAD_INSTEAD' | translate }}
+          </button>
+        </div>
+
+      </ng-container>
+
+    </div>
+
+  </div>
+</div>

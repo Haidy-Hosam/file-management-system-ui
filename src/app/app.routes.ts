@@ -1,8 +1,8 @@
 import { Login } from './pages/login/login';
 import { Dashboard } from './pages/dashboard/dashboard';
-import { Files } from './pages/files/files';
+import { Files } from './pages/file/pages/file/files';
 import { ProfileComponent } from './pages/profile/profile';
-import { FileDetails } from './pages/file-details/file-details';
+import { FileDetails } from './pages/file/pages/file_details/file-details';
 import { Departments } from './pages/departments/departments';
 import { DepartmentDetailsComponent } from './pages/department-details/department-details';
 import { Users } from './pages/users/users';

@@ -1,0 +1,200 @@
+<div class="files-page">
+  <div class="page-header">
+    <div>
+      <h1>{{ 'FILES.TITLE' | translate }}</h1>
+      <p class="subtitle">{{ 'FILES.SUBTITLE' | translate }}</p>
+    </div>
+  </div>
+
+  <app-file-toolbar
+  [searchTerm]="searchTerm"
+  [activeTab]="activeTab"
+  [showAdvancedSearch]="showAdvancedSearch"
+  [activeAdvancedFilterCount]="activeAdvancedFilterCount"
+  [trashCount]="trashCount"
+
+  (searchChange)="onToolbarSearchChange($event)"
+  (tabChange)="setTab($event)"
+  (advancedSearchToggle)="toggleAdvancedSearch($event)"
+  (uploadClick)="openUploadModal(); $event.stopPropagation()">
+</app-file-toolbar>
+
+<app-file-filters
+  *ngIf="showAdvancedSearch"
+
+  [departments]="departments"
+  [uniqueOwners]="uniqueOwners"
+  [statusOptions]="statusOptions"
+  [fileTypes]="fileTypes"
+
+  [isDeptFilterSelected]="isDeptFilterSelected.bind(this)"
+  [isOwnerFilterSelected]="isOwnerFilterSelected.bind(this)"
+  [isStatusFilterSelected]="isStatusFilterSelected.bind(this)"
+  [isFileTypeFilterSelected]="isFileTypeFilterSelected.bind(this)"
+
+  [createdFrom]="advancedFilters.createdFrom"
+  [createdTo]="advancedFilters.createdTo"
+  [modifiedFrom]="advancedFilters.modifiedFrom"
+  [modifiedTo]="advancedFilters.modifiedTo"
+
+  [activeFilterCount]="activeAdvancedFilterCount"
+
+  (deptFilterChange)="toggleDeptFilter($event)"
+  (ownerFilterChange)="toggleOwnerFilter($event)"
+  (statusFilterChange)="toggleStatusFilter($event)"
+  (fileTypeFilterChange)="toggleFileTypeFilter($event)"
+
+  (dateFilterChange)="applyFilters()"
+  (clearFilters)="clearAdvancedFilters()">
+</app-file-filters>
+
+  <p class="error-message" *ngIf="errorMessage">{{ errorMessage }}</p>
+  <div class="selection-toolbar" *ngIf="hasSelection">
+
+  <div class="selection-left">
+    <span class="selected-count">
+      {{ selectedCount }} {{ 'FILES.SELECTED_COUNT' | translate }}
+    </span>
+  </div>
+
+  <div class="selection-actions">
+
+    <button class="selection-btn" (click)="downloadSelectedFiles()">
+      <i class="bi bi-download"></i>
+      {{ 'COMMON.DOWNLOAD' | translate }}
+    </button>
+
+    <button
+      class="selection-btn danger"
+      *appHasPermission="['files','DELETE']"
+      (click)="deleteSelectedFiles()">
+
+      <i class="bi bi-trash"></i>
+      {{ 'COMMON.DELETE' | translate }}
+    </button>
+
+  </div>
+
+</div>
+
+<div class="table-wrapper" *ngIf="!isLoading; else loadingState">
+  <app-file-table
+  [filteredFiles]="filteredFiles"
+
+  [sortBy]="sortBy"
+  [sortDirection]="sortDirection"
+
+  [openMenuFileId]="openMenuFileId"
+
+  [isSelected]="isSelected.bind(this)"
+  [getFileIcon]="getFileIcon.bind(this)"
+  [getFileIconColor]="getFileIconColor.bind(this)"
+
+  (selectAll)="toggleSelectAll($event)"
+  (sortChange)="setSort($event)"
+  (selectFile)="toggleSelectFile($event)"
+  (viewDetails)="viewDetails($event)"
+
+  (toggleMenu)="toggleMenu($event.fileId, $event.event)"
+
+  (previewFile)="previewFile($event)"
+  (downloadFile)="downloadFile($event)"
+  (forwardFile)="onForward($event)"
+  (openStatus)="openStatusModal($event)"
+  (deleteFile)="deleteFile($event)">
+</app-file-table>
+</div>
+
+
+  <ng-template #loadingState>
+    <div class="loading-state">{{ 'FILES.LOADING_FILES' | translate }}</div>
+  </ng-template>
+
+  <div class="table-footer" *ngIf="!isLoading">
+  <span>{{ 'FILES.SHOWING' | translate }} {{ filteredFiles.length }} {{ 'FILES.OF' | translate }} {{ totalElements }} {{ 'FILES.FILES_LABEL' | translate }}</span>
+  <div class="pagination">
+    <button (click)="previousPage()" [disabled]="page === 0">
+      {{ 'COMMON.PREVIOUS' | translate }}
+    </button>
+
+    <span>{{ page + 1 }} / {{ totalDisplayedPages }}</span>
+
+    <button (click)="nextPage()" [disabled]="page === totalDisplayedPages - 1">
+      {{ 'COMMON.NEXT' | translate }}
+    </button>
+  </div>
+</div>
+<!-- Upload Modal -->
+<app-file-upload
+  [showUploadModal]="showUploadModal"
+  [currentStep]="currentStep"
+  [totalSteps]="totalSteps"
+  [isDragging]="isDragging"
+  [isUploading]="isUploading"
+  [canSubmitUpload]="canSubmitUpload"
+
+  [uploadItems]="uploadItems"
+  [uploadRejections]="uploadRejections"
+  [uploadDepartments]="uploadDepartments"
+  [selectedDepartmentIds]="selectedDepartmentIds"
+  [fileTypes]="fileTypes"
+  [securitylevels]="securitylevels"
+
+  [maxFileSizeMB]="maxFileSizeMB"
+  [maxFilesPerUpload]="maxFilesPerUpload"
+
+  [isDepartmentSelected]="isDepartmentSelected.bind(this)"
+  [getDepartmentName]="getDepartmentName.bind(this)"
+  [getSecurityLevelName]="getSecurityLevelName.bind(this)"
+  [getFileTypeName]="getFileTypeName.bind(this)"
+  [canGoNext]="canGoNext.bind(this)"
+
+  (close)="closeUploadModal()"
+  (goToStep)="goToStep($event)"
+  (fileSelected)="onFileSelected($event)"
+  (dragOver)="onDragOver($event)"
+  (dragLeave)="onDragLeave($event)"
+  (drop)="onDrop($event)"
+  (removeItem)="removeUploadItem($event)"
+  (toggleDepartment)="toggleDepartmentSelection($event)"
+  (prevStep)="prevStep()"
+  (nextStep)="nextStep()"
+  (submit)="submitUpload()">
+</app-file-upload>
+
+
+
+<!-- Edit Status Modal -->
+<app-file-edit-dialog
+  [showStatusModal]="showStatusModal"
+  [statusModalFile]="statusModalFile"
+  [statusOptions]="statusOptions"
+  [(selectedStatus)]="selectedStatus"
+  [isUpdatingStatus]="isUpdatingStatus"
+  [canConfirmStatus]="canConfirmStatus"
+
+  (close)="closeStatusModal()"
+  (confirm)="confirmStatusUpdate()">
+</app-file-edit-dialog>
+
+
+<!-- Preview Modal -->
+<app-file-preview
+  [showPreviewModal]="showPreviewModal"
+  [previewModalFile]="previewModalFile"
+  [isLoadingPreview]="isLoadingPreview"
+  [previewKind]="previewKind"
+  [previewUrl]="previewUrl"
+  [previewText]="previewText"
+
+  (close)="closePreviewModal()"
+  (download)="downloadPreviewedFile()">
+</app-file-preview>
+
+@if (forwardingFileId !== null) {
+  <app-forward-file-dialog
+    [fileId]="forwardingFileId"
+    (closed)="onForwardDialogClosed()"
+    (forwarded)="onForwardSuccess()">
+  </app-forward-file-dialog>
+}

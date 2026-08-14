@@ -2,7 +2,7 @@
 import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { FileForwardService } from '../../core/services/file-forward.service';
+import { FileForwardService } from '../../pages/file/services/file-forward.service';
 import { UserService } from '../../core/services/user.service'; // adjust to your actual service
 import { UserResponse } from '../../core/services/user.service';
 import { TranslatePipe } from '@ngx-translate/core';

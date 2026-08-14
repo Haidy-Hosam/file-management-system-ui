@@ -2,7 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { RouterLink } from '@angular/router';
-import { FileService, FileResponse } from '../../core/services/file.service';
+import { FileService, FileResponse } from '../file/services/file.service';
 import { DepartmentService } from '../../core/services/department.service';
 import { Department } from '../../core/models/department.model';
 import { TrashService } from '../../core/services/trash.service';

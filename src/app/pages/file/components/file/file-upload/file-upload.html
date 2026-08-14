@@ -1,0 +1,568 @@
+<!-- Upload Modal -->
+<div
+  class="upload-overlay"
+  *ngIf="showUploadModal"
+  (click)="onClose()"
+>
+  <div
+    class="upload-modal upload-modal-wide"
+    (click)="$event.stopPropagation()"
+  >
+
+    <h3>
+      {{ 'FILES.UPLOAD_MODAL_TITLE' | translate }}
+    </h3>
+
+
+    <!-- Step indicator -->
+    <div class="stepper">
+
+      <!-- Step 1 -->
+      <div
+        class="step"
+        [class.active]="currentStep === 1"
+        [class.done]="currentStep > 1"
+        (click)="onGoToStep(1)"
+      >
+        <span class="step-num">1</span>
+
+        <span class="step-label">
+          {{ 'FILES.STEP_FILES' | translate }}
+        </span>
+      </div>
+
+
+      <div
+        class="step-line"
+        [class.done]="currentStep > 1"
+      ></div>
+
+
+      <!-- Step 2 -->
+      <div
+        class="step"
+        [class.active]="currentStep === 2"
+        [class.done]="currentStep > 2"
+        (click)="onGoToStep(2)"
+      >
+        <span class="step-num">2</span>
+
+        <span class="step-label">
+          {{ 'FILES.STEP_DEPARTMENTS' | translate }}
+        </span>
+      </div>
+
+
+      <div
+        class="step-line"
+        [class.done]="currentStep > 2"
+      ></div>
+
+
+      <!-- Step 3 -->
+      <div
+        class="step"
+        [class.active]="currentStep === 3"
+        [class.done]="currentStep > 3"
+        (click)="onGoToStep(3)"
+      >
+        <span class="step-num">3</span>
+
+        <span class="step-label">
+          {{ 'FILES.STEP_FILE_TYPES' | translate }}
+        </span>
+      </div>
+
+
+      <div
+        class="step-line"
+        [class.done]="currentStep > 3"
+      ></div>
+
+
+      <!-- Step 4 -->
+      <div
+        class="step"
+        [class.active]="currentStep === 4"
+        [class.done]="currentStep > 4"
+        (click)="onGoToStep(4)"
+      >
+        <span class="step-num">4</span>
+
+        <span class="step-label">
+          {{ 'FILES.Securitylevel' | translate }}
+        </span>
+      </div>
+
+
+      <div
+        class="step-line"
+        [class.done]="currentStep > 4"
+      ></div>
+
+
+      <!-- Step 5 -->
+      <div
+        class="step"
+        [class.active]="currentStep === 5"
+        (click)="onGoToStep(5)"
+      >
+        <span class="step-num">5</span>
+
+        <span class="step-label">
+          {{ 'FILES.STEP_PREVIEW' | translate }}
+        </span>
+      </div>
+
+    </div>
+
+
+    <!-- Hidden file input -->
+    <input
+      #fileInput
+      type="file"
+      hidden
+      multiple
+      (change)="onFileSelected($event)"
+    />
+
+
+    <!-- ===================================================== -->
+    <!-- STEP 1: Files -->
+    <!-- ===================================================== -->
+
+    <div
+      class="step-content"
+      *ngIf="currentStep === 1"
+    >
+
+      <div
+        class="dropzone"
+        [class.dragging]="isDragging"
+
+        (dragover)="onDragOver($event)"
+        (dragleave)="onDragLeave($event)"
+        (drop)="onDrop($event)"
+
+        (click)="onBrowse(fileInput)"
+      >
+
+        <p>
+          {{ 'FILES.DROPZONE_TEXT' | translate }}
+        </p>
+
+      </div>
+
+
+      <!-- Selected files -->
+      <ul
+        class="selected-files-list"
+        *ngIf="uploadItems.length > 0"
+      >
+
+        <li
+          *ngFor="let item of uploadItems; let i = index"
+        >
+
+          <span>
+            {{ item.file.name }}
+          </span>
+
+          <button
+            type="button"
+            (click)="onRemoveItem(i); $event.stopPropagation()"
+          >
+            ✕
+          </button>
+
+        </li>
+
+      </ul>
+
+
+      <!-- Upload limits -->
+      <div class="upload-limit-hint">
+
+        {{ 'FILES.UPLOAD_SIZE_LIMIT' | translate: {
+          mb: maxFileSizeMB
+        } }}
+
+        ·
+
+        {{ 'FILES.UPLOAD_COUNT_LIMIT' | translate: {
+          count: maxFilesPerUpload
+        } }}
+
+      </div>
+
+
+      <!-- Rejections -->
+      <ul
+        class="upload-rejections"
+        *ngIf="uploadRejections.length > 0"
+      >
+
+        <li
+          *ngFor="let r of uploadRejections"
+          class="rejection-row"
+        >
+
+          <span class="rejection-icon">
+            ⚠
+          </span>
+
+          <span class="rejection-name">
+            {{ r.name }}
+          </span>
+
+          <span class="rejection-reason">
+
+            <ng-container [ngSwitch]="r.reason">
+
+              <ng-container *ngSwitchCase="'size'">
+
+                {{ 'FILES.REJECTION_SIZE' | translate: {
+                  mb: maxFileSizeMB
+                } }}
+
+              </ng-container>
+
+
+              <ng-container *ngSwitchCase="'count'">
+
+                {{ 'FILES.REJECTION_COUNT' | translate: {
+                  count: maxFilesPerUpload
+                } }}
+
+              </ng-container>
+
+
+              <ng-container *ngSwitchCase="'duplicate'">
+
+                {{ 'FILES.REJECTION_DUPLICATE' | translate }}
+
+              </ng-container>
+
+            </ng-container>
+
+          </span>
+
+        </li>
+
+      </ul>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- STEP 2: Departments -->
+    <!-- ===================================================== -->
+
+    <div
+      class="step-content"
+      *ngIf="currentStep === 2"
+    >
+
+      <label>
+        {{ 'FILES.SEND_TO_DEPTS' | translate }}
+      </label>
+
+
+      <div class="dept-chip-grid">
+
+        <button
+          *ngFor="let dept of uploadDepartments"
+
+          type="button"
+
+          class="dept-chip"
+
+          [class.dept-chip--selected]="
+            isDepartmentSelected(dept.id)
+          "
+
+          (click)="onToggleDepartment(dept.id)"
+        >
+
+          <span class="dept-chip__check">
+            ✓
+          </span>
+
+          {{ dept.name }}
+
+        </button>
+
+      </div>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- STEP 3: File Types -->
+    <!-- ===================================================== -->
+
+    <div
+      class="step-content"
+      *ngIf="currentStep === 3"
+    >
+
+      <label>
+        {{ 'FILES.FILE_TYPE_FOR_EACH' | translate }}
+      </label>
+
+
+      <ul class="filetype-list">
+
+        <li
+          *ngFor="let item of uploadItems"
+        >
+
+          <span class="filetype-list-name">
+            {{ item.file.name }}
+          </span>
+
+
+          <select
+            [(ngModel)]="item.fileTypeId"
+          >
+
+            <option
+              [ngValue]="null"
+              disabled
+            >
+              {{ 'FILES.SELECT_FILE_TYPE' | translate }}
+            </option>
+
+
+            <option
+              *ngFor="let type of fileTypes"
+              [ngValue]="type.id"
+            >
+              {{ type.name }}
+            </option>
+
+          </select>
+
+        </li>
+
+      </ul>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- STEP 4: Security Level -->
+    <!-- ===================================================== -->
+
+    <div
+      class="step-content"
+      *ngIf="currentStep === 4"
+    >
+
+      <label>
+        {{ 'FILES.Securitylevel' | translate }}
+      </label>
+
+
+      <ul
+        class="Securitylevel_List"
+        *ngIf="securitylevels.length > 0"
+      >
+
+        <li
+          *ngFor="let item of uploadItems"
+        >
+
+          <span class="filetype-list-name">
+            {{ item.file.name }}
+          </span>
+
+
+          <select
+            [(ngModel)]="item.securityLevelId"
+          >
+
+            <option
+              [ngValue]="null"
+              disabled
+            >
+              {{ 'FILES.SELECT_FILE_SECURITYLEVEL' | translate }}
+            </option>
+
+
+            <option
+              *ngFor="let level of securitylevels"
+              [ngValue]="level.id"
+            >
+              {{ level.name }}
+            </option>
+
+          </select>
+
+        </li>
+
+      </ul>
+
+
+      <p
+        *ngIf="securitylevels.length === 0"
+        class="empty-state"
+      >
+        {{ 'FILES.NO_SECURITY_LEVELS' | translate }}
+      </p>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- STEP 5: Preview -->
+    <!-- ===================================================== -->
+
+    <div
+      class="step-content"
+      *ngIf="currentStep === 5"
+    >
+
+      <!-- Departments -->
+      <label>
+        {{ 'FILES.STEP_DEPARTMENTS' | translate }}
+      </label>
+
+
+      <div class="preview-tags">
+
+        <span
+          class="tag"
+          *ngFor="let deptId of selectedDepartmentIds"
+        >
+          {{ getDepartmentName(deptId) }}
+        </span>
+
+      </div>
+
+
+      <!-- Security Level -->
+      <label>
+        {{ 'FILES.SELECT_FILE_SECURITYLEVEL' | translate }}
+      </label>
+
+
+      <div class="preview-tags">
+
+        <span
+          class="tag"
+          *ngFor="let item of uploadItems"
+        >
+          {{ getSecurityLevelName(item.securityLevelId) }}
+        </span>
+
+      </div>
+
+
+      <!-- Files -->
+      <label>
+        {{ 'FILES.STEP_FILES' | translate }}
+      </label>
+
+
+      <ul class="preview-list">
+
+        <li
+          *ngFor="let item of uploadItems"
+        >
+
+          <span class="preview-file-name">
+            {{ item.file.name }}
+          </span>
+
+
+          <span class="preview-file-type">
+            {{ getFileTypeName(item.fileTypeId) }}
+          </span>
+
+
+          <span
+            class="preview-file-type"
+            *ngIf="item.securityLevelId != null"
+          >
+            ({{ getSecurityLevelName(item.securityLevelId) }})
+          </span>
+
+        </li>
+
+      </ul>
+
+    </div>
+
+
+    <!-- ===================================================== -->
+    <!-- Modal Actions -->
+    <!-- ===================================================== -->
+
+    <div class="modal-actions">
+
+      <!-- Cancel -->
+      <button
+        class="cancel-btn"
+
+        (click)="onClose()"
+
+        [disabled]="isUploading"
+      >
+        {{ 'COMMON.CANCEL' | translate }}
+      </button>
+
+
+      <!-- Back -->
+      <button
+        *ngIf="currentStep > 1"
+
+        class="back-btn"
+
+        (click)="onPrevStep()"
+
+        [disabled]="isUploading"
+      >
+        {{ 'COMMON.BACK' | translate }}
+      </button>
+
+
+      <!-- Next -->
+      <button
+        *ngIf="currentStep < totalSteps"
+
+        class="confirm-btn"
+
+        (click)="onNextStep()"
+
+        [disabled]="!canGoNext()"
+      >
+        {{ 'COMMON.NEXT' | translate }}
+      </button>
+
+
+      <!-- Upload -->
+      <button
+        *ngIf="currentStep === totalSteps"
+
+        class="confirm-btn"
+
+        (click)="onSubmit()"
+
+        [disabled]="!canSubmitUpload"
+      >
+
+        {{
+          (
+            isUploading
+              ? 'COMMON.UPLOADING'
+              : 'COMMON.UPLOAD'
+          ) | translate
+        }}
+
+      </button>
+
+    </div>
+
+  </div>
+</div>
