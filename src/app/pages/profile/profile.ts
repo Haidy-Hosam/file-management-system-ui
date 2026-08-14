@@ -58,17 +58,19 @@ export class ProfileComponent implements OnInit {
 
     this.loadProfile();
     this.loadFiles();
+    this.loadSentForwards();
+    this.loadReceivedForwards();
   }
 
   get isOwnProfile(): boolean {
     return this.userId === null;
   }
 
-  setTab(tab: ProfileTab): void {
-    this.activeTab = tab;
-    if (tab === 'SENT' && !this.sentLoaded) this.loadSentForwards();
-    if (tab === 'RECEIVED' && !this.receivedLoaded) this.loadReceivedForwards();
-  }
+ setTab(tab: ProfileTab): void {
+   this.activeTab = tab;
+  //  if (tab === 'SENT' && !this.sentLoaded) this.loadSentForwards();
+  //  if (tab === 'RECEIVED' && !this.receivedLoaded) this.loadReceivedForwards();
+ }
 
   loadSentForwards(): void {
   this.sentLoading = true;

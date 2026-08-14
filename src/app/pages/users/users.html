@@ -52,10 +52,7 @@
             <i class="bi bi-pencil me-2"></i>{{ 'COMMON.EDIT' | translate }}
           </button>
           <button (click)="toggleStatus(user)">
-            <i class="bi" [ngClass]="user.isDeleted ? 'bi-check-circle' : 'bi-slash-circle'" class="me-2"></i>{{ user.isDeleted ? ('COMMON.ACTIVATE' | translate) : ('COMMON.DEACTIVATE' | translate) }}
-          </button>
-          <button class="danger" (click)="deleteUser(user)">
-            <i class="bi bi-trash me-2"></i>{{ 'COMMON.DELETE' | translate }}
+            <i class="bi" [ngClass]="user.deleted ? 'bi-check-circle' : 'bi-slash-circle'" class="me-2"></i>{{ user.deleted ? ('COMMON.ACTIVATE' | translate) : ('COMMON.DEACTIVATE' | translate) }}
           </button>
         </div>
       </div>
@@ -83,8 +80,8 @@
       </div>
 
       <div class="card-footer">
-        <span class="status-badge" [ngClass]="user.isDeleted ? 'inactive' : 'active'">
-          {{ user.isDeleted ? ('USERS.INACTIVE' | translate) : ('USERS.ACTIVE' | translate) }}
+        <span class="status-badge" [ngClass]="user.deleted ? 'inactive' : 'active'">
+          {{ user.deleted ? ('USERS.INACTIVE' | translate) : ('USERS.ACTIVE' | translate) }}
         </span>
         <div class="footer-icons">
 
@@ -107,7 +104,7 @@
     <p><strong>{{ 'USERS.DEPARTMENT' | translate }}:</strong> {{ viewUser?.departmentName }}</p>
     <p><strong>{{ 'USERS.FILES' | translate }}:</strong> {{ viewUser?.filesCount ?? '—' }}</p>
     <p><strong>{{ 'USERS.LAST_LOGIN' | translate }}:</strong> {{ viewUser?.lastLogin ? (viewUser?.lastLogin | date:'short') : '—' }}</p>
-    <p><strong>{{ 'DASHBOARD.STATUS' | translate }}:</strong> {{ viewUser?.isDeleted ? ('USERS.INACTIVE' | translate) : ('USERS.ACTIVE' | translate) }}</p>
+    <p><strong>{{ 'DASHBOARD.STATUS' | translate }}:</strong> {{ viewUser?.deleted ? ('USERS.INACTIVE' | translate) : ('USERS.ACTIVE' | translate) }}</p>
     <div class="modal-actions">
       <button class="cancel-btn" (click)="closeViewModal()">{{ 'COMMON.CLOSE' | translate }}</button>
     </div>

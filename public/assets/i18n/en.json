@@ -272,7 +272,16 @@
     "SIZE": "Size",
     "MODIFIED": "Modified",
     "PAGE": "Page",
-    "OF": "of"
+    "OF": "of",
+    "TO": "To",
+    "MESSAGE": "Message",
+    "FORWARDED_AT":"Forwarded at",
+    "FILE": "File",
+    "SENT": "Sent",
+    "RECEIVED":"Received",
+    "FROM":"From"
+
+
   },
   "ROLES": {
     "USERS_COUNT": "users",

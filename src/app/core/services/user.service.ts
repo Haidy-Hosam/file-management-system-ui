@@ -9,7 +9,7 @@ export interface UserResponse {
   email: string;
   role: string;
   departmentName: string;
-  isDeleted: boolean;
+  deleted: boolean;
   filesCount?: number;
   lastLogin?: string;
 }
@@ -63,15 +63,17 @@ export class UserService {
     return this.http.post<UserResponse>(this.baseUrl, request);
   }
 
-  deleteUser(id: number): Observable<void> {
-    return this.http.delete<void>(`${this.baseUrl}/${id}`);
-  }
+  // deleteUser(id: number): Observable<void> {
+  //   return this.http.delete<void>(`${this.baseUrl}/${id}`);
+  // }
  getMyProfile(): Observable<UserResponse> {
   return this.http.get<UserResponse>(`${this.baseUrl}/profile`);
 }
 updateUser(id: number, request: UpdateUserRequest): Observable<UserResponse> {
   return this.http.put<UserResponse>(`${this.baseUrl}/${id}`, request);
 }
+
+//Soft delete
 
 toggleStatus(id: number): Observable<UserResponse> {
   return this.http.patch<UserResponse>(`${this.baseUrl}/${id}/status`, {});

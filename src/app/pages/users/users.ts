@@ -128,18 +128,18 @@ export class Users implements OnInit {
     return colors[index];
   }
 
-  deleteUser(user: UserResponse): void {
-    if (!confirm(`Delete user "${user.name}"? This cannot be undone.`)) return;
+  // deleteUser(user: UserResponse): void {
+  //   if (!confirm(`Delete user "${user.name}"? This cannot be undone.`)) return;
 
-    this.userService.deleteUser(user.u_id).subscribe({
-      next: () => this.loadUsers(),
-      error: (err: HttpErrorResponse) => {
-        this.errorMessage = 'Delete failed. You may not have permission.';
-        console.error('Delete failed:', err.status, err.error);
-      }
-    });
-    this.closeMenu();
-  }
+  //   this.userService.deleteUser(user.u_id).subscribe({
+  //     next: () => this.loadUsers(),
+  //     error: (err: HttpErrorResponse) => {
+  //       this.errorMessage = 'Delete failed. You may not have permission.';
+  //       console.error('Delete failed:', err.status, err.error);
+  //     }
+  //   });
+  //   this.closeMenu();
+  // }
 
   toggleStatus(user: UserResponse): void {
     this.userService.toggleStatus(user.u_id).subscribe({

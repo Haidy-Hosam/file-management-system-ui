@@ -114,7 +114,7 @@
         </tr>
       </thead>
       <tbody>
-<tr *ngFor="let fwd of receivedForwards" (click)="openReceivedForward(fwd)" class="clickable-row">          <td class="file-name">{{ fwd.fileName }}</td>
+<tr *ngFor="let fwd of sentForwards" (click)="openReceivedForward(fwd)" class="clickable-row">          <td class="file-name">{{ fwd.fileName }}</td>
           <td>{{ fwd.recipientName }}</td>
           <td class="message-cell">{{ fwd.message || '—' }}</td>
           <td>{{ fwd.forwardedAt | date:'short' }}</td>
