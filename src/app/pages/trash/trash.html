@@ -1,13 +1,14 @@
 <div class="trash-page">
   <div class="page-header d-flex align-items-center justify-content-between">
     <div>
-      <a routerLink="/files" class="back-link mb-2 d-inline-flex align-items-center gap-1">
+      <!-- <a routerLink="/files" class="back-link mb-2 d-inline-flex align-items-center gap-1">
         <svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2">
           <line x1="19" y1="12" x2="5" y2="12"></line>
           <polyline points="12 19 5 12 12 5"></polyline>
         </svg>
         {{ 'TRASH.BACK_TO_FILES' | translate }}
-      </a>
+      </a> -->
+      <app-back-button></app-back-button>
       <div class="d-flex align-items-center gap-2">
         <div class="trash-header-icon">
           <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2">
@@ -23,7 +24,7 @@
     </div>
 
     <button
-      *ngIf="deletedFiles.length > 0"
+      *ngIf="deletedFiles.content.length > 0"
       class="btn btn-outline-danger d-flex align-items-center gap-2"
       (click)="clearAllTrash()"
     >
@@ -65,7 +66,7 @@
   </div>
 
   <!-- Trash File Table -->
-  <div class="table-container shadow-sm rounded bg-white" *ngIf="filteredFiles.length > 0; else emptyState">
+  <div class="table-container shadow-sm rounded bg-white" *ngIf="filteredFiles.content.length > 0; else emptyState">
     <table class="table table-hover align-middle mb-0">
       <thead>
         <tr>
@@ -80,12 +81,12 @@
           <th>{{ 'TRASH.COL_NAME' | translate }}</th>
           <th>{{ 'TRASH.COL_DEPTS' | translate }}</th>
           <th>{{ 'TRASH.COL_SIZE' | translate }}</th>
-          <th>{{ 'TRASH.COL_DATE_DELETED' | translate }}</th>
+          <!-- <th>{{ 'TRASH.COL_DATE_DELETED' | translate }}</th> -->
           <th class="text-end">{{ 'TRASH.COL_ACTIONS' | translate }}</th>
         </tr>
       </thead>
       <tbody>
-        <tr *ngFor="let file of filteredFiles">
+        <tr *ngFor="let file of filteredFiles.content">
           <td>
             <input
               type="checkbox"
@@ -110,9 +111,6 @@
             <span *ngIf="!file.departmentNames || file.departmentNames.length === 0" class="text-muted small">-</span>
           </td>
           <td>{{ file.size || ('COMMON.NA' | translate) }}</td>
-          <td>
-            <span class="text-muted small">{{ file.deletedDate }}</span>
-          </td>
           <td class="text-end">
             <div class="d-inline-flex gap-2">
               <button
@@ -136,6 +134,11 @@
         </tr>
       </tbody>
     </table>
+    <div class="pagination" *ngIf="sentLoading && !sentError && filteredFiles.totalPages > 1">
+      <button (click)="prevPage()" [disabled]="page === 0">{{ 'COMMON.PREVIOUS' | translate }}</button>
+      <span>{{ 'PROFILE.PAGE' | translate }} {{ page + 1 }} {{ 'PROFILE.OF' | translate }} {{ filteredFiles.totalPages }}</span>
+      <button (click)="nextPage()" [disabled]="page + 1 >= filteredFiles.totalPages">{{ 'COMMON.NEXT' | translate }}</button>
+    </div>
   </div>
 
   <!-- Empty State -->

@@ -79,6 +79,10 @@ export class Dashboard implements OnInit {
         this.totalFiles = response.totalDocuments;
         this.pendingCount = response.pendingReviews;
         this.approvedCount = response.approvedArchives;
+        this.rejectedCount =
+          (response as any).rejectedCount ??
+          (response as any).rejectedDocuments ??
+          Math.max(0, response.totalDocuments - (response.approvedArchives + response.pendingReviews));
         this.totalDepartments = response.activeDepartments;
       },
       error: (error) => {
@@ -152,6 +156,19 @@ export class Dashboard implements OnInit {
   get strokeDashArrayPending(): string {
     const p = this.pendingPercent;
     return `${p} ${100 - p}`;
+  }
+
+  get strokeDashOffsetPending(): number {
+    return -this.approvedPercent;
+  }
+
+  get strokeDashArrayRejected(): string {
+    const p = this.rejectedPercent;
+    return `${p} ${100 - p}`;
+  }
+
+  get strokeDashOffsetRejected(): number {
+    return -(this.approvedPercent + this.pendingPercent);
   }
 
   getFileIcon(ext: string): string {

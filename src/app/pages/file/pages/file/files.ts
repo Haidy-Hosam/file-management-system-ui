@@ -27,6 +27,7 @@ import { FileTable } from '../../components/file/file-table/file-table';
 import { FileUpload } from '../../components/file/file-upload/file-upload';
 import { FileEditDialog } from '../../components/file/file-edit-status/file-edit-dialog';
 import { FilePreview } from '../../components/file/file-preview/file-preview';
+import { BackButton } from "../../../../core/back-button/back-button";
 
 interface AdvancedFilters {
   departments: Set<string>;
@@ -53,8 +54,9 @@ interface AdvancedFilters {
     FileTable,
     FileUpload,
     FileEditDialog,
-    FilePreview
-  ],
+    FilePreview,
+    BackButton
+],
   templateUrl: './files.html',
   styleUrl: './files.css',
 })
@@ -84,8 +86,18 @@ export class Files implements OnInit {
     return this.authService.getRole() === 'ADMIN';
   }
 
+  loadTrashCount(){
+    this.trashService.gettrashCount().subscribe({
+     next:(cont)=>{
+        this.count = cont;
+     }
+    })
+     
+  }
+
+  count:number = 0
   get trashCount(): number {
-    return this.trashService.trashCount;
+    return this.count; 
   }
 
   // Backend pagination parameters
@@ -159,8 +171,9 @@ export class Files implements OnInit {
     });
   }
 
-  /////////////////////////////
+
   ngOnInit(): void {
+    this.loadTrashCount();
     this.setSecurityLevelsArr();
     this.searchTrigger$
       .pipe(
@@ -733,12 +746,13 @@ export class Files implements OnInit {
     if (!confirm(`Delete "${file.name}"?`)) return;
 
     const rejectedFile: FileResponse = { ...file, status: 'REJECTED' };
-    this.trashService.moveToTrash(rejectedFile);
-
+    
     this.fileService.updateFileStatus(file.id, 'REJECTED').subscribe({
       next: () => {
         this.fileService.deleteFile(file.id).subscribe({
-          next: () => this.loadFiles(),
+          next: () => {this.loadFiles();
+            this.trashService.moveToTrash(rejectedFile);
+          },
           error: () => this.loadFiles(),
         });
       },

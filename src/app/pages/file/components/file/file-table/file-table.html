@@ -202,6 +202,14 @@
 
       </td>
 
+          <button class = "EditStatusbtn"
+            *appHasPermission="['Files','UPDATE']"
+            (click)="onOpenStatus(file)">
+
+            {{ 'FILES.EDIT_STATUS' | translate }}
+
+          </button>
+
 
       <td class="col-actions">
 
@@ -243,21 +251,21 @@
           </button>
 
 
-          <button
+          <!-- <button
             (click)="onForwardFile(file)">
 
             {{ 'COMMON.FORWARD' | translate }}
 
-          </button>
+          </button> -->
 
 
-          <button
+          <!-- <button
             *appHasPermission="['Files','UPDATE']"
             (click)="onOpenStatus(file)">
 
             {{ 'FILES.EDIT_STATUS' | translate }}
 
-          </button>
+          </button> -->
 
 
           <button

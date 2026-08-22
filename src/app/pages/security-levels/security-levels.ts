@@ -4,11 +4,12 @@ import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import { SecuritylevelService } from '../../core/services/securitylevel.service';
 import { SecurityLevel } from '../../core/models/SecurityLevel.model';
+import { BackButton } from "../../core/back-button/back-button";
 
 @Component({
   selector: 'app-security-levels',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslatePipe],
+  imports: [CommonModule, FormsModule, TranslatePipe, BackButton],
   templateUrl: './security-levels.html',
   styleUrl: './security-levels.css',
 })

@@ -9,11 +9,12 @@ import { DepartmentService } from '../../core/services/department.service';
 import { Role } from '../../core/models/role.model';
 import { Department } from '../../core/models/department.model';
 import { TranslatePipe } from '@ngx-translate/core';
+import { BackButton } from "../../core/back-button/back-button";
 
 @Component({
   selector: 'app-users',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterModule, TranslatePipe],
+  imports: [CommonModule, FormsModule, RouterModule, TranslatePipe, BackButton],
   templateUrl: './users.html',
   styleUrl: './users.css'
 })
@@ -39,16 +40,16 @@ export class Users implements OnInit {
 
   ngOnInit(): void {
     this.loadUsers();
-    this.loadRoles();
+    //this.loadRoles();
     this.loadDepartments();
   }
 
-  loadRoles(): void {
-    this.roleService.getAllRoles().subscribe({
-      next: (roles: Role[]) => this.roles = roles,
-      error: (err: HttpErrorResponse) => console.error('Failed to load roles:', err.status, err.error)
-    });
-  }
+  // loadRoles(): void {
+  //   this.roleService.getAllRoles().subscribe({
+  //     next: (roles: Role[]) => this.roles = roles,
+  //     error: (err: HttpErrorResponse) => console.error('Failed to load roles:', err.status, err.error)
+  //   });
+  // }
 
   loadDepartments(): void {
     this.departmentService.getLookupDepartments().subscribe({

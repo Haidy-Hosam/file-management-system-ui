@@ -12,37 +12,7 @@
     </div>
 
     <div class="d-flex align-items-center gap-3 flex-wrap">
-      <!-- Period Selector -->
-      <div class="period-selector btn-group p-1 bg-white border rounded-pill shadow-sm">
-        <button
-          class="btn btn-sm rounded-pill px-3"
-          [class.active]="selectedPeriod === 'TODAY'"
-          (click)="setPeriod('TODAY')"
-        >
-          {{ 'DASHBOARD.TODAY' | translate }}
-        </button>
-        <button
-          class="btn btn-sm rounded-pill px-3"
-          [class.active]="selectedPeriod === 'WEEK'"
-          (click)="setPeriod('WEEK')"
-        >
-          {{ 'DASHBOARD.THIS_WEEK' | translate }}
-        </button>
-        <button
-          class="btn btn-sm rounded-pill px-3"
-          [class.active]="selectedPeriod === 'MONTH'"
-          (click)="setPeriod('MONTH')"
-        >
-          {{ 'DASHBOARD.THIS_MONTH' | translate }}
-        </button>
-        <button
-          class="btn btn-sm rounded-pill px-3"
-          [class.active]="selectedPeriod === 'ALL'"
-          (click)="setPeriod('ALL')"
-        >
-          {{ 'DASHBOARD.ALL_TIME' | translate }}
-        </button>
-      </div>
+     
 
       <!-- Quick Action Buttons -->
       <div class="d-flex gap-2">
@@ -138,7 +108,37 @@
       </div>
     </div>
   </div>
-
+   <!-- Period Selector -->
+      <div class="period-selector btn-group p-1 bg-white border rounded-pill shadow-sm">
+        <button
+          class="btn btn-sm rounded-pill px-3"
+          [class.active]="selectedPeriod === 'TODAY'"
+          (click)="setPeriod('TODAY')"
+        >
+          {{ 'DASHBOARD.TODAY' | translate }}
+        </button>
+        <button
+          class="btn btn-sm rounded-pill px-3"
+          [class.active]="selectedPeriod === 'WEEK'"
+          (click)="setPeriod('WEEK')"
+        >
+          {{ 'DASHBOARD.THIS_WEEK' | translate }}
+        </button>
+        <button
+          class="btn btn-sm rounded-pill px-3"
+          [class.active]="selectedPeriod === 'MONTH'"
+          (click)="setPeriod('MONTH')"
+        >
+          {{ 'DASHBOARD.THIS_MONTH' | translate }}
+        </button>
+        <button
+          class="btn btn-sm rounded-pill px-3"
+          [class.active]="selectedPeriod === 'ALL'"
+          (click)="setPeriod('ALL')"
+        >
+          {{ 'DASHBOARD.ALL_TIME' | translate }}
+        </button>
+      </div>
   <!-- Analytics & Visualizations Section -->
   <div class="row g-3 mb-4">
     <!-- Chart 1: Document Status Breakdown (Donut Chart) -->
@@ -162,12 +162,37 @@
             />
             <!-- Segment: Approved -->
             <path
+              *ngIf="approvedPercent > 0"
               class="donut-segment segment-approved"
               [attr.stroke-dasharray]="strokeDashArrayApproved"
               stroke-dashoffset="0"
               d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
               fill="none"
               stroke="#10b981"
+              stroke-width="3.8"
+              stroke-linecap="round"
+            />
+            <!-- Segment: Pending -->
+            <path
+              *ngIf="pendingPercent > 0"
+              class="donut-segment segment-pending"
+              [attr.stroke-dasharray]="strokeDashArrayPending"
+              [attr.stroke-dashoffset]="strokeDashOffsetPending"
+              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+              fill="none"
+              stroke="#f59e0b"
+              stroke-width="3.8"
+              stroke-linecap="round"
+            />
+            <!-- Segment: Rejected -->
+            <path
+              *ngIf="rejectedPercent > 0"
+              class="donut-segment segment-rejected"
+              [attr.stroke-dasharray]="strokeDashArrayRejected"
+              [attr.stroke-dashoffset]="strokeDashOffsetRejected"
+              d="M18 2.0845 a 15.9155 15.9155 0 0 1 0 31.831 a 15.9155 15.9155 0 0 1 0 -31.831"
+              fill="none"
+              stroke="#ef4444"
               stroke-width="3.8"
               stroke-linecap="round"
             />

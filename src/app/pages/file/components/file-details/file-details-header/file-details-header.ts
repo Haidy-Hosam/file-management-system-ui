@@ -2,6 +2,7 @@ import { CommonModule } from '@angular/common';
 import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { TranslatePipe } from '@ngx-translate/core';
 import { FileResponse } from '../../../services/file.service';
+import { BackButton } from "../../../../../core/back-button/back-button";
 
 type TabId = 'overview' | 'activity' | 'permissions' | 'approval';
 
@@ -10,8 +11,9 @@ type TabId = 'overview' | 'activity' | 'permissions' | 'approval';
   standalone: true,
   imports: [
     CommonModule,
-    TranslatePipe
-  ],
+    TranslatePipe,
+    BackButton
+],
   templateUrl: './file-details-header.html',
   styleUrl: './file-details-header.css'
 })

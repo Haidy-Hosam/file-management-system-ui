@@ -2,6 +2,19 @@
   width: 100%;
   border-collapse: collapse;
 }
+.EditStatusbtn{
+    display: inline-flex;
+    align-items: center;
+    padding: 0.55rem 1rem;
+    border-radius: 8px;
+    font-size: 0.70rem;
+    cursor: pointer;
+    white-space: nowrap;
+    background: #2563eb;
+    color: white;
+    border: none;
+    font-weight: 600;
+}
 
 .files-table th {
   text-align: left;

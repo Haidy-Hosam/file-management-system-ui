@@ -1,13 +1,13 @@
 <div class="top-row">
 
-  <button
+  <!-- <button
     class="link-btn"
     (click)="goBack()"
   >
     <span class="icon">←</span>
     {{ 'FILE_DETAILS.BACK_TO_FILES' | translate }}
-  </button>
-
+  </button> -->
+  <app-back-button></app-back-button>
 
   <div class="actions">
 
@@ -21,7 +21,7 @@
 
 
     <button
-      class="btn btn-outline"
+      class="btn btn-primary"
       (click)="downloadFile()"
     >
       <span class="icon">⬇</span>
@@ -29,13 +29,13 @@
     </button>
 
 
-    <button
+    <!-- <button
       class="btn btn-primary"
       (click)="editFile()"
     >
       <span class="icon">✎</span>
       {{ 'COMMON.EDIT' | translate }}
-    </button>
+    </button> -->
 
   </div>
 

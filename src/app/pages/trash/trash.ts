@@ -1,31 +1,68 @@
 import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { RouterLink } from '@angular/router';
 import { TrashService, TrashItem } from '../../core/services/trash.service';
-import { AuthService } from '../../core/services/auth.service';
 import { TranslatePipe } from '@ngx-translate/core';
-import { PermissionsService } from '../../core/services/permissions.service';
+import { BackButton } from "../../core/back-button/back-button";
+import { PageResponse } from '../file/models/file.model';
+import { HttpErrorResponse } from '@angular/common/http';
 
 @Component({
   selector: 'app-trash',
   standalone: true,
-  imports: [CommonModule, FormsModule, RouterLink, TranslatePipe],
+  imports: [CommonModule, FormsModule, RouterLink, TranslatePipe, BackButton],
   templateUrl: './trash.html',
   styleUrl: './trash.css',
 })
 export class Trash implements OnInit {
-  deletedFiles: TrashItem[] = [];
-  filteredFiles: TrashItem[] = [];
+
+  deletedFiles !: PageResponse<TrashItem>;
+  filteredFiles : PageResponse<TrashItem> = {
+  content: [],
+  totalPages: 0,
+  totalElements: 0,
+  size: 10,
+  number: 0,
+  first: false,
+  last: false,
+  // أي properties إجبارية تانية موجودة في PageResponse حطيها هنا
+};;
   searchTerm = '';
   selectedIds = new Set<number>();
   errorMessage = '';
 
   constructor(
     private trashService: TrashService,
-    private permissionsService: PermissionsService,
-    private router:Router
   ) {}
+  
+  page:number = 0;
+  size:number = 10;
+  totalPages = 0;
+  totalElements = 0;
+
+  sentLoading = false;
+  sentError: string | null = null;
+
+
+  loadDeletedItems(){
+    this.sentLoading = true;
+      this.sentError = null;
+     this.trashService.listDeletedFiles(this.page,this.size).subscribe({
+      next: (data) => {
+        this.deletedFiles = data;
+        this.filteredFiles = data;
+        this.totalPages = this.deletedFiles.totalPages;
+        this.totalElements = this.deletedFiles.totalElements;
+        },
+    error: (err: HttpErrorResponse) => {
+     this.sentError = err.status === 404
+        ? "You don't have permission to view this."
+        : 'Could not load sent files.';
+      this.sentLoading = false;
+    }
+    })
+  }
 
   ngOnInit(): void {
     //  if (this.permissionsService.has('files','DELETE')) {
@@ -33,24 +70,43 @@ export class Trash implements OnInit {
     //    return;
     //  }
 
-    this.trashService.trash$.subscribe((items) => {
-      this.deletedFiles = items;
-      this.applyFilter();
-    });
+   this.loadDeletedItems();
+  
+  }
+
+  nextPage(): void {
+   
+     
+      if (this.page + 1 < this.totalPages) {
+        this.page++;
+         
+         this.loadDeletedItems();
+      }
+    
+  }
+
+  prevPage(): void {
+    if (this.page > 0) {
+      this.page--;
+      this.loadDeletedItems();
+  
+    }
   }
 
   applyFilter(): void {
     if (!this.searchTerm.trim()) {
-      this.filteredFiles = [...this.deletedFiles];
+      this.filteredFiles.content = [...this.deletedFiles.content];
     } else {
       const term = this.searchTerm.toLowerCase();
-      this.filteredFiles = this.deletedFiles.filter(
+      this.filteredFiles.content = this.deletedFiles.content.filter(
         (f) =>
           f.name.toLowerCase().includes(term) ||
           f.fileType?.toLowerCase().includes(term) ||
           f.departmentNames?.some((d) => d.toLowerCase().includes(term))
       );
     }
+    this.filteredFiles.totalElements = this.deletedFiles.totalElements;
+    this.filteredFiles.totalPages = this.deletedFiles.totalPages;
   }
 
   onSearchChange(): void {
@@ -60,7 +116,7 @@ export class Trash implements OnInit {
   toggleSelectAll(event: Event): void {
     const checked = (event.target as HTMLInputElement).checked;
     if (checked) {
-      this.filteredFiles.forEach((f) => this.selectedIds.add(f.id));
+      this.filteredFiles.content.forEach((f) => this.selectedIds.add(f.id));
     } else {
       this.selectedIds.clear();
     }
@@ -76,8 +132,8 @@ export class Trash implements OnInit {
 
   isAllSelected(): boolean {
     return (
-      this.filteredFiles.length > 0 &&
-      this.filteredFiles.every((f) => this.selectedIds.has(f.id))
+      this.filteredFiles.content.length > 0 &&
+      this.filteredFiles.content.every((f) => this.selectedIds.has(f.id))
     );
   }
 

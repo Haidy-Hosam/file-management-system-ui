@@ -1,9 +1,10 @@
 import { Injectable } from '@angular/core';
 import { BehaviorSubject, Observable } from 'rxjs';
-import { FileResponse } from '../../pages/file/services/file.service';
+import { FileResponse, PageResponse } from '../../pages/file/services/file.service';
+import { HttpClient, HttpParams } from '@angular/common/http';
 
 export interface TrashItem extends FileResponse {
-  deletedDate: string;
+  //deletedDate: string;
 }
 
 @Injectable({ providedIn: 'root' })
@@ -12,7 +13,10 @@ export class TrashService {
   private trashSubject = new BehaviorSubject<TrashItem[]>(this.loadFromStorage());
   public trash$: Observable<TrashItem[]> = this.trashSubject.asObservable();
 
-  constructor() {}
+  private baseUrl = 'http://localhost:8080/api/files';
+
+
+  constructor(private http: HttpClient) {}
 
   private loadFromStorage(): TrashItem[] {
     try {
@@ -44,7 +48,7 @@ export class TrashService {
       const trashItem: TrashItem = {
         ...file,
         status: 'REJECTED',
-        deletedDate: new Date().toISOString().split('T')[0],
+       //deletedDate: new Date().toISOString().split('T')[0],
       };
       const updated = [trashItem, ...current];
       this.saveToStorage(updated);
@@ -86,7 +90,24 @@ export class TrashService {
     this.saveToStorage([]);
   }
 
-  get trashCount(): number {
-    return this.trashSubject.value.length;
+   gettrashCount(): Observable<number>{
+    return this.http.get<number>(`${this.baseUrl}/TrashCount`);
   }
+  
+  private buildPageParams(page: number, size: number, sortBy?: string, sortDir?: 'asc' | 'desc'): HttpParams {
+    let params = new HttpParams().set('page', page).set('size', size);
+    if (sortBy) {
+      params = params.set('sortBy', sortBy);
+      if (sortDir) params = params.set('sortDir', sortDir);
+    }
+    return params;
+  }
+
+  deleteFile(fileId: number): Observable<void> {
+    return this.http.delete<void>(`${this.baseUrl}/${fileId}`);
+  }
+  listDeletedFiles(page: number, size: number): Observable<PageResponse<FileResponse>> {
+      const params = this.buildPageParams(page, size);
+      return this.http.get<PageResponse<FileResponse>>(`${this.baseUrl}/trash`, { params });
+    }
 }

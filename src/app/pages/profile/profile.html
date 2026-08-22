@@ -16,11 +16,11 @@
 
     <div class="stat-cards">
       <div class="stat-card">
-        <span class="stat-value">{{ totalElements }}</span>
+        <span class="stat-value">{{ totalElementsFiles }}</span>
         <span class="stat-label">{{ 'PROFILE.MY_FILES' | translate }}</span>
       </div>
       <div class="stat-card" *ngIf="isOwnProfile">
-        <span class="stat-value">{{ sentLoaded ? sentForwards.length : '—' }}</span>
+        <span class="stat-value">{{ sentLoaded ? sentForwards.totalElements : '—' }}</span>
         <span class="stat-label">{{ 'PROFILE.SENT' | translate }}</span>
       </div>
       <div class="stat-card" *ngIf="isOwnProfile">
@@ -86,10 +86,10 @@
       </tbody>
     </table>
 
-    <div class="pagination" *ngIf="!filesLoading && !filesError && totalPages > 1">
+    <div class="pagination" *ngIf="!filesLoading && !filesError && totalPagesFiles > 1">
       <button (click)="prevPage()" [disabled]="page === 0">{{ 'COMMON.PREVIOUS' | translate }}</button>
-      <span>{{ 'PROFILE.PAGE' | translate }} {{ page + 1 }} {{ 'PROFILE.OF' | translate }} {{ totalPages }}</span>
-      <button (click)="nextPage()" [disabled]="page + 1 >= totalPages">{{ 'COMMON.NEXT' | translate }}</button>
+      <span>{{ 'PROFILE.PAGE' | translate }} {{ page + 1 }} {{ 'PROFILE.OF' | translate }} {{ totalPagesFiles }}</span>
+      <button (click)="nextPage()" [disabled]="page + 1 >= totalPagesFiles">{{ 'COMMON.NEXT' | translate }}</button>
     </div>
   </section>
 
@@ -100,11 +100,11 @@
       {{ sentError }}
       <button (click)="loadSentForwards()">{{ 'COMMON.RETRY' | translate }}</button>
     </div>
-    <div class="empty-state" *ngIf="!sentLoading && !sentError && sentForwards.length === 0">
+    <div class="empty-state" *ngIf="!sentLoading && !sentError && sentForwards.content.length === 0">
       {{ 'PROFILE.NO_SENT_YET' | translate }}
     </div>
 
-    <table class="files-table" *ngIf="!sentLoading && !sentError && sentForwards.length > 0">
+    <table class="files-table" *ngIf="!sentLoading && !sentError && sentForwards.content.length > 0">
       <thead>
         <tr>
           <th>{{ 'PROFILE.FILE' | translate }}</th>
@@ -114,13 +114,18 @@
         </tr>
       </thead>
       <tbody>
-<tr *ngFor="let fwd of sentForwards" (click)="openReceivedForward(fwd)" class="clickable-row">          <td class="file-name">{{ fwd.fileName }}</td>
+<tr *ngFor="let fwd of sentForwards.content" (click)="openReceivedForward(fwd)" class="clickable-row">          <td class="file-name">{{ fwd.fileName }}</td>
           <td>{{ fwd.recipientName }}</td>
           <td class="message-cell">{{ fwd.message || '—' }}</td>
           <td>{{ fwd.forwardedAt | date:'short' }}</td>
         </tr>
       </tbody>
     </table>
+    <div class="pagination" *ngIf="!sentLoading && !sentError && sentForwards.totalPages > 1">
+      <button (click)="prevPage()" [disabled]="page === 0">{{ 'COMMON.PREVIOUS' | translate }}</button>
+      <span>{{ 'PROFILE.PAGE' | translate }} {{ page + 1 }} {{ 'PROFILE.OF' | translate }} {{ sentForwards.totalPages }}</span>
+      <button (click)="nextPage()" [disabled]="page + 1 >= sentForwards.totalPages">{{ 'COMMON.NEXT' | translate }}</button>
+    </div>
   </section>
 
   <!-- Received -->

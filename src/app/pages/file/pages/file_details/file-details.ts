@@ -51,7 +51,7 @@ export class FileDetails implements OnInit {
   activeTab: TabId = 'overview';
   tabs: { id: TabId; label: string }[] = [
     { id: 'overview', label: 'Overview' },
-    { id: 'activity', label: 'Activity' },
+    // { id: 'activity', label: 'Activity' },
     { id: 'approval', label: 'Approval' },
   ];
 
@@ -94,9 +94,9 @@ export class FileDetails implements OnInit {
 
   private loadTabData(tab: TabId): void {
     switch (tab) {
-      case 'activity':
-        if (this.activity.length === 0) this.loadActivity();
-        break;
+      // case 'activity':
+      //   if (this.activity.length === 0) this.loadActivity();
+      //   break;
       case 'permissions':
         if (this.permissions.length === 0) this.loadPermissions();
         break;
@@ -113,12 +113,12 @@ export class FileDetails implements OnInit {
     });
   }
 
-  loadActivity(): void {
-    this.fileDetailsService.getActivity(this.fileId).subscribe({
-      next: (activity) => (this.activity = activity),
-      error: () => (this.errorMessage = 'Failed to load activity log.'),
-    });
-  }
+  // loadActivity(): void {
+  //   this.fileDetailsService.getActivity(this.fileId).subscribe({
+  //     next: (activity) => (this.activity = activity),
+  //     error: () => (this.errorMessage = 'Failed to load activity log.'),
+  //   });
+  // }
 
   loadPermissions(): void {
     this.fileDetailsService.getPermissions(this.fileId).subscribe({

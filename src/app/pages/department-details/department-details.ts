@@ -7,12 +7,13 @@ import { formatBytes } from '../../core/utils/format-bytes';
 import { FormsModule } from '@angular/forms';
 import { TranslatePipe } from '@ngx-translate/core';
 import {HasPermissionDirective} from '../../core/directives/has-permission.directive'
+import { BackButton } from "../../core/back-button/back-button";
 
 
 @Component({
   selector: 'app-department-details',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslatePipe, HasPermissionDirective],
+  imports: [CommonModule, FormsModule, TranslatePipe, HasPermissionDirective, BackButton],
   templateUrl: './department-details.html',
   styleUrl: './department-details.css',
 })

@@ -7,7 +7,6 @@ import { FileService, FileResponse, PageResponse } from '../file/services/file.s
 import { FileForwardService } from '../file/services/file-forward.service';
 import { FileForwardResponse } from '../file/models/FileForward.model';
 import { TranslatePipe } from '@ngx-translate/core';
-
 type ProfileTab = 'FILES' | 'SENT' | 'RECEIVED';
 
 @Component({
@@ -32,10 +31,13 @@ export class ProfileComponent implements OnInit {
 
   page = 0;
   size = 10;
-  totalPages = 0;
-  totalElements = 0;
+  totalPagesFiles = 0;
+  totalElementsFiles = 0;
+  totalPagesSent = 0;
+  totalElementsSent = 0;
 
-  sentForwards: FileForwardResponse[] = [];
+
+  sentForwards !: PageResponse<FileForwardResponse>;
   sentLoading = false;
   sentLoaded = false;
   sentError: string | null = null;
@@ -70,13 +72,20 @@ export class ProfileComponent implements OnInit {
    this.activeTab = tab;
   //  if (tab === 'SENT' && !this.sentLoaded) this.loadSentForwards();
   //  if (tab === 'RECEIVED' && !this.receivedLoaded) this.loadReceivedForwards();
+  this.page = 0;
  }
 
   loadSentForwards(): void {
   this.sentLoading = true;
   this.sentError = null;
-  this.fileForwardService.getSentForwards(this.userId ?? undefined).subscribe({
-    next: (data) => { this.sentForwards = data; this.sentLoading = false; this.sentLoaded = true; },
+  this.fileForwardService.getSentForwards(this.userId ?? undefined , this.page , this.size).subscribe({
+    next: (data) => {
+       this.sentForwards = data;
+        this.sentLoading = false;
+         this.sentLoaded = true; 
+         this.totalPagesSent = this.sentForwards.totalPages;
+        this.totalElementsSent = this.sentForwards.totalElements;
+        },
     error: (err: HttpErrorResponse) => {
       this.sentError = err.status === 404
         ? "You don't have permission to view this."
@@ -128,8 +137,8 @@ export class ProfileComponent implements OnInit {
     request$.subscribe({
       next: (result: PageResponse<FileResponse>) => {
         this.files = result.content;
-        this.totalPages = result.totalPages;
-        this.totalElements = result.totalElements;
+        this.totalPagesFiles = result.totalPages;
+        this.totalElementsFiles = result.totalElements;
         this.filesLoading = false;
       },
       error: () => {
@@ -140,16 +149,32 @@ export class ProfileComponent implements OnInit {
   }
 
   nextPage(): void {
-    if (this.page + 1 < this.totalPages) {
-      this.page++;
-      this.loadFiles();
-    }
+   
+      if(this.activeTab == "FILES"){
+         if (this.page + 1 < this.totalPagesFiles) {
+          this.page++;
+          this.loadFiles();
+         }
+      }
+      else if(this.activeTab =="SENT"){
+         if (this.page + 1 < this.totalPagesSent) {
+          this.page++;
+          this.loadSentForwards();
+         }
+      }
+    
   }
 
   prevPage(): void {
     if (this.page > 0) {
       this.page--;
-      this.loadFiles();
+      if(this.activeTab == "FILES"){
+        this.loadFiles();
+      }
+      else if(this.activeTab =="SENT"){
+
+        this.loadSentForwards();
+      }
     }
   }
 

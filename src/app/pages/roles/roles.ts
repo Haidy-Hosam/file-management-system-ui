@@ -10,12 +10,13 @@ import { Permission } from '../../core/models/permission.model';
 import { UserService, UserResponse } from '../../core/services/user.service';
 import { forkJoin } from 'rxjs';
 import { TranslatePipe } from '@ngx-translate/core';
+import { BackButton } from "../../core/back-button/back-button";
 
 
 @Component({
   selector: 'app-roles-permissions',
   standalone: true,
-  imports: [CommonModule, FormsModule, TranslatePipe],
+  imports: [CommonModule, FormsModule, TranslatePipe, BackButton],
   templateUrl: './roles.html',
   styleUrl: './roles.css',
 })

@@ -5,10 +5,10 @@
     <p class="text-danger">{{ 'DEPARTMENT_DETAILS.FAILED_LOAD' | translate }}</p>
   } @else if (department()) {
     <!-- Back link -->
-    <button class="btn btn-link text-decoration-none px-0 mb-3 d-flex align-items-center gap-1" (click)="goBack()">
+    <!-- <button class="btn btn-link text-decoration-none px-0 mb-3 d-flex align-items-center gap-1" (click)="goBack()">
       <i class="bi bi-arrow-left"></i> {{ 'DEPARTMENT_DETAILS.BACK_TO_DEPARTMENTS' | translate }}
-    </button>
-
+    </button> -->
+    <app-back-button></app-back-button>
     <!-- Header card -->
     <div class="card border-0 mb-4 header-card">
       <div class="card-body p-4">
