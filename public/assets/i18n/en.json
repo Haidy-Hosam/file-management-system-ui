@@ -279,9 +279,10 @@
     "FILE": "File",
     "SENT": "Sent",
     "RECEIVED":"Received",
-    "FROM":"From"
-
-
+    "FROM":"From",
+    "ISREAD":"Is read",
+    "UNREAD" : "Unread",
+    "READ": "Read"
   },
   "ROLES": {
     "USERS_COUNT": "users",

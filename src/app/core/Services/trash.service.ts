@@ -70,15 +70,19 @@ export class TrashService {
     }
   }
 
-  restoreFile(fileId: number): TrashItem | null {
-    const current = this.getDeletedFiles();
-    const itemToRestore = current.find((item) => item.id === fileId) ?? null;
-    if (itemToRestore) {
-      const updated = current.filter((item) => item.id !== fileId);
-      this.saveToStorage(updated);
-    }
-    return itemToRestore;
-  }
+  // restoreFile(fileId: number): TrashItem | null {
+  //   const current = this.getDeletedFiles();
+  //   const itemToRestore = current.find((item) => item.id === fileId) ?? null;
+  //   if (itemToRestore) {
+  //     const updated = current.filter((item) => item.id !== fileId);
+  //     this.saveToStorage(updated);
+  //   }
+  //   return itemToRestore;
+  // }
+
+  restoreFile(fileId: number): Observable<void> {
+  return this.http.put<void>(`${this.baseUrl}/restore/${fileId}`, {});
+}
 
   permanentlyDeleteFile(fileId: number): void {
     const current = this.getDeletedFiles();

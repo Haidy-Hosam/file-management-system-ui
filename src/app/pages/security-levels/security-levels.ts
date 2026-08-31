@@ -156,4 +156,12 @@ export class SecurityLevelsComponent implements OnInit {
   dismissError(): void {
     this.errorMessage.set('');
   }
+
+  tierClass(name: string): 'high' | 'medium' | 'low' | 'default' {
+  const n = name?.toLowerCase() ?? '';
+  if (n.includes('high') || n.includes('critical') || n.includes('restrict')) return 'high';
+  if (n.includes('medium') || n.includes('internal')) return 'medium';
+  if (n.includes('low') || n.includes('general') || n.includes('public')) return 'low';
+  return 'default';
+}
 }

@@ -1,63 +1,53 @@
 <div class="sl-page">
   <app-back-button></app-back-button>
-  <!-- Page header -->
+
   <div class="sl-header">
     <div>
       <h1 class="sl-title">{{ 'SECURITY_LEVELS.TITLE' | translate }}</h1>
       <p class="sl-subtitle">{{ 'SECURITY_LEVELS.SUBTITLE' | translate }}</p>
     </div>
     <button class="btn btn-primary" (click)="openCreateModal()">
-      <span>＋</span> {{ 'SECURITY_LEVELS.NEW_LEVEL' | translate }}
+      <i class="bi bi-plus-lg"></i> {{ 'SECURITY_LEVELS.NEW_LEVEL' | translate }}
     </button>
   </div>
 
-  <!-- Success banner -->
-  <div class="alert alert-success" *ngIf="successMessage()">
-    {{ successMessage() | translate }}
-  </div>
-
-  <!-- Error banner -->
+  <div class="alert alert-success" *ngIf="successMessage()">{{ successMessage() | translate }}</div>
   <div class="alert alert-error" *ngIf="errorMessage()">
     {{ errorMessage() | translate }}
     <button class="alert-dismiss" (click)="dismissError()">✕</button>
   </div>
 
-  <!-- Loading -->
   <div class="sl-state-msg" *ngIf="isLoading()">{{ 'COMMON.LOADING' | translate }}</div>
 
-  <!-- Table card -->
-  <div class="sl-card" *ngIf="!isLoading()">
-    <table class="sl-table" *ngIf="levels().length > 0; else emptyState">
-      <thead>
-        <tr>
-          <th>{{ 'SECURITY_LEVELS.COL_ID' | translate }}</th>
-          <th>{{ 'SECURITY_LEVELS.COL_NAME' | translate }}</th>
-        </tr>
-      </thead>
-      <tbody>
-        <tr *ngFor="let level of levels(),let i = index">
-          <td hidden class="cell-id">{{ level.id }}</td>
-          <td class="cell-id">{{ i + 1 }}</td>
-          <td>
-            <span class="level-badge">{{ level.name }}</span>
-          </td>
-          <td class="cell-actions">
-            <button class="action-btn edit-btn" (click)="openEditModal(level)" title="{{ 'COMMON.EDIT' | translate }}">
-              <i class="bi bi-pencil-fill"></i>
-            </button>
-            <button class="action-btn delete-btn" (click)="openDeleteModal(level)" title="{{ 'COMMON.DELETE' | translate }}">
-              <i class="bi bi-trash3-fill"></i>
-            </button>
-          </td>
-        </tr>
-      </tbody>
-    </table>
+  <div class="sl-list" *ngIf="!isLoading()">
+    <ng-container *ngIf="levels().length > 0; else emptyState">
+      <div class="sl-row" *ngFor="let level of levels(); let i = index" [class]="'tier-' + tierClass(level.name)">
+        <div class="sl-row-main">
+          <span class="tier-dot"></span>
+          <span class="sl-name">{{ level.name }}</span>
+          <span class="tier-tag">{{ tierClass(level.name) === 'high' ? 'Restricted' : tierClass(level.name) === 'medium' ? 'Internal' : tierClass(level.name) === 'low' ? 'General' : 'Custom' }}</span>
+        </div>
+        <div class="sl-row-actions">
+          <button class="action-btn edit-btn" (click)="openEditModal(level)" [title]="'COMMON.EDIT' | translate">
+            <i class="bi bi-pencil-fill"></i>
+          </button>
+          <button class="action-btn delete-btn" (click)="openDeleteModal(level)" [title]="'COMMON.DELETE' | translate">
+            <i class="bi bi-trash3-fill"></i>
+          </button>
+        </div>
+      </div>
+    </ng-container>
 
     <ng-template #emptyState>
-      <div class="sl-state-msg">{{ 'SECURITY_LEVELS.NO_LEVELS' | translate }}</div>
+      <div class="sl-empty">
+        <i class="bi bi-shield-lock sl-empty-icon"></i>
+        <p class="sl-empty-title">{{ 'SECURITY_LEVELS.NO_LEVELS' | translate }}</p>
+        <button class="btn btn-primary" (click)="openCreateModal()">
+          <i class="bi bi-plus-lg"></i> {{ 'SECURITY_LEVELS.NEW_LEVEL' | translate }}
+        </button>
+      </div>
     </ng-template>
   </div>
-
 </div>
 
 <!-- ══════════════════════════════════

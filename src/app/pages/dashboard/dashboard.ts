@@ -8,6 +8,7 @@ import { Department } from '../../core/models/department.model';
 import { TrashService } from '../../core/services/trash.service';
 import { AuthService } from '../../core/services/auth.service';
 import { DashboardService } from '../../core/services/dashboard.service';
+import { UserService } from '../../core/services/user.service';
 import { DashboardStatistics } from '../../core/models/DashboardStatistics';
 import { TranslatePipe } from '@ngx-translate/core';
 
@@ -27,7 +28,7 @@ interface MonthlyActivity {
 export class Dashboard implements OnInit {
   Math = Math;
   isLoading = true;
-  userEmail = '';
+  userName = '';
   userRole = '';
   greetingKey = 'DASHBOARD.GOOD_MORNING';
 
@@ -61,15 +62,31 @@ export class Dashboard implements OnInit {
     private departmentService: DepartmentService,
     private trashService: TrashService,
     private authService: AuthService,
-    private dashboardService: DashboardService
+    private dashboardService: DashboardService,
+    private userService: UserService
+
   ) {}
 
   ngOnInit(): void {
-    this.userEmail = this.authService.getDecodedToken()?.sub ?? 'User';
+    // this.userEmail = this.authService.getDecodedToken()?.sub ?? 'User';
     this.userRole = this.authService.getRole() ?? 'USER';
     this.greetingKey = this.computeGreeting();
     this.loadDashboardData();
     this.getStatistics();
+    this.loadCurrentUser();
+
+  }
+
+  loadCurrentUser(): void {
+    this.userService.getMyProfile().subscribe({
+      next: (profile) => {
+        this.userName = profile.name;
+      },
+      error: () => {
+        // fallback to token email if the profile call fails
+        this.userName = this.authService.getDecodedToken()?.sub ?? 'User';
+      },
+    });
   }
 
   getStatistics(): void {
@@ -99,10 +116,17 @@ export class Dashboard implements OnInit {
   }
 
   loadDashboardData(): void {
-  this.isLoading = true;
-  this.trashCount = this.trashService.trashCount;
+ this.isLoading = true;
 
-  // CHANGED: getAllFiles(0, 50) → listFiles(0, 50)
+  this.trashService.gettrashCount().subscribe({
+    next: (count) => {
+      this.trashCount = count;
+    },
+    error: () => {
+      this.trashCount = 0;
+    },
+  });
+
   this.fileService.listFiles(0, 50).subscribe({
     next: (res) => {
       const files = res.content || [];

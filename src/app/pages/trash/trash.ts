@@ -7,6 +7,7 @@ import { TranslatePipe } from '@ngx-translate/core';
 import { BackButton } from "../../core/back-button/back-button";
 import { PageResponse } from '../file/models/file.model';
 import { HttpErrorResponse } from '@angular/common/http';
+import { firstValueFrom } from 'rxjs';
 
 @Component({
   selector: 'app-trash',
@@ -137,16 +138,25 @@ export class Trash implements OnInit {
     );
   }
 
-  restoreSingle(file: TrashItem): void {
-    this.trashService.restoreFile(file.id);
-    this.selectedIds.delete(file.id);
-  }
+restoreSingle(file: TrashItem): void {
+  this.trashService.restoreFile(file.id).subscribe({
+    next: () => this.loadDeletedItems(),
+    error: (err) => console.error('Restore failed', err),
+  });
+}
 
-  restoreSelected(): void {
-    if (this.selectedIds.size === 0) return;
-    this.selectedIds.forEach((id) => this.trashService.restoreFile(id));
-    this.selectedIds.clear();
-  }
+ restoreSelected(): void {
+  if (this.selectedIds.size === 0) return;
+  const ids = Array.from(this.selectedIds);
+  Promise.all(
+    ids.map((id) => firstValueFrom(this.trashService.restoreFile(id)))
+  )
+    .then(() => {
+      this.selectedIds.clear();
+      this.loadDeletedItems();
+    })
+    .catch((err) => console.error('Bulk restore failed', err));
+}
 
   permanentlyDeleteSingle(file: TrashItem): void {
     if (!confirm(`Permanently delete "${file.name}"? This cannot be undone.`)) return;
