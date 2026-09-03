@@ -75,7 +75,7 @@
       </thead>
       <tbody>
         <tr *ngFor="let file of files">
-          <td class="file-name">{{ file.name }}.{{ file.extension }}</td>
+          <td class="file-name">{{ file.name }}</td>
           <td>{{ file.fileType }}</td>
           <td>{{ file.departmentNames.join(', ') || '—' }}</td>
           <td><span class="status-badge" [ngClass]="file.status.toLowerCase()">{{ ('STATUS.' + (file.status | uppercase) | translate) || file.status }}</span></td>

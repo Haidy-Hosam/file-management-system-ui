@@ -183,7 +183,7 @@ export class ProfileComponent implements OnInit {
       const url = window.URL.createObjectURL(blob);
       const a = document.createElement('a');
       a.href = url;
-      a.download = `${file.name}.${file.extension}`;
+      a.download = file.name;
       a.click();
       window.URL.revokeObjectURL(url);
     });
